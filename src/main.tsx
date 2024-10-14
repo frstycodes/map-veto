@@ -1,12 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import { ConvexProvider, ConvexReactClient } from 'convex/react'
+import { ConvexReactClient } from 'convex/react'
 import { ConvexQueryClient } from '@convex-dev/react-query'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
+import { ConvexAuthProvider } from '@convex-dev/auth/react'
+import './index.css'
 
 //region Convex Setup
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL)
@@ -33,11 +34,11 @@ declare module '@tanstack/react-router' {
 function Root() {
   return (
     <StrictMode>
-      <ConvexProvider client={convex}>
+      <ConvexAuthProvider client={convex}>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} context={{}} />
         </QueryClientProvider>
-      </ConvexProvider>
+      </ConvexAuthProvider>
     </StrictMode>
   )
 }
