@@ -66,7 +66,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               <Loader2 className='animate-spin h-4 w-4' />
             </motion.div>
           )}
-          <motion.div key='button-content' layout>
+          <motion.div key='button-content' className='contents' layout>
             {children}
           </motion.div>
         </AnimatePresence>

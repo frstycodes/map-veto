@@ -25,5 +25,5 @@
       "@convex/*": ["./convex/*"]
     }
   },
-  "include": ["src", "**/*.ts", "tailwind.config.ts"]
+  "include": ["src","**/*.ts"]
 }
