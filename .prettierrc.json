@@ -1,6 +1,5 @@
 {
   "singleQuote": true,
-  "parser": "babel-ts",
   "plugins": ["prettier-plugin-tailwindcss","prettier-plugin-sort-imports"],
   "jsxSingleQuote": true,
   "bracketSpacing": true,

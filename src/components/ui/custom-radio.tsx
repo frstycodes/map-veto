@@ -1,4 +1,3 @@
-import { cn, dist, Vec2 } from '@/lib/utils'
 import {
   motion,
   MotionProps,
@@ -8,62 +7,42 @@ import {
   useSpring,
   useTransform
 } from 'framer-motion'
-import { createContext, HTMLProps, useContext, useRef } from 'react'
+import { ComponentProps, createContext, useContext, useRef } from 'react'
+import * as __RadioGroup from '@radix-ui/react-radio-group'
+import { cn, dist, Vec2 } from '@/lib/utils'
 
-type RadioGroupContextType = {
-  position: MotionValue
-  name: string
-  value: string
-  onValueChange: (value: string) => void
-}
+const groupContext = createContext<MotionValue>(
+  motionValue([Infinity, Infinity])
+)
 
-const groupContext = createContext<RadioGroupContextType>({
-  position: motionValue([Infinity, Infinity]),
-  name: '',
-  value: '',
-  onValueChange: () => {}
-})
+type RadioGroupProps = ComponentProps<typeof __RadioGroup.Root>
 
-type RadioGroupProps = HTMLProps<HTMLDivElement> &
-  MotionProps & {
-    name: string
-    value?: string
-    onValueChange?: (value: string) => void
-  }
-
-export function RadioGroup({
-  name,
-  value = '',
-  onValueChange = () => {},
-  ...props
-}: RadioGroupProps) {
+export function RadioGroup(props: RadioGroupProps) {
   const position = useMotionValue([Infinity, Infinity])
   return (
-    <motion.div
+    <__RadioGroup.Root
       onMouseMove={(e) => position.set([e.clientX, e.clientY])}
       onMouseLeave={() => position.set([Infinity, Infinity])}
       {...props}
     >
-      <groupContext.Provider value={{ position, name, onValueChange, value }}>
+      <groupContext.Provider value={position}>
         {props.children}
       </groupContext.Provider>
-    </motion.div>
+    </__RadioGroup.Root>
   )
 }
-type RadioProps = HTMLProps<HTMLDivElement> &
+// region Radio Item
+type RadioItemProps = ComponentProps<typeof __RadioGroup.Item> &
   MotionProps & {
-    inputProps?: HTMLProps<HTMLInputElement>
-    children?: React.ReactNode
     animateRange?: number
   }
-export function Radio({
+export function RadioItem({
   children,
-  inputProps,
   animateRange = 150,
   ...props
-}: RadioProps) {
-  const ref = useRef<HTMLLabelElement>(null)
-  const { position, value, onValueChange, name } = useContext(groupContext)
+}: RadioItemProps) {
+  const ref = useRef<HTMLDivElement>(null)
+  const position = useContext(groupContext)
 
   const distance = useTransform(position, (val) => {
     const rect = ref.current?.getBoundingClientRect() ?? {
@@ -92,26 +71,17 @@ export function Radio({
   })
 
   return (
-    <label ref={ref}>
-      <input
-        defaultChecked={props.value === value}
-        type='radio'
-        name={name}
-        value={props.value}
-        onChange={(e) => onValueChange(e.target.value)}
-        {...inputProps}
-        className={cn('peer hidden', inputProps?.className)}
-      />
+    <__RadioGroup.Item {...props} className='group'>
       <motion.div
+        ref={ref}
         style={{ borderColor, backgroundColor }}
-        {...props}
         className={cn(
-          'cursor-pointer rounded-md border-2 border-foreground peer-checked:!border-primary peer-checked:!bg-primary/20 peer-checked:text-foreground',
+          'cursor-pointer rounded-md  border-2 border-foreground group-data-[state=checked]:!border-primary group-data-[state=checked]:!bg-primary/20 group-data-[state=checked]:text-foreground',
           props.className
         )}
       >
         {children}
       </motion.div>
-    </label>
+    </__RadioGroup.Item>
   )
 }
