@@ -14,3 +14,13 @@ export function dist(a: Vec2, b: Vec2) {
   const dy = y1 - y2
   return Math.sqrt(dx * dx + dy * dy)
 }
+
+export function isSameArray<T>(a: T[], b: T[]) {
+  if (a.length !== b.length) return false
+  const bSet = new Set(b)
+
+  for (const item of a) {
+    if (!bSet.has(item)) return false
+  }
+  return true
+}
