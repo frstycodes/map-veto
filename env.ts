@@ -12,7 +12,6 @@ function parseViteEnv(env: unknown) {
 const envSchema = z.preprocess(
   parseViteEnv,
   z.object({
-    CONVEX_URL: z.string().url(),
   }),
 )
 
