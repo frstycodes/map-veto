@@ -7,7 +7,13 @@ import {
   useSpring,
   useTransform
 } from 'framer-motion'
-import { ComponentProps, createContext, useContext, useRef } from 'react'
+import {
+  ComponentProps,
+  createContext,
+  HTMLProps,
+  useContext,
+  useRef
+} from 'react'
 import * as __RadioGroup from '@radix-ui/react-radio-group'
 import { cn, dist, Vec2 } from '@/lib/utils'
 
@@ -32,13 +38,14 @@ export function RadioGroup(props: RadioGroupProps) {
   )
 }
 // region Radio Item
-type RadioItemProps = ComponentProps<typeof __RadioGroup.Item> &
-  MotionProps & {
-    animateRange?: number
-  }
+type RadioItemProps = ComponentProps<typeof __RadioGroup.Item> & {
+  animateRange?: number
+  rootProps?: MotionProps & HTMLProps<HTMLDivElement>
+}
 export function RadioItem({
   children,
   animateRange = 150,
+  rootProps,
   ...props
 }: RadioItemProps) {
   const ref = useRef<HTMLDivElement>(null)
@@ -71,17 +78,19 @@ export function RadioItem({
   })
 
   return (
-    <__RadioGroup.Item {...props} className='group'>
-      <motion.div
-        ref={ref}
-        style={{ borderColor, backgroundColor }}
-        className={cn(
-          'cursor-pointer rounded-md  border-2 border-foreground group-data-[state=checked]:!border-primary group-data-[state=checked]:!bg-primary/20 group-data-[state=checked]:text-foreground',
-          props.className
-        )}
-      >
-        {children}
-      </motion.div>
-    </__RadioGroup.Item>
+    <motion.div {...rootProps}>
+      <__RadioGroup.Item {...props} className='group'>
+        <motion.div
+          ref={ref}
+          style={{ borderColor, backgroundColor }}
+          className={cn(
+            'cursor-pointer rounded-md  border-2 border-foreground group-data-[state=checked]:!border-primary group-data-[state=checked]:!bg-primary/20 group-data-[state=checked]:text-foreground',
+            props.className
+          )}
+        >
+          {children}
+        </motion.div>
+      </__RadioGroup.Item>
+    </motion.div>
   )
 }

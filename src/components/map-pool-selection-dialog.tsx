@@ -2,7 +2,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle
 } from './ui/dialog'
@@ -14,30 +13,20 @@ import {
   useTransform
 } from 'framer-motion'
 import { CheckboxGroup, CheckboxItem } from './ui/custom-checkbox'
-import mapPools from '@/config/maps/map-pools.json'
+import { VetoCfg } from '@/state/veto-cfg-store'
 import mapsData from '@/config/maps/data.json'
 import { ComponentProps } from 'react'
 import { Info } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-type MapPoolSelectionDialogProps = ComponentProps<typeof Dialog> & {
-  pool: string[]
-  onPoolChange: (pool: string[]) => void
-}
+type MapPoolSelectionDialogProps = ComponentProps<typeof Dialog>
 
 export function MapPoolSelectionDialog({
-  pool,
-  onPoolChange,
   ...props
 }: MapPoolSelectionDialogProps) {
+  const { pool } = VetoCfg.useStore('pool')
   return (
-    <Dialog
-      {...props}
-      onOpenChange={(open) => {
-        if (!open && pool.length < 5) onPoolChange(mapPools.competitiveMaps)
-        props.onOpenChange?.(open)
-      }}
-    >
+    <Dialog {...props}>
       <DialogContent className='overflow-hidden'>
         <DialogHeader>
           <DialogTitle>Create Map Pool</DialogTitle>
@@ -47,7 +36,7 @@ export function MapPoolSelectionDialog({
         </DialogHeader>
         <CheckboxGroup
           value={pool}
-          onValueChange={onPoolChange}
+          onValueChange={(pool) => VetoCfg.set({ pool })}
           className='gap-2 flex-wrap grid grid-cols-12 select-none'
         >
           {mapsData.map((map) => {
@@ -63,9 +52,6 @@ export function MapPoolSelectionDialog({
             )
           })}
         </CheckboxGroup>
-        <DialogFooter>
-          <MapsMinThresholdWarning show={pool.length < 5} threshold={5} />
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

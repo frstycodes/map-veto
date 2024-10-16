@@ -2,6 +2,7 @@ import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useTheme } from '@/providers/theme-provider'
 import Particles from '@/components/ui/particles'
+import Ripple from '@/components/ui/ripple'
 
 export const Route = createRootRouteWithContext()({
   component: Root
@@ -21,6 +22,7 @@ function Root() {
         className='fixed -z-10 h-full'
       />
       <Outlet />
+      <Ripple className='-z-20 fixed opacity-40' />
       <div className='fixed bottom-4 right-4'>
         <ThemeToggle />
       </div>
