@@ -1,7 +1,7 @@
 import mapsData from '@root/data/maps/valorant.json'
 import { Boxes, Medal } from 'lucide-react'
 
-export const config = {
+export default {
   maps: mapsData,
   pools: {
     all: {

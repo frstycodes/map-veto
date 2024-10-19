@@ -13,10 +13,8 @@ import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 async function getGameConfig(game: string) {
-  const config: GameConfig = await import(`@/config/${game}.ts`).then(
-    (mod) => mod.config
-  )
-  return config
+  const res = await import(`@root/config/client/maps/${game}.ts`)
+  return res.default as GameConfig
 }
 
 export const Route = createFileRoute('/$game')({
