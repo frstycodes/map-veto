@@ -2,6 +2,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle
 } from './ui/dialog'
@@ -13,20 +14,37 @@ import {
   useTransform
 } from 'framer-motion'
 import { CheckboxGroup, CheckboxItem } from './ui/custom-checkbox'
-import { VetoCfg } from '@/state/veto-cfg-store'
-import mapsData from '@/config/maps/data.json'
+import { MapData } from '@root/types/shared/game-config.types'
+import { Info, Settings } from 'lucide-react'
+import { Route } from '@/routes/$game'
 import { ComponentProps } from 'react'
-import { Info } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type MapPoolSelectionDialogProps = ComponentProps<typeof Dialog>
 
+const customPool = {
+  id: 'custom',
+  name: 'Custom',
+  icon: Settings,
+  maps: []
+}
+
 export function MapPoolSelectionDialog({
   ...props
 }: MapPoolSelectionDialogProps) {
-  const { pool } = VetoCfg.useStore('pool')
+  const { config, store } = Route.useLoaderData()
+  const { pool } = store.useStore('pool')
   return (
-    <Dialog {...props}>
+    <Dialog
+      {...props}
+      onOpenChange={(open) => {
+        if (!open && pool.maps.length < 3) {
+          const pool = config.pools[config.defaultPool]
+          store.set({ pool })
+        }
+        props.onOpenChange?.(open)
+      }}
+    >
       <DialogContent className='overflow-hidden'>
         <DialogHeader>
           <DialogTitle>Create Map Pool</DialogTitle>
@@ -35,11 +53,18 @@ export function MapPoolSelectionDialog({
           </DialogDescription>
         </DialogHeader>
         <CheckboxGroup
-          value={pool}
-          onValueChange={(pool) => VetoCfg.set({ pool })}
+          value={pool.maps}
+          onValueChange={(pool) =>
+            store.set({
+              pool: {
+                ...customPool,
+                maps: pool
+              }
+            })
+          }
           className='gap-2 flex-wrap grid grid-cols-12 select-none'
         >
-          {mapsData.map((map) => {
+          {config.maps.map((map) => {
             return (
               <CheckboxItem
                 value={map.name}
@@ -52,6 +77,9 @@ export function MapPoolSelectionDialog({
             )
           })}
         </CheckboxGroup>
+        <DialogFooter>
+          <MapsMinThresholdWarning threshold={3} show={pool.maps.length < 3} />
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
@@ -89,14 +117,14 @@ export function MapsMinThresholdWarning({
 
 type CheckboxCustomRenderProps = {
   distance: MotionValue<number>
-  map: (typeof mapsData)[number]
+  map: MapData
 }
 function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
   const imageOpacitySync = useTransform(distance, [0, 1], [1, 0.6])
   const imageOpacity = useSpring(imageOpacitySync, {
     mass: 0.1
   })
-  const image = `./maps/${map.premierImg}`
+  const image = `./maps/${map.images[0]}`
   return (
     <>
       <motion.img
