@@ -2,6 +2,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { ThemeProvider } from './providers/theme-provider'
+import { Toaster } from './components/ui/sonner'
 import { createRoot } from 'react-dom/client'
 import { routeTree } from './routeTree.gen'
 import { StrictMode } from 'react'
@@ -21,6 +22,7 @@ function Root() {
   return (
     <StrictMode>
       <ThemeProvider defaultTheme='dark'>
+        <Toaster />
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} context={{}} />
         </QueryClientProvider>
