@@ -1,6 +1,6 @@
 import { trpcServer } from '@hono/trpc-server'
 import { serveStatic } from 'hono/bun'
-import { appRouter } from './trpc'
+import { trpcRouter } from './trpc'
 import { Hono } from 'hono'
 
 const app = new Hono()
@@ -8,7 +8,7 @@ const app = new Hono()
 app.use(
   'trpc/*',
   trpcServer({
-    router: appRouter,
+    router: trpcRouter,
     endpoint: '/trpc'
   })
 )

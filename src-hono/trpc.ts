@@ -7,15 +7,11 @@ const router = t.router
 const merge = t.mergeRouters
 
 const statusRouter = router({
-  status: publicProcedure.query(async function* () {
-    let i = 0
-    while (1) {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      yield ++i
-    }
+  status: publicProcedure.query(() => {
+    return 'ok'
   })
 })
 
-export const appRouter = merge(statusRouter)
+export const trpcRouter = merge(statusRouter)
 
-export type TRPCRouter = typeof appRouter
+export type TRPCRouter = typeof trpcRouter

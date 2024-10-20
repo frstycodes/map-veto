@@ -12,8 +12,7 @@ export enum BanAction {
 
 export type BanOrder =
   | { team: 1 | 2; type: BanAction.Ban | BanAction.Pick }
-  | { team: null; type: BanAction.Decider }
-  | { team: null; type: null }
+  | { team: null; type: BanAction.Decider | null }
 
 export type Preset = {
   icons: React.ReactNode
