@@ -1,65 +1,40 @@
-import {
-  motion,
-  MotionProps,
-  MotionValue,
-  motionValue,
-  useMotionValue,
-  useSpring,
-  useTransform
-} from 'framer-motion'
-import React, {
-  ComponentProps,
-  createContext,
-  useContext,
-  useRef,
-  useState
-} from 'react'
+import { motion, MotionProps, MotionValue, motionValue, useSpring, useTransform } from 'framer-motion'
+import React, { ComponentProps, createContext, useContext, useState } from 'react'
+import { useMousePosition } from '@/hooks/use-mouse-position'
 import * as Checkbox from '@radix-ui/react-checkbox'
-import { cn, dist, Vec2 } from '@/lib/utils'
+import { useDistance } from '@/hooks/use-distance'
+import { cn, Vec2 } from '@/lib/utils'
 
-const groupContext = createContext<MotionValue>(
-  motionValue([Infinity, Infinity])
-)
+const groupContext = createContext({ mousePosition: motionValue([Infinity, Infinity] as Vec2), animateRange: 0 })
 
 type CheckboxGroupProps = {
   children: React.ReactNode
   className?: string
   value?: string[]
   onValueChange?: (value: string[]) => void
+  animateRange?: number
 }
 
-export function CheckboxGroup({
-  children,
-  className,
-  value,
-  onValueChange
-}: CheckboxGroupProps) {
-  const position = useMotionValue([Infinity, Infinity])
+export function CheckboxGroup({ children, className, value, onValueChange, animateRange = 150 }: CheckboxGroupProps) {
+  const [mousePosition, ref] = useMousePosition<HTMLDivElement>()
   const [checkedItems, setCheckedItems] = useState<string[]>(value ?? [])
 
   const handleCheckedChange = (itemValue: string, checked: boolean) => {
-    const newCheckedItems = checked
-      ? [...checkedItems, itemValue]
-      : checkedItems.filter((item) => item !== itemValue)
+    const newCheckedItems = checked ? [...checkedItems, itemValue] : checkedItems.filter((item) => item !== itemValue)
 
     setCheckedItems(newCheckedItems)
     onValueChange?.(newCheckedItems)
   }
 
   return (
-    <div
-      className={className}
-      onMouseMove={(e) => position.set([e.clientX, e.clientY])}
-      onMouseLeave={() => position.set([Infinity, Infinity])}
-    >
-      <groupContext.Provider value={position}>
+    <div ref={ref} className={className}>
+      <groupContext.Provider value={{ mousePosition, animateRange }}>
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
             return React.cloneElement(child, {
               // @ts-expect-error - Child is always CheckboxItem
               checked: checkedItems.includes(child.props.value),
-              onCheckedChange: (checked: boolean) =>
-                handleCheckedChange(child.props.value, checked)
+              onCheckedChange: (checked: boolean) => handleCheckedChange(child.props.value, checked)
             })
           }
           return child
@@ -71,32 +46,13 @@ export function CheckboxGroup({
 
 type CheckboxItemProps = ComponentProps<typeof Checkbox.Root> &
   MotionProps & {
-    animateRange?: number
     render?: React.FC<{ distance: MotionValue<number> }>
   }
 
-export function CheckboxItem({
-  children,
-  animateRange = 150,
-  render: Render,
-  ...props
-}: CheckboxItemProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const position = useContext(groupContext)
+export function CheckboxItem({ children, render: Render, ...props }: CheckboxItemProps) {
+  const { mousePosition, animateRange } = useContext(groupContext)
 
-  const distance = useTransform(position, (val) => {
-    const rect = ref.current?.getBoundingClientRect() ?? {
-      x: 0,
-      width: 0,
-      y: 0,
-      height: 0
-    }
-    const centerX = rect.x + rect.width / 2
-    const centerY = rect.y + rect.height / 2
-    const center = [centerX, centerY] as Vec2
-    const distance = dist(val, center)
-    return Math.abs(distance)
-  })
+  const [distance, ref] = useDistance<HTMLDivElement>(mousePosition)
   const distanceFrac = useTransform(distance, [0, animateRange], [0, 1])
 
   const borderOpacitySync = useTransform(distanceFrac, [0, 1], [1, 0.2])

@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export type Vec2 = [number, number]
 
-export function dist(a: Vec2, b: Vec2) {
+export function distanceBetweenTwoVec2(a: Vec2, b: Vec2) {
   const [x1, y1] = a
   const [x2, y2] = b
   const dx = x1 - x2

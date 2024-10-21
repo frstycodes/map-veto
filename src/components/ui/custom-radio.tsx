@@ -1,66 +1,43 @@
-import {
-  motion,
-  motionValue,
-  useMotionValue,
-  useSpring,
-  useTransform
-} from 'framer-motion'
-import { ComponentProps, createContext, useContext, useRef } from 'react'
-import * as __RadioGroup from '@radix-ui/react-radio-group'
-import { cn, dist, Vec2 } from '@/lib/utils'
+import { motion, motionValue, useSpring, useTransform } from 'framer-motion'
+import { ComponentProps, createContext, useContext } from 'react'
+import * as Radix_RadioGroup from '@radix-ui/react-radio-group'
+import { useMousePosition } from '@/hooks/use-mouse-position'
+import { useDistance } from '@/hooks/use-distance'
+import { cn, Vec2 } from '@/lib/utils'
 
 const groupContext = createContext({
-  position: motionValue([Infinity, Infinity]),
+  position: motionValue([Infinity, Infinity] as Vec2),
   animateRange: 150
 })
 
-type RadioGroupProps = ComponentProps<typeof __RadioGroup.Root> & {
+type RadioGroupProps = ComponentProps<typeof Radix_RadioGroup.Root> & {
   animateRange?: number
 }
 
 export function RadioGroup({ animateRange = 150, ...props }: RadioGroupProps) {
-  const position = useMotionValue([Infinity, Infinity])
+  const [position, ref] = useMousePosition<HTMLDivElement>()
   return (
-    <__RadioGroup.Root
-      onMouseMove={(e) => position.set([e.clientX, e.clientY])}
-      onMouseLeave={() => position.set([Infinity, Infinity])}
-      {...props}
-    >
-      <groupContext.Provider value={{ position, animateRange }}>
-        {props.children}
-      </groupContext.Provider>
-    </__RadioGroup.Root>
+    <Radix_RadioGroup.Root ref={ref} {...props}>
+      <groupContext.Provider value={{ position, animateRange }}>{props.children}</groupContext.Provider>
+    </Radix_RadioGroup.Root>
   )
 }
-// region Radio Item
-
-const MotionRadioItem = motion.create(__RadioGroup.Item)
 
 type RadioItemProps = ComponentProps<typeof MotionRadioItem> & {
   animateRange?: number
 }
-export function RadioItem({ children, ...props }: RadioItemProps) {
-  const ref = useRef<HTMLButtonElement>(null)
-  const { position, animateRange } = useContext(groupContext)
 
-  const distance = useTransform(position, (val) => {
-    const rect = ref.current?.getBoundingClientRect() ?? {
-      x: 0,
-      width: 0,
-      y: 0,
-      height: 0
-    }
-    const centerX = rect.x + rect.width / 2
-    const centerY = rect.y + rect.height / 2
-    const center = [centerX, centerY] as Vec2
-    const distance = dist(val as Vec2, center)
-    return Math.abs(distance)
-  })
+const MotionRadioItem = motion.create(Radix_RadioGroup.Item)
+export function RadioItem({ children, ...props }: RadioItemProps) {
+  const { position, animateRange } = useContext(groupContext)
+  const [distance, ref] = useDistance<HTMLButtonElement>(position)
+
   const borderOpacitySync = useTransform(distance, [0, animateRange], [1, 0.2])
   const borderOpacity = useSpring(borderOpacitySync, {
     mass: 0.1,
     stiffness: 100
   })
+
   const backgroundOpacity = useTransform(borderOpacity, [0, 1], [0, 0.1])
   const backgroundColor = useTransform(backgroundOpacity, (opacity) => {
     return `hsl(var(--foreground) / ${opacity})`
