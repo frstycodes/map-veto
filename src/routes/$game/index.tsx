@@ -1,39 +1,43 @@
 import { MapPoolSelectionDialog } from '@/components/map-pool-selection-dialog'
 import { RadioGroup, RadioItem } from '@/components/ui/custom-radio'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { GameConfig } from '@root/types/shared/game-config.types'
 import { RainbowButton } from '@/components/ui/rainbow-button'
 import { BanOrderDialog } from '@/components/ban-order-dialog'
 import { Loader2, Map, Settings, Swords } from 'lucide-react'
 import { createVetoStore } from '@/state/veto-cfg-store'
-import { createFileRoute } from '@tanstack/react-router'
 import { HTMLProps, useEffect, useState } from 'react'
+import { games } from '@root/config/client/maps'
 import { Button } from '@/components/ui/button'
 import { AppStore } from '@/state/app-store'
 import { motion } from 'framer-motion'
+import { trpc } from '@/lib/trpc'
 import { cn } from '@/lib/utils'
 
-async function getGameConfig(game: string) {
-  const res = await import(`@root/config/client/maps/${game}.ts`)
-  return res.default as GameConfig
-}
-
-export const Route = createFileRoute('/$game')({
+export const Route = createFileRoute('/$game/')({
   loader: async ({ params }) => {
-    const config = await getGameConfig(params.game)
+    const isValidGame = games.has(params.game)
+    if (!isValidGame) throw redirect({ to: '/$game', params: { game: 'valorant' } })
+
+    const importRes = await import(`@root/config/client/maps/${params.game}.ts`)
+    const config: GameConfig = importRes.default
+
+    const root = document.documentElement
+    if (root && config.color) {
+      root.style.setProperty('--primary', config.color)
+    }
+
     const store = createVetoStore({
       pool: config.pools[config.defaultPool],
       bestOf: config.defaultBestOf
     })
+
     return { store, config }
   },
   pendingComponent() {
     return (
       <div className='grid h-full w-full place-items-center text-lg'>
-        <motion.div
-          className='flex gap-2 font-bold'
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-        >
+        <motion.div className='flex gap-2 font-bold' initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
           <Loader2 className='h-7 w-7 animate-spin stroke-[3px]' />
           Loading
         </motion.div>
@@ -44,6 +48,24 @@ export const Route = createFileRoute('/$game')({
 })
 
 function GamePage() {
+  const { store, config } = Route.useLoaderData()
+  const { game } = Route.useParams()
+
+  const startVetoMutation = trpc.startVeto.useMutation({
+    onSuccess(id) {
+      throw redirect({ to: `/${game}/${id}` })
+    }
+  })
+
+  const handleStart = () => {
+    const {
+      banOrders,
+      pool: { maps },
+      bestOf: rounds
+    } = store.get()
+
+    startVetoMutation.mutate({ banOrders, game, maps, rounds })
+  }
   return (
     <div className='flex h-full w-full flex-col items-center justify-center gap-8'>
       <motion.div
@@ -58,8 +80,7 @@ function GamePage() {
               <Map className='h-8 w-8 inline' /> Map Veto
             </h1>
             <p>
-              Quickly veto maps for{' '}
-              <span className='font-bold uppercase text-primary'>Valorant</span>
+              Quickly veto maps for <span className='font-bold uppercase text-primary'>{config.name}</span>
             </p>
           </div>
           <Section title='Choose Map Pool:'>
@@ -72,7 +93,7 @@ function GamePage() {
             <BanOrderDialog />
           </Section>
           <div className='flex justify-end'>
-            <StartMapVetoButton />
+            <StartMapVetoButton loading={startVetoMutation.isPending} onClick={handleStart} />
           </div>
         </div>
       </motion.div>
@@ -96,6 +117,7 @@ function Section({ title, description, ...props }: SectionProps) {
   )
 }
 
+//region Choose Map Pool
 function ChooseMapPool() {
   const { store, config } = Route.useLoaderData()
   const { pool } = store.useStore('pool')
@@ -111,11 +133,7 @@ function ChooseMapPool() {
   const pools = Object.values(config.pools)
   pools.push({ id: 'custom', name: 'Custom', icon: Settings, maps: [] })
   return (
-    <RadioGroup
-      className='flex flex-wrap gap-4'
-      value={pool.id}
-      onValueChange={handlePoolChange}
-    >
+    <RadioGroup className='flex flex-wrap gap-4' value={pool.id} onValueChange={handlePoolChange}>
       {pools.map(({ id, name, icon: Icon }) => {
         return (
           <RadioItem
@@ -136,6 +154,7 @@ function ChooseMapPool() {
   )
 }
 
+//region Choose Best Of
 function ChooseBestOf() {
   const { config, store } = Route.useLoaderData()
   const { bestOf, pool } = store.useStore('bestOf', 'pool')
@@ -182,10 +201,11 @@ function ChooseBestOf() {
   )
 }
 
+//region Start Map Veto Button
 type StartMapVetoProps = {
   onClick?: (e: React.MouseEvent) => void
+  loading?: boolean
 }
-
 function StartMapVetoButton(props: StartMapVetoProps) {
   const { performanceMode } = AppStore.useStore('performanceMode')
   const Comp = performanceMode ? Button : RainbowButton
@@ -194,11 +214,11 @@ function StartMapVetoButton(props: StartMapVetoProps) {
       onClick={props.onClick}
       className={cn(
         'gap-2 font-bold text-background',
-        performanceMode &&
-          'rounded-xl bg-foreground py-2 hover:bg-foreground/80 text-md h-11 px-8'
+        performanceMode && 'rounded-xl bg-foreground py-2 hover:bg-foreground/80 text-md h-11 px-8'
       )}
     >
-      <Map /> Start
+      {props.loading && <Loader2 className='animate-spin' />}
+      {!props.loading && <Map />} Start
     </Comp>
   )
 }

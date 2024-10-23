@@ -13,9 +13,11 @@ export type MapData = {
 }
 
 export type GameConfig = {
+  name: string
   maps: MapData[]
   pools: Record<string, MapPool>
   defaultPool: string
   bestOfOptions: number[]
   defaultBestOf: number
+  color: string
 }

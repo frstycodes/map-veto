@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "name": "Ancient",
+    "images": ["Ancient-premier.png", "Ancient-splash.png", "Ancient-stylized.png", "Ancient-premier.png"]
+  },
+  {
+    "id": 2,
+    "name": "Anubis",
+    "images": ["Anubis-premier.png", "Anubis-splash.png", "Anubis-stylized.png", "Anubis-premier.png"]
+  },
+  {
+    "id": 3,
+    "name": "Inferno",
+    "images": ["Inferno-premier.png", "Inferno-splash.png", "Inferno-stylized.png", "Inferno-premier.png"]
+  },
+  {
+    "id": 4,
+    "name": "Mirage",
+    "images": ["Mirage-premier.png", "Mirage-splash.png", "Mirage-stylized.png", "Mirage-premier.png"]
+  },
+  {
+    "id": 5,
+    "name": "Nuke",
+    "images": ["Nuke-premier.png", "Nuke-splash.png", "Nuke-stylized.png", "Nuke-premier.png"]
+  },
+  {
+    "id": 6,
+    "name": "Overpass",
+    "images": ["Overpass-premier.png", "Overpass-splash.png", "Overpass-stylized.png", "Overpass-premier.png"]
+  },
+  {
+    "id": 7,
+    "name": "Vertigo",
+    "images": ["Vertigo-premier.png", "Vertigo-splash.png", "Vertigo-stylized.png", "Vertigo-premier.png"]
+  },
+  {
+    "id": 8,
+    "name": "Office",
+    "images": ["Office-premier.png", "Office-splash.png", "Office-stylized.png", "Office-premier.png"]
+  },
+  {
+    "id": 9,
+    "name": "Dust2",
+    "images": ["Dust2-premier.png", "Dust2-splash.png", "Dust2-stylized.png", "Dust2-premier.png"]
+  },
+  {
+    "id": 10,
+    "name": "Train",
+    "images": ["Train-premier.png", "Train-splash.png", "Train-stylized.png", "Train-premier.png"]
+  },
+  {
+    "id": 11,
+    "name": "Cache",
+    "images": ["Cache-premier.png", "Cache-splash.png", "Cache-stylized.png", "Cache-premier.png"]
+  }
+]
