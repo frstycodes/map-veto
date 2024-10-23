@@ -1,4 +1,4 @@
-import { motion, motionValue, useSpring, useTransform } from 'framer-motion'
+import { motion, motionValue, useMotionTemplate as mt, useSpring, useTransform } from 'framer-motion'
 import { ComponentProps, createContext, useContext } from 'react'
 import * as Radix_RadioGroup from '@radix-ui/react-radio-group'
 import { useMousePosition } from '@/hooks/use-mouse-position'
@@ -28,6 +28,7 @@ type RadioItemProps = ComponentProps<typeof MotionRadioItem> & {
 }
 
 const MotionRadioItem = motion.create(Radix_RadioGroup.Item)
+
 export function RadioItem({ children, ...props }: RadioItemProps) {
   const { position, animateRange } = useContext(groupContext)
   const [distance, ref] = useDistance<HTMLButtonElement>(position)
@@ -39,18 +40,15 @@ export function RadioItem({ children, ...props }: RadioItemProps) {
   })
 
   const backgroundOpacity = useTransform(borderOpacity, [0, 1], [0, 0.1])
-  const backgroundColor = useTransform(backgroundOpacity, (opacity) => {
-    return `hsl(var(--foreground) / ${opacity})`
-  })
-  const borderColor = useTransform(borderOpacity, (opacity) => {
-    return `hsl(var(--foreground) / ${opacity})`
-  })
 
   return (
     <MotionRadioItem
       ref={ref}
       {...props}
-      style={{ borderColor, backgroundColor }}
+      style={{
+        borderColor: mt`hsl(var(--foreground) / ${borderOpacity})`,
+        backgroundColor: mt`hsl(var(--foreground) / ${backgroundOpacity})`
+      }}
       className={cn(
         'cursor-pointer rounded-xl w-full h-full border-2 border-foreground data-[state=checked]:!border-primary data-[state=checked]:!bg-primary/20 data-[state=checked]:text-foreground',
         'disabled:cursor-not-allowed disabled:opacity-50',

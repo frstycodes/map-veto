@@ -1,4 +1,12 @@
-import { motion, MotionProps, MotionValue, motionValue, useSpring, useTransform } from 'framer-motion'
+import {
+  motion,
+  MotionProps,
+  MotionValue,
+  motionValue,
+  useSpring,
+  useTransform,
+  useMotionTemplate as mt
+} from 'framer-motion'
 import React, { ComponentProps, createContext, useContext, useState } from 'react'
 import { useMousePosition } from '@/hooks/use-mouse-position'
 import * as Checkbox from '@radix-ui/react-checkbox'
@@ -55,18 +63,12 @@ export function CheckboxItem({ children, render: Render, ...props }: CheckboxIte
   const [distance, ref] = useDistance<HTMLDivElement>(mousePosition)
   const distanceFrac = useTransform(distance, [0, animateRange], [0, 1])
 
-  const borderOpacitySync = useTransform(distanceFrac, [0, 1], [1, 0.2])
-  const borderOpacity = useSpring(borderOpacitySync, {
-    mass: 0.1,
-    stiffness: 100
-  })
+  const borderOpacitySync = useTransform(distance, [0, animateRange], [1, 0.2])
+  const borderOpacity = useSpring(borderOpacitySync, { mass: 0.1, stiffness: 100 })
   const backgroundOpacity = useTransform(borderOpacity, [0, 1], [0, 0.1])
-  const backgroundColor = useTransform(backgroundOpacity, (opacity) => {
-    return `hsl(var(--foreground) / ${opacity})`
-  })
-  const borderColor = useTransform(borderOpacity, (opacity) => {
-    return `hsl(var(--foreground) / ${opacity})`
-  })
+
+  const backgroundColor = mt`hsl(var(--foreground) / ${backgroundOpacity})`
+  const borderColor = mt`hsl(var(--foreground) / ${borderOpacity})`
 
   return (
     <Checkbox.Root {...props} className={cn('group', props.className)}>

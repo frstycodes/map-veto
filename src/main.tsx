@@ -2,6 +2,7 @@
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { ThemeProvider } from './providers/theme-provider'
 import { queryClient, trpc, trpcClient } from './lib/trpc'
+import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { Toaster } from './components/ui/sonner'
 import { createRoot } from 'react-dom/client'
 import { routeTree } from './routeTree.gen'
@@ -20,8 +21,10 @@ function Root() {
     <StrictMode>
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <ThemeProvider defaultTheme='dark'>
-          <Toaster />
-          <RouterProvider router={router} context={{}} />
+          <TooltipProvider delayDuration={100}>
+            <Toaster />
+            <RouterProvider router={router} context={{}} />
+          </TooltipProvider>
         </ThemeProvider>
       </trpc.Provider>
     </StrictMode>
