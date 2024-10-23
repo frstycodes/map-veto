@@ -1,18 +1,22 @@
 import { MapPoolSelectionDialog } from '@/components/map-pool-selection-dialog'
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { CenteredPageLayout } from '@/components/centered-page-layout'
 import { RadioGroup, RadioItem } from '@/components/ui/custom-radio'
-import { createFileRoute, redirect } from '@tanstack/react-router'
 import { GameConfig } from '@root/types/shared/game-config.types'
 import { RainbowButton } from '@/components/ui/rainbow-button'
 import { BanOrderDialog } from '@/components/ban-order-dialog'
 import { Loader2, Map, Settings, Swords } from 'lucide-react'
 import { createVetoStore } from '@/state/veto-cfg-store'
 import { HTMLProps, useEffect, useState } from 'react'
+import { PageHeader } from '@/components/page-header'
+import { PageLoader } from '@/components/page-loader'
 import { games } from '@root/config/client/maps'
 import { Button } from '@/components/ui/button'
 import { AppStore } from '@/state/app-store'
-import { motion } from 'framer-motion'
+import { Logo } from '@/components/logo'
 import { trpc } from '@/lib/trpc'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/$game/')({
   loader: async ({ params }) => {
@@ -34,26 +38,29 @@ export const Route = createFileRoute('/$game/')({
 
     return { store, config }
   },
-  pendingComponent() {
-    return (
-      <div className='grid h-full w-full place-items-center text-lg'>
-        <motion.div className='flex gap-2 font-bold' initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-          <Loader2 className='h-7 w-7 animate-spin stroke-[3px]' />
-          Loading
-        </motion.div>
-      </div>
-    )
-  },
+  pendingComponent: PageLoader,
   component: GamePage
 })
 
 function GamePage() {
   const { store, config } = Route.useLoaderData()
   const { game } = Route.useParams()
+  const navigate = Route.useNavigate()
+  const router = useRouter()
 
   const startVetoMutation = trpc.startVeto.useMutation({
-    onSuccess(id) {
-      throw redirect({ to: `/${game}/${id}` })
+    async onSuccess(id) {
+      const routeData = {
+        to: '/$game/$id',
+        params: { game, id }
+      }
+      await router.preloadRoute(routeData).catch(() => {
+        toast.error('Failed to prefetch route')
+      })
+      navigate(routeData)
+    },
+    onError(error) {
+      toast.error(error.message)
     }
   })
 
@@ -67,37 +74,28 @@ function GamePage() {
     startVetoMutation.mutate({ banOrders, game, maps, rounds })
   }
   return (
-    <div className='flex h-full w-full flex-col items-center justify-center gap-8'>
-      <motion.div
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1, type: 'spring' }}
-        className='flex flex-col items-center justify-center'
-      >
-        <div className='flex flex-col gap-10'>
-          <div>
-            <h1 className='mb-3 text-3xl flex items-center gap-2 font-extrabold'>
-              <Map className='h-8 w-8 inline' /> Map Veto
-            </h1>
-            <p>
-              Quickly veto maps for <span className='font-bold uppercase text-primary'>{config.name}</span>
-            </p>
-          </div>
-          <Section title='Choose Map Pool:'>
-            <ChooseMapPool />
-          </Section>
-          <Section title='Best of:'>
-            <ChooseBestOf />
-          </Section>
-          <Section title='Ban Order:'>
-            <BanOrderDialog />
-          </Section>
-          <div className='flex justify-end'>
-            <StartMapVetoButton loading={startVetoMutation.isPending} onClick={handleStart} />
-          </div>
-        </div>
-      </motion.div>
-    </div>
+    <CenteredPageLayout className='space-y-8 px-8 fade-in-100'>
+      <header className='space-y-3'>
+        <PageHeader>
+          <Logo />
+        </PageHeader>
+        <p>
+          Quickly veto maps for <span className='font-bold uppercase text-primary'>{config.name}</span>
+        </p>
+      </header>
+      <div className='space-y-8 animate-in fade-in-0 duration-500'>
+        <Section title='Choose Map Pool:'>
+          <ChooseMapPool />
+        </Section>
+        <Section title='Best of:'>
+          <ChooseBestOf />
+        </Section>
+        <Section title='Ban Order:'>
+          <BanOrderDialog />
+        </Section>
+        <StartMapVetoButton className='float-right' loading={startVetoMutation.isPending} onClick={handleStart} />
+      </div>
+    </CenteredPageLayout>
   )
 }
 
@@ -126,9 +124,7 @@ function ChooseMapPool() {
 
   const handlePoolChange = (poolId: string) => {
     if (poolId == 'custom') return
-    store.set({
-      pool: config.pools[poolId]
-    })
+    store.set({ pool: config.pools[poolId] })
   }
   const pools = Object.values(config.pools)
   pools.push({ id: 'custom', name: 'Custom', icon: Settings, maps: [] })
@@ -139,7 +135,7 @@ function ChooseMapPool() {
           <RadioItem
             key={id}
             onClick={id === 'custom' ? () => setDialogOpen(true) : undefined}
-            className='grid aspect-square z-10 h-28 w-40 place-items-center dark:backdrop-brightness-125 backdrop-blur-xl gap-4 rounded-2xl text-sm font-medium'
+            className='grid aspect-square z-10 h-28 w-40 place-items-center backdrop-blur-sm gap-4 rounded-2xl text-sm font-medium'
             value={id}
           >
             <div className='grid place-items-center gap-3'>
@@ -171,30 +167,25 @@ function ChooseBestOf() {
       name='best-of'
       className='flex gap-4'
     >
-      {config.bestOfOptions.map((__bestOf) => {
-        if (__bestOf + 2 > pool.maps.length) return null
+      {config.bestOfOptions.map((mapped_bestOf) => {
+        if (mapped_bestOf + 2 > pool.maps.length) return null
 
         return (
-          <motion.div
-            key={__bestOf}
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.7 }}
-          >
+          <div key={mapped_bestOf}>
             <RadioItem
-              className='relative grid aspect-square h-28 place-items-center rounded-2xl p-2 dark:backdrop-brightness-125 backdrop-blur-[2px]'
-              value={__bestOf.toString()}
+              className='relative grid aspect-square h-28 place-items-center rounded-2xl p-2 backdrop-blur-sm'
+              value={mapped_bestOf.toString()}
             >
               <div className='flex flex-wrap gap-1.5 items-center justify-center'>
-                {Array.from({ length: __bestOf }, (_, i) => (
+                {Array.from({ length: mapped_bestOf }, (_, i) => (
                   <Swords key={i} className='h-5 w-5' />
                 ))}
               </div>
               <p className='absolute bottom-1 left-3 grid place-items-center text-sm font-semibold text-foreground'>
-                {__bestOf}
+                {mapped_bestOf}
               </p>
             </RadioItem>
-          </motion.div>
+          </div>
         )
       })}
     </RadioGroup>
@@ -205,6 +196,7 @@ function ChooseBestOf() {
 type StartMapVetoProps = {
   onClick?: (e: React.MouseEvent) => void
   loading?: boolean
+  className?: string
 }
 function StartMapVetoButton(props: StartMapVetoProps) {
   const { performanceMode } = AppStore.useStore('performanceMode')
@@ -214,7 +206,8 @@ function StartMapVetoButton(props: StartMapVetoProps) {
       onClick={props.onClick}
       className={cn(
         'gap-2 font-bold text-background',
-        performanceMode && 'rounded-xl bg-foreground py-2 hover:bg-foreground/80 text-md h-11 px-8'
+        performanceMode && 'rounded-xl bg-foreground py-2 hover:bg-foreground/80 text-md h-11 px-8',
+        props.className
       )}
     >
       {props.loading && <Loader2 className='animate-spin' />}
