@@ -1,9 +1,12 @@
 import { trpcServer } from '@hono/trpc-server'
+import { trpcRouter } from './routers'
 import { serveStatic } from 'hono/bun'
-import { trpcRouter } from './trpc'
+import { logger } from 'hono/logger'
 import { Hono } from 'hono'
 
 const app = new Hono()
+
+app.use('*', logger())
 
 app.use(
   'trpc/*',

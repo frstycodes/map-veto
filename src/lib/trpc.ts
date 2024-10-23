@@ -1,9 +1,5 @@
-import {
-  createTRPCQueryUtils,
-  createTRPCReact,
-  httpBatchLink
-} from '@trpc/react-query'
-import { type TRPCRouter } from '@root/src-hono/trpc'
+import { createTRPCQueryUtils, createTRPCReact, httpBatchLink } from '@trpc/react-query'
+import { type TRPCRouter } from '@root/src-hono/routers'
 import { QueryClient } from '@tanstack/react-query'
 
 export const trpc = createTRPCReact<TRPCRouter>()
