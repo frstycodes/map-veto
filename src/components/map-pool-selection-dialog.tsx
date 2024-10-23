@@ -1,18 +1,5 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from './ui/dialog'
-import {
-  AnimatePresence,
-  motion,
-  MotionValue,
-  useSpring,
-  useTransform
-} from 'framer-motion'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
+import { AnimatePresence, motion, MotionValue, useSpring, useTransform } from 'framer-motion'
 import { CheckboxGroup, CheckboxItem } from './ui/custom-checkbox'
 import { MapData } from '@root/types/shared/game-config.types'
 import { Info, Settings } from 'lucide-react'
@@ -29,9 +16,7 @@ const customPool = {
   maps: []
 }
 
-export function MapPoolSelectionDialog({
-  ...props
-}: MapPoolSelectionDialogProps) {
+export function MapPoolSelectionDialog({ ...props }: MapPoolSelectionDialogProps) {
   const { config, store } = Route.useLoaderData()
   const { pool } = store.useStore('pool')
   return (
@@ -48,9 +33,7 @@ export function MapPoolSelectionDialog({
       <DialogContent className='overflow-hidden'>
         <DialogHeader>
           <DialogTitle>Create Map Pool</DialogTitle>
-          <DialogDescription>
-            Create a custom map pool by selecting the maps you want to include.
-          </DialogDescription>
+          <DialogDescription>Create a custom map pool by selecting the maps you want to include.</DialogDescription>
         </DialogHeader>
         <CheckboxGroup
           value={pool.maps}
@@ -70,9 +53,7 @@ export function MapPoolSelectionDialog({
                 value={map.name}
                 key={map.id}
                 className='h-20 col-span-6 md:col-span-6 w-full relative group aspect-square grid place-items-center rounded-xl overflow-hidden'
-                render={(props) => (
-                  <CheckboxCustomRender {...props} map={map} />
-                )}
+                render={(props) => <CheckboxCustomRender {...props} map={map} />}
               />
             )
           })}
@@ -88,11 +69,7 @@ type MapsMinThresholdWarningProps = ComponentProps<typeof motion.div> & {
   show: boolean
   threshold: number
 }
-export function MapsMinThresholdWarning({
-  threshold = 5,
-  show,
-  ...props
-}: MapsMinThresholdWarningProps) {
+export function MapsMinThresholdWarning({ threshold = 5, show, ...props }: MapsMinThresholdWarningProps) {
   return (
     <AnimatePresence mode='popLayout' initial={false}>
       {show && (
@@ -107,8 +84,7 @@ export function MapsMinThresholdWarning({
             props.className
           )}
         >
-          <Info /> Minimum {threshold} maps required or competitive pool will be
-          automatically selected.
+          <Info /> Minimum {threshold} maps required or competitive pool will be automatically selected.
         </motion.div>
       )}
     </AnimatePresence>
