@@ -1,0 +1,79 @@
+{
+  "name": "Valorant",
+
+  "pools": {
+    "all": {
+      "id": "all",
+      "name": "All Maps",
+      "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-boxes\"><path d=\"M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z\"/><path d=\"m7 16.5-4.74-2.85\"/><path d=\"m7 16.5 5-3\"/><path d=\"M7 16.5v5.17\"/><path d=\"M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z\"/><path d=\"m17 16.5-5-3\"/><path d=\"m17 16.5 4.74-2.85\"/><path d=\"M17 16.5v5.17\"/><path d=\"M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z\"/><path d=\"M12 8 7.26 5.15\"/><path d=\"m12 8 4.74-2.85\"/><path d=\"M12 13.5V8\"/></svg>",
+      "maps": ["Ascent", "Bind", "Breeze", "Fracture", "Haven", "Icebox", "Lotus", "Sunset", "Abyss", "Pearl", "Split"]
+    },
+    "comp": {
+      "id": "comp",
+      "name": "Competitive Pool",
+      "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-medal\"><path d=\"M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15\"/><path d=\"M11 12 5.12 2.2\"/><path d=\"m13 12 5.88-9.8\"/><path d=\"M8 7h8\"/><circle cx=\"12\" cy=\"17\" r=\"5\"/><path d=\"M12 18v-2h-.5\"/></svg>",
+      "maps": ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Sunset", "Abyss"]
+    }
+  },
+  "defaultPool": "comp",
+  "bestOfOptions": [1, 3, 5],
+  "defaultBestOf": 3,
+  "color": "355 100% 60%",
+  "maps": [
+    {
+      "id": 1,
+      "name": "Ascent",
+      "images": ["Ascent-premier.png", "Ascent-splash.png", "Ascent-stylized.png", "Ascent-tall.png"]
+    },
+    {
+      "id": 2,
+      "name": "Split",
+      "images": ["Split-premier.png", "Split-splash.png", "Split-stylized.png", "Split-tall.png"]
+    },
+    {
+      "id": 3,
+      "name": "Fracture",
+      "images": ["Fracture-premier.png", "Fracture-splash.png", "Ascent-Fracture.png", "Ascent-premier.Fracture"]
+    },
+    {
+      "id": 4,
+      "name": "Bind",
+      "images": ["Bind-premier.png", "Bind-splash.png", "Bind-stylized.png", "Bind-tall.png"]
+    },
+    {
+      "id": 5,
+      "name": "Breeze",
+      "images": ["Breeze-premier.png", "Breeze-splash.png", "Breeze-stylized.png", "Breeze-tall.png"]
+    },
+    {
+      "id": 6,
+      "name": "Abyss",
+      "images": ["Abyss-premier.png", "Abyss-splash.png", "Abyss-stylized.png", "Abyss-tall.png"]
+    },
+    {
+      "id": 7,
+      "name": "Lotus",
+      "images": ["Lotus-premier.png", "Lotus-splash.png", "Lotus-stylized.png", "Lotus-tall.png"]
+    },
+    {
+      "id": 8,
+      "name": "Sunset",
+      "images": ["Sunset-premier.png", "Sunset-splash.png", "Sunset-stylized.png", "Sunset-tall.png"]
+    },
+    {
+      "id": 9,
+      "name": "Pearl",
+      "images": ["Pearl-premier.png", "Pearl-splash.png", "Pearl-stylized.png", "Pearl-tall.png"]
+    },
+    {
+      "id": 10,
+      "name": "Icebox",
+      "images": ["Icebox-premier.png", "Icebox-splash.png", "Icebox-stylized.png", "Icebox-tall.png"]
+    },
+    {
+      "id": 11,
+      "name": "Haven",
+      "images": ["Haven-premier.png", "Haven-splash.png", "Haven-stylized.png", "Haven-tall.png"]
+    }
+  ]
+}
