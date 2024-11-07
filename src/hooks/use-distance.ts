@@ -1,4 +1,4 @@
-import { distanceBetweenTwoVec2, Vec2 } from '@/lib/utils'
+import { distanceBetweenTwoVec2, Vec2 } from '@/utils/math'
 import { MotionValue, useTransform } from 'framer-motion'
 import { RefObject, useRef } from 'react'
 

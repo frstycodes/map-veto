@@ -1,6 +1,6 @@
 import { useMotionValue } from 'framer-motion'
+import { Vec2 } from '@/utils/tailwind-utils'
 import { useEffect, useRef } from 'react'
-import { Vec2 } from '@/lib/utils'
 
 export function useMousePosition<T extends HTMLElement>(initial: Vec2 = [Infinity, Infinity]) {
   const ref = useRef<T>(null)

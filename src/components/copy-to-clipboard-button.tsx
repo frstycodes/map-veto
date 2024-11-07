@@ -1,8 +1,8 @@
 import { AlertCircle, CheckCheckIcon, ClipboardList } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 import { ComponentProps, useState } from 'react'
+import { cn } from '@/utils/tailwind-utils'
 import { Button } from './ui/button'
-import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
 type CopyToClipBoardButtonProps = ComponentProps<typeof Button> & {

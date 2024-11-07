@@ -1,19 +1,19 @@
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { BanAction, BanOrder, BanOrderPreset } from '@root/types/shared/ban-order.types'
-import { getAvailableBanOrderPresets } from '@root/utils/client/ban-order'
-import { validateBanOrder } from '@root/utils/shared/ban-order'
+import { BanAction, BanOrder, BanOrderPreset } from '@/types/ban-order.types'
+import { getAvailableBanOrderPresets } from '@/utils/ban-order'
+import { Route as GameRoute } from '@/routes/$game/_layout'
 import { RadioGroup, RadioItem } from './ui/custom-radio'
+import { validateBanOrder } from '@/utils/ban-order'
 import { useEffect, useMemo, useState } from 'react'
 import { Gavel, Medal, Swords } from 'lucide-react'
 import { DialogHeader } from './ui/dialog'
-import { Route } from '@/routes/$game'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { toast } from 'sonner'
 
 export function BanOrderDialog() {
-  const { store } = Route.useLoaderData()
+  const { store } = GameRoute.useLoaderData()
   const [dialogOpen, setDialogOpen] = useState(false)
   const { bestOf, pool, banOrderPreset } = store.useStore('bestOf', 'pool', 'banOrderPreset')
 
@@ -131,7 +131,7 @@ const BAN_ORDER_OPTIONS: BanOrder[] = [
 ]
 
 function ManualBanOrderSettings() {
-  const { store } = Route.useLoaderData()
+  const { store } = GameRoute.useLoaderData()
   const { banOrders } = store.useStore('banOrders')
 
   return (
@@ -148,7 +148,7 @@ type StageOptionProps = {
 }
 
 function StageOption({ stage, banOrder }: StageOptionProps) {
-  const { store } = Route.useLoaderData()
+  const { store } = GameRoute.useLoaderData()
   const handleValueChange = (value: string) => {
     const [team, type] = JSON.parse(value)
 

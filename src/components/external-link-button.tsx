@@ -2,8 +2,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 import { Button, buttonVariants } from './ui/button'
 import { ExternalLinkIcon } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
+import { cn } from '@/utils/tailwind-utils'
 import { ComponentProps } from 'react'
-import { cn } from '@/lib/utils'
 
 type ExternalLinkButtonProps = ComponentProps<typeof Button> & {
   url: string

@@ -3,7 +3,7 @@ import { ComponentProps, createContext, useContext } from 'react'
 import * as Radix_RadioGroup from '@radix-ui/react-radio-group'
 import { useMousePosition } from '@/hooks/use-mouse-position'
 import { useDistance } from '@/hooks/use-distance'
-import { cn, Vec2 } from '@/lib/utils'
+import { cn, Vec2 } from '@/utils/tailwind-utils'
 
 const groupContext = createContext({
   position: motionValue([Infinity, Infinity] as Vec2),

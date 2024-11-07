@@ -1,5 +1,5 @@
+import { cn } from '@/utils/tailwind-utils'
 import { HTMLProps } from 'react'
-import { cn } from '@/lib/utils'
 
 type PageHeaderProps = HTMLProps<HTMLDivElement>
 export function PageHeader(props: PageHeaderProps) {

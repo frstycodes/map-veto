@@ -1,11 +1,11 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
 import { AnimatePresence, motion, MotionValue, useSpring, useTransform } from 'framer-motion'
 import { CheckboxGroup, CheckboxItem } from './ui/custom-checkbox'
-import { MapData } from '@root/types/shared/game-config.types'
+import { Route as GameRoute } from '@/routes/$game/_layout'
+import { MapData } from '@/types/game-config.types'
 import { Info, Settings } from 'lucide-react'
-import { Route } from '@/routes/$game'
+import { cn } from '@/utils/tailwind-utils'
 import { ComponentProps } from 'react'
-import { cn } from '@/lib/utils'
 
 type MapPoolSelectionDialogProps = ComponentProps<typeof Dialog>
 
@@ -17,7 +17,7 @@ const customPool = {
 }
 
 export function MapPoolSelectionDialog({ ...props }: MapPoolSelectionDialogProps) {
-  const { config, store } = Route.useLoaderData()
+  const { config, store } = GameRoute.useLoaderData()
   const { pool } = store.useStore('pool')
   return (
     <Dialog

@@ -1,6 +1,6 @@
-import { BanOrder, BanOrderPreset } from '@root/types/shared/ban-order.types'
-import { MapPool } from '@root/types/shared/game-config.types'
+import { BanOrder, BanOrderPreset } from '@/types/ban-order.types'
 import { createSelector } from 'better-zustand-selector'
+import { MapPool } from '@/types/game-config.types'
 import { create } from 'zustand'
 
 export type VetoConfigStore = {

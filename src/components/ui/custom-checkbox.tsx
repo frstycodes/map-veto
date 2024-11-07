@@ -11,7 +11,7 @@ import React, { ComponentProps, createContext, useContext, useState } from 'reac
 import { useMousePosition } from '@/hooks/use-mouse-position'
 import * as Checkbox from '@radix-ui/react-checkbox'
 import { useDistance } from '@/hooks/use-distance'
-import { cn, Vec2 } from '@/lib/utils'
+import { cn, Vec2 } from '@/utils/tailwind-utils'
 
 const groupContext = createContext({ mousePosition: motionValue([Infinity, Infinity] as Vec2), animateRange: 0 })
 

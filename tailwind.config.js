@@ -13,6 +13,10 @@ export default {
       fontFamily: {
         sans: ['Montserrat', ...defaultTheme.fontFamily.sans]
       },
+      boxShadow: {
+        'active-indicator': '0 0 2px var(--color-primary)',
+        rim: 'inset 0 1px 0 #ffffff12, inset 0 -1px 0 #00000020, inset 0 0 0.5px 0.1px #ffffff12, inset 0 0 0.5px 0.4px #00000020'
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

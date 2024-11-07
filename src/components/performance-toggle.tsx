@@ -11,12 +11,7 @@ export function PerformanceModeToggle() {
     AppStore.set({ performanceMode: !performanceMode })
   }
   return (
-    <Button
-      layout
-      variant='ghost'
-      className='gap-2 rounded-lg'
-      onClick={handleThemeChange}
-    >
+    <Button layout variant='ghost' className='gap-2 rounded-lg' onClick={handleThemeChange}>
       <AnimatePresence initial={false} mode='popLayout'>
         {performanceMode ? (
           <motion.div

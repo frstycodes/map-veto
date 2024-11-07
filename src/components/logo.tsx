@@ -1,7 +1,7 @@
+import { cn } from '@/utils/tailwind-utils'
 import { motion } from 'framer-motion'
 import { ComponentProps } from 'react'
 import { Map } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 type LogoProps = ComponentProps<typeof motion.div>
 export function Logo(props: LogoProps) {
