@@ -1,15 +1,12 @@
 import { BanOrderPreset, Presets } from '@/types/ban-order.types'
-import { BanAction, BanOrder } from '@/types/ban-order.types'
+import { StageAction, Stage } from '@/types/ban-order.types'
 import { Gavel, Swords } from 'lucide-react'
 
-function padBanOrder(banOrders: BanOrder[], poolSize: number): BanOrder[] {
-  return [
-    ...banOrders,
-    ...Array(Math.max(0, poolSize - banOrders.length)).fill({
-      team: null,
-      type: null
-    })
-  ]
+function padBanOrder(stages: Stage[], poolSize: number): Stage[] {
+  for (let i = 0; i < poolSize - stages.length; i++) {
+    stages.push({ team: 0, type: null })
+  }
+  return stages
 }
 
 /**
@@ -18,32 +15,38 @@ function padBanOrder(banOrders: BanOrder[], poolSize: number): BanOrder[] {
  * @param bestOf Best of X rounds
  * @returns Ban order for the Alternate ban/pick structure
  */
-export function getAlternateBanOrder(poolSize: number, bestOf: number): BanOrder[] | null {
+export function getAlternateBanOrder(poolSize: number, bestOf: number): Stage[] | null {
   if (bestOf === 1) return null
   const minRequired = bestOf + 4 // Mininum 4 bans required
   if (poolSize < minRequired) return null
 
-  const banOrders: BanOrder[] = []
+  const stages: Stage[] = []
   let picksUsed = 0
 
-  for (let i = 0; i < Math.floor(poolSize / 2); i++) {
-    const isEven = !(i & 1)
+  /*
+    {POOLSIZE - 1} won't affect the result when POOLSIZE is odd but when 
+    POOLSIZE is even, the last element will be skipped since {Math.floor((POOLSIZE - 1) / 2)}
+    will leave 2 maps out of the pool where the last map will be of NO_ACTION type and second 
+    last being the DECIDER.
+   */
+  for (let i = 0; i < Math.floor((poolSize - 1) / 2); i++) {
+    const isEven = i % 2 === 0
 
     const type = (() => {
       const picksLimitReached = picksUsed === bestOf - 1
-      if (isEven || picksLimitReached) return BanAction.Ban
-      return BanAction.Pick
+      if (isEven || picksLimitReached) return StageAction.Ban
+      return StageAction.Pick
     })()
 
-    banOrders.push({ team: 1, type })
-    banOrders.push({ team: 2, type })
-    if (type == BanAction.Pick) picksUsed += 2
+    stages.push({ team: 1, type })
+    stages.push({ team: 2, type })
+    if (type == StageAction.Pick) picksUsed += 2
   }
-  banOrders.push({ team: null, type: BanAction.Decider })
+  stages.push({ team: 0, type: StageAction.Decider })
 
-  padBanOrder(banOrders, poolSize)
+  padBanOrder(stages, poolSize)
 
-  return banOrders
+  return stages
 }
 
 /**
@@ -52,31 +55,42 @@ export function getAlternateBanOrder(poolSize: number, bestOf: number): BanOrder
  * @param bestOf Best of X rounds
  * @returns Ban order for the last pick structure
  */
-export function getLastPickBanOrder(poolSize: number, bestOf: number): BanOrder[] | null {
+export function getLastPickBanOrder(poolSize: number, bestOf: number): Stage[] | null {
   const minRequired = bestOf + 2
-  if (poolSize < minRequired) return null
 
-  const banOrders: BanOrder[] = []
-  const bansRequired = poolSize - bestOf
+  if (poolSize < minRequired) {
+    return null
+  }
+
+  const stages: Stage[] = []
+  let bansRequired = poolSize - bestOf
+
+  /*
+    {BANS_REQUIRED - 1} only when POOLSIZE is even as doing that will not break the ban orders and
+    balance the bans and picks leaving second last for the DECIDER and the last for NO_ACTION.
+   */
+  if (poolSize % 2 == 0) {
+    bansRequired -= 1
+  }
 
   for (let i = 0; i < bansRequired; i++) {
-    banOrders.push({ team: ((i % 2) + 1) as 1 | 2, type: BanAction.Ban })
+    stages.push({ team: ((i % 2) + 1) as 1 | 2, type: StageAction.Ban })
   }
 
   let picksRemaining = bestOf - 1
 
   while (picksRemaining > 0) {
-    banOrders.push({ team: 1, type: BanAction.Pick })
-    banOrders.push({ team: 2, type: BanAction.Pick })
+    stages.push({ team: 1, type: StageAction.Pick })
+    stages.push({ team: 2, type: StageAction.Pick })
     picksRemaining -= 2
   }
 
-  banOrders.push({ team: null, type: BanAction.Decider })
+  stages.push({ team: 0, type: StageAction.Decider })
 
-  return padBanOrder(banOrders, poolSize)
+  return padBanOrder(stages, poolSize)
 }
 
-export function validateBanOrder(orders: BanOrder[], rounds: number): string | null {
+export function validateBanOrder(orders: Stage[], rounds: number): string | null {
   let seenDecider = false
   let seenNull = false
   let deciderCount = 0
@@ -96,7 +110,7 @@ export function validateBanOrder(orders: BanOrder[], rounds: number): string | n
     }
 
     switch (itemType) {
-      case BanAction.Decider:
+      case StageAction.Decider:
         if (seenNull) {
           return `Decider can't be placed after a null action. Error at position ${i}.`
         }
@@ -107,7 +121,7 @@ export function validateBanOrder(orders: BanOrder[], rounds: number): string | n
         deciderCount++
         break
 
-      case BanAction.Pick:
+      case StageAction.Pick:
         if (seenDecider || seenNull) {
           return `Pick can't be placed after a Decider or null action. Error at position ${i}.`
         }
@@ -117,7 +131,7 @@ export function validateBanOrder(orders: BanOrder[], rounds: number): string | n
         else return `Invalid team for Pick at position ${i}.`
         break
 
-      case BanAction.Ban:
+      case StageAction.Ban:
         if (seenDecider || seenNull) {
           return `Ban can't be placed after a Decider or null action. Error at position ${i}.`
         }
@@ -170,7 +184,7 @@ export function getAvailableBanOrderPresets(poolSize: number, bestOf: number) {
       ),
       label: 'Alternate',
       description: 'Ban, Pick, Ban until decider',
-      banOrders: alternate
+      stages: alternate
     },
     [BanOrderPreset.LastPick]: {
       icons: (
@@ -182,7 +196,7 @@ export function getAvailableBanOrderPresets(poolSize: number, bestOf: number) {
       ),
       label: 'Last Pick',
       description: `Ban until ${bestOf} maps remaining.`,
-      banOrders: lastPick
+      stages: lastPick
     }
   }
 

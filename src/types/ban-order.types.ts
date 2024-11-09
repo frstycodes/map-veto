@@ -4,24 +4,21 @@ export enum BanOrderPreset {
   Custom = 'custom'
 }
 
-export enum BanAction {
+export enum StageAction {
   Ban = 'ban',
   Pick = 'pick',
   Decider = 'decider'
 }
 
-export type BanOrder =
-  | { team: 1 | 2; type: BanAction.Ban | BanAction.Pick }
-  | { team: null; type: BanAction.Decider | null }
+export type Stage =
+  | { team: 1 | 2; type: StageAction.Ban | StageAction.Pick }
+  | { team: 0; type: StageAction.Decider | null }
 
 export type Preset = {
   icons: React.ReactNode
   label: string
   description: string
-  banOrders: BanOrder[] | null
+  stages: Stage[] | null
 }
 
-export type Presets = Record<
-  BanOrderPreset.Alternate | BanOrderPreset.LastPick,
-  Preset
->
+export type Presets = Record<BanOrderPreset.Alternate | BanOrderPreset.LastPick, Preset>

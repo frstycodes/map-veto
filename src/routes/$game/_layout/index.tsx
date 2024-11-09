@@ -5,12 +5,12 @@ import { RadioGroup, RadioItem } from '@/components/ui/custom-radio'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { RainbowButton } from '@/components/ui/rainbow-button'
 import { BanOrderDialog } from '@/components/ban-order-dialog'
-import { Loader2, Map, Settings, Swords } from 'lucide-react'
 import { Route as GameRoute } from '@/routes/$game/_layout'
 import customPool from '@/config/games/custom_pool.json'
 import { HTMLProps, useEffect, useState } from 'react'
 import { PageHeader } from '@/components/page-header'
 import { PageLoader } from '@/components/page-loader'
+import { Loader2, Map, Swords } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AppStore } from '@/state/app-store'
 import { cn } from '@/utils/tailwind-utils'
@@ -47,12 +47,12 @@ function GamePage() {
 
   const handleStart = () => {
     const {
-      banOrders,
+      stages,
       pool: { maps },
       bestOf: rounds
     } = store.get()
 
-    startVetoMutation.mutate({ banOrders, game, maps, rounds })
+    startVetoMutation.mutate({ stages, game, maps, rounds })
   }
   return (
     <CenteredPageLayout className='space-y-8 px-8 fade-in-100'>

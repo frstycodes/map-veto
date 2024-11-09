@@ -1,20 +1,18 @@
 package main
 
 import (
-	"main/src/poll"
 	"main/src/utils"
+	"main/src/veto"
 	"path/filepath"
 
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
 	"github.com/gogf/gf/os/gfile"
-
-	"main/src/api"
 )
 
 func cors(r *ghttp.Request) {
 	r.Response.CORS(ghttp.CORSOptions{
-		AllowOrigin: "localhost:3000",
+		AllowOrigin: "*",
 	})
 	r.Middleware.Next()
 }
@@ -25,33 +23,29 @@ func main() {
 
 	// API Handlers
 	s.Group("/api", func(group *ghttp.RouterGroup) {
-		group.GET("/", func(r *ghttp.Request) {
-			r.Response.Write("API")
+		group.GET("/status", func(r *ghttp.Request) {
+			r.Response.WriteJson(g.Map{
+				"status": "ok",
+			})
 		})
 		group.Group("/veto", func(vetoGroup *ghttp.RouterGroup) {
-			vetoGroup.POST("/start", api.StartVeto)
-			vetoGroup.GET("/tokens/:id", api.GetTokens)
+			vetoGroup.POST("/start", veto.StartVeto)
+			vetoGroup.Group("/:id", func(idGroup *ghttp.RouterGroup) {
+				idGroup.GET("/", veto.GetVetoHandler)
+				idGroup.GET("/tokens", veto.GetTokens)
+				idGroup.GET("/state", veto.InitialVetoStateHandler)
+				idGroup.GET("/poll", veto.VetoPollHandler)
+				idGroup.POST("/action", veto.ActionHandler)
+				idGroup.Group("/team/:teamId", func(teamGroup *ghttp.RouterGroup) {
+					teamGroup.PUT("/", veto.UpdateTeamHandler)
+				})
+			})
 		})
-		group.GET("/poll", poll.HandlePoll)
-		group.POST("/poll", poll.SendEvent)
 	})
 
-	/*
-		// Socket.io
-		server := socketio.NewServer(&engineio.Options{
-			Transports: []transport.Transport{&websocket.Transport{}},
-		})
-		defer server.Close()
-
-		io.IOHandler(server)
-		s.BindHandler("/socket.io/", func(r *ghttp.Request) { // Socket.io http handler
-			server.ServeHTTP(r.Response.Writer, r.Request)
-		})
-	*/
 	// Serve Frontend
 	utils.ServeStatic(s, filepath.Join(gfile.MainPkgPath(), "../../dist"), "index.html")
 
-	// go utils.StartSocketIO(server)
 	s.SetPort(8000)
 	s.Run()
 }

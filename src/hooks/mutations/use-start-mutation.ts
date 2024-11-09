@@ -1,8 +1,8 @@
 import { DefaultError, useMutation, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
-import { BanOrder } from '@/types/ban-order.types'
+import { Stage } from '@/types/ban-order.types'
 
 type StartVetoProps = {
-  banOrders: BanOrder[]
+  stages: Stage[]
   maps: string[]
   rounds: number
   game: string

@@ -54,7 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         <AnimatePresence mode='popLayout'>
           {loading && (
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} key='button-loader'>
+            <motion.div layout initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
               <Loader2 className='animate-spin h-4 w-4' />
             </motion.div>
           )}

@@ -1,95 +1,133 @@
-package poll
+package longpoll
 
 import (
-	"io"
-	"net/http"
 	"sync"
 	"time"
-
-	"github.com/gogf/gf/net/ghttp"
 )
 
-type Client struct {
-	onDone    func(data []byte)
-	waitGroup *sync.WaitGroup
+// // Subscriber represents a client subscription
+// type Subscriber struct {
+// 	ID       string
+// 	Callback func(interface{})
+// 	Done     chan struct{}
+// }
+
+// // LongPoll represents a long polling instance
+// type LongPoll struct {
+// 	subscribers map[string]*Subscriber
+// 	mu          sync.RWMutex
+// 	timeout     time.Duration
+// }
+
+// // New creates a new LongPoll instance
+// func New(timeout time.Duration) *LongPoll {
+// 	return &LongPoll{
+// 		subscribers: make(map[string]*Subscriber),
+// 		timeout:     timeout,
+// 	}
+// }
+
+// // Subscribe adds a new subscriber with a callback function
+// func (lp *LongPoll) Sub(id string, callback func(interface{})) *Subscriber {
+// 	lp.mu.Lock()
+// 	defer lp.mu.Unlock()
+
+// 	// Unsub before subscribing again
+// 	lp.Unsub(id)
+
+// 	subscriber := &Subscriber{
+// 		ID:       id,
+// 		Callback: callback,
+// 		Done:     make(chan struct{}),
+// 	}
+
+// 	lp.subscribers[id] = subscriber
+// 	return subscriber
+// }
+
+// // Unsubscribe removes a subscriber
+// func (lp *LongPoll) Unsub(id string) {
+// 	lp.mu.Lock()
+// 	defer lp.mu.Unlock()
+
+// 	if subscriber, exists := lp.subscribers[id]; exists {
+// 		close(subscriber.Done)
+// 		delete(lp.subscribers, id)
+// 	}
+// }
+
+// // Send broadcasts data to all subscribers
+// func (lp *LongPoll) Send(data interface{}) {
+// 	for _, subscriber := range lp.subscribers {
+// 		go func(s *Subscriber) {
+// 			s.Callback(data)
+// 		}(subscriber)
+// 	}
+
+// }
+
+// // Count returns the number of active subscribers
+// func (lp *LongPoll) Count() int {
+// 	lp.mu.RLock()
+// 	defer lp.mu.RUnlock()
+// 	return len(lp.subscribers)
+// }
+
+// // Clear removes all subscribers
+// func (lp *LongPoll) Clear() {
+// 	lp.mu.Lock()
+// 	defer lp.mu.Unlock()
+
+// 	for _, subscriber := range lp.subscribers {
+// 		close(subscriber.Done)
+// 	}
+// 	lp.subscribers = make(map[string]*Subscriber)
+// }
+
+type Subscriber struct {
+	ID       string
+	Callback func(interface{})
 }
 
 type LongPoll struct {
-	queue []*Client
-	mutex sync.Mutex
+	subscribers map[string]*Subscriber
+	mu          sync.RWMutex
+	timeout     time.Duration
 }
 
-func (poll *LongPoll) Add(client *Client) {
-	poll.mutex.Lock()
-	defer poll.mutex.Unlock()
-
-	poll.queue = append(poll.queue, client)
-}
-
-func (poll *LongPoll) Remove(client *Client) {
-	poll.mutex.Lock()
-	defer poll.mutex.Unlock()
-
-	for i, c := range poll.queue {
-		if c == client {
-			poll.queue = append(poll.queue[:i], poll.queue[i+1:]...)
-			break
-		}
+func New(time time.Duration) *LongPoll {
+	return &LongPoll{
+		subscribers: make(map[string]*Subscriber),
+		timeout:     time,
+		mu:          sync.RWMutex{},
 	}
 }
 
-func (poll *LongPoll) Send(data string) {
-	poll.mutex.Lock()
-	defer poll.mutex.Unlock()
+func (lp *LongPoll) Sub(id string, callback func(interface{})) *Subscriber {
+	lp.mu.Lock()
+	defer lp.mu.Unlock()
 
-	for _, client := range poll.queue {
-		client.onDone([]byte(data))
-		client.waitGroup.Done()
+	delete(lp.subscribers, id)
+
+	subscriber := &Subscriber{
+		ID:       id,
+		Callback: callback,
 	}
-
-	poll.queue = []*Client{} // Clear the queue after sending
+	lp.subscribers[id] = subscriber
+	return subscriber
 }
 
-func (poll *LongPoll) Handler(r *ghttp.Request, callback func(data []byte), timeoutDuration time.Duration) {
-	client := &Client{
-		onDone:    callback,
-		waitGroup: &sync.WaitGroup{},
-	}
+func (lp *LongPoll) Unsub(id string) {
+	lp.mu.Lock()
+	defer lp.mu.Unlock()
 
-	poll.Add(client)
-	client.waitGroup.Add(1)
-
-	done := make(chan bool)
-	timeout := time.After(timeoutDuration)
-
-	go func() {
-		client.waitGroup.Wait()
-		done <- true
-	}()
-
-	select {
-	case <-done:
-		return
-	case <-timeout:
-		r.Response.WriteStatus(http.StatusRequestTimeout)
-		return
-	}
+	delete(lp.subscribers, id)
 }
 
-var poll = LongPoll{}
-
-func HandlePoll(r *ghttp.Request) {
-	poll.Handler(r, func(data []byte) {
-		r.Response.Write(data)
-	}, 60*time.Second)
-}
-
-func SendEvent(r *ghttp.Request) {
-	data, err := io.ReadAll(r.Body)
-	if err != nil {
-		r.Response.WriteStatus(http.StatusBadRequest)
-		return
+func (lp *LongPoll) Send(data interface{}) {
+	for _, subscriber := range lp.subscribers {
+		go func(s *Subscriber) {
+			s.Callback(data)
+		}(subscriber)
 	}
-	poll.Send(string(data))
-	r.Response.Write(data)
 }

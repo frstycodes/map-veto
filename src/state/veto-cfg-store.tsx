@@ -1,4 +1,4 @@
-import { BanOrder, BanOrderPreset } from '@/types/ban-order.types'
+import { Stage, BanOrderPreset } from '@/types/ban-order.types'
 import { createSelector } from 'better-zustand-selector'
 import { MapPool } from '@/types/game-config.types'
 import { create } from 'zustand'
@@ -6,14 +6,14 @@ import { create } from 'zustand'
 export type VetoConfigStore = {
   bestOf: number
   pool: MapPool
-  banOrders: BanOrder[]
+  stages: Stage[]
   banOrderPreset: BanOrderPreset
 }
 
 const defaultStore: VetoConfigStore = {
   bestOf: 0,
   pool: null!,
-  banOrders: [],
+  stages: [],
   banOrderPreset: BanOrderPreset.LastPick
 }
 

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { LinkIcon } from 'lucide-react'
 
 async function getTokens(vetoID: string) {
-  const res = await fetch(`/api/veto/tokens/${vetoID}`)
+  const res = await fetch(`/api/veto/${vetoID}/tokens`)
   if (!res.ok) throw new Error('Failed to fetch tokens')
   return res.json()
 }
