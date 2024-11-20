@@ -1,4 +1,5 @@
 import {
+  animate,
   motion,
   MotionProps,
   motionValue,
@@ -11,6 +12,7 @@ import {
 import { Children, ComponentProps, createContext, HTMLProps, ReactNode, useContext, useRef } from 'react'
 import { SPRING_OPTS } from '@/config/motion-config'
 import { cn } from '@/utils/tailwind-utils'
+import { Time } from '@/utils/time'
 
 type ContainerContextType = {
   mouseX: MotionValue<number>
@@ -72,6 +74,8 @@ type RenderFn = (props: { distance: MotionValue<number> }) => ReactNode
 type AnimatingCardProps<T extends RenderFn | undefined> = Omit<ComponentProps<typeof motion.button>, 'children'> & {
   render?: T
   children?: T extends undefined ? ReactNode : never
+  holdFor: Time
+  onHoldSuccess?: () => void
 }
 
 export function AnimatingCard<T extends RenderFn | undefined>({
@@ -79,6 +83,8 @@ export function AnimatingCard<T extends RenderFn | undefined>({
   className,
   children,
   render: Render,
+  holdFor = Time.MS * 500,
+  onHoldSuccess,
   ...props
 }: AnimatingCardProps<T>) {
   const ref = useRef<HTMLButtonElement>(null)
@@ -112,9 +118,43 @@ export function AnimatingCard<T extends RenderFn | undefined>({
 
   const zIndex = useTransform(distance, range, [100, 0])
 
+  const holdTimeoutRef = useRef<NodeJS.Timer | null>()
+
+  const holdProgress = useMotionValue(0)
+
+  const UPDATE = 8
+  function handleHold() {
+    let timeElapsed = 0
+
+    holdTimeoutRef.current = setInterval(() => {
+      timeElapsed += UPDATE
+      const progress = (timeElapsed / holdFor) * 100
+      holdProgress.set(progress)
+
+      if (progress >= 100) {
+        clearInterval(holdTimeoutRef.current!)
+        onHoldSuccess?.()
+      }
+    }, UPDATE)
+  }
+
+  function handleHoldReset() {
+    clearInterval(holdTimeoutRef.current!)
+    holdTimeoutRef.current = null
+    animate(holdProgress, 0)
+  }
   return (
     <motion.button
       ref={ref}
+      onMouseDown={handleHold}
+      onMouseUp={(e) => {
+        handleHoldReset()
+        props.onMouseUp?.(e)
+      }}
+      onMouseLeave={(e) => {
+        handleHoldReset()
+        props.onMouseLeave?.(e)
+      }}
       style={{
         flex,
         zIndex,
@@ -124,10 +164,19 @@ export function AnimatingCard<T extends RenderFn | undefined>({
         filter: mt`blur(${blurAmount}px)`,
         ...style
       }}
-      className={cn('rounded-md shadow-md outline outline-2', className)}
+      className={cn('relative overflow-hidden rounded-md shadow-md outline outline-2', className)}
       {...props}
-      // @ts-expect-error - Render is always a react component
-      children={Render ? <Render distance={distanceFrac} /> : children}
-    />
+    >
+      <motion.div
+        className='absolute bottom-0 z-50 h-3 scale-[1.2] bg-primary/60 blur-lg'
+        style={{ width: mt`${holdProgress}%` }}
+      />
+      {Render ? (
+        // @ts-expect-error - Render is always a react component
+        <Render distance={distanceFrac} />
+      ) : (
+        children
+      )}
+    </motion.button>
   )
 }

@@ -14,7 +14,7 @@ export const useVetoPoller = <T>(
     queryKey: ['veto', id],
     ...opts,
     queryFn: async () => {
-      const res = await fetch(`/api/veto/${id}/polltoken=${clientId}`)
+      const res = await fetch(`/api/veto/${id}/poll?token=${clientId}`)
       const data = await res.json()
 
       if (!res.ok) throw new Error(data.message)

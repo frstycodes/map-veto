@@ -13,7 +13,6 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as TestImport } from './routes/test'
 import { Route as IndexImport } from './routes/index'
 import { Route as GameLayoutImport } from './routes/$game/_layout'
 import { Route as GameLayoutIndexImport } from './routes/$game/_layout/index'
@@ -31,12 +30,6 @@ const GameLayoutIdImport = createFileRoute('/$game/_layout/$id')()
 const GameRoute = GameImport.update({
   id: '/$game',
   path: '/$game',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const TestRoute = TestImport.update({
-  id: '/test',
-  path: '/test',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -89,13 +82,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/test': {
-      id: '/test'
-      path: '/test'
-      fullPath: '/test'
-      preLoaderRoute: typeof TestImport
       parentRoute: typeof rootRoute
     }
     '/$game': {
@@ -203,7 +189,6 @@ const GameRouteWithChildren = GameRoute._addFileChildren(GameRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/test': typeof TestRoute
   '/$game': typeof GameLayoutRouteWithChildren
   '/$game/': typeof GameLayoutIndexRoute
   '/$game/$id': typeof GameLayoutIdLayoutRouteWithChildren
@@ -213,7 +198,6 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/test': typeof TestRoute
   '/$game': typeof GameLayoutIndexRoute
   '/$game/$id': typeof GameLayoutIdLayoutIndexRoute
   '/$game/$id/$token': typeof GameLayoutIdLayoutTokenRoute
@@ -222,7 +206,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/test': typeof TestRoute
   '/$game': typeof GameRouteWithChildren
   '/$game/_layout': typeof GameLayoutRouteWithChildren
   '/$game/_layout/': typeof GameLayoutIndexRoute
@@ -236,18 +219,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/test'
     | '/$game'
     | '/$game/'
     | '/$game/$id'
     | '/$game/$id/$token'
     | '/$game/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/test' | '/$game' | '/$game/$id' | '/$game/$id/$token'
+  to: '/' | '/$game' | '/$game/$id' | '/$game/$id/$token'
   id:
     | '__root__'
     | '/'
-    | '/test'
     | '/$game'
     | '/$game/_layout'
     | '/$game/_layout/'
@@ -260,13 +241,11 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  TestRoute: typeof TestRoute
   GameRoute: typeof GameRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  TestRoute: TestRoute,
   GameRoute: GameRouteWithChildren,
 }
 
@@ -281,15 +260,11 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/test",
         "/$game"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/test": {
-      "filePath": "test.tsx"
     },
     "/$game": {
       "filePath": "$game",

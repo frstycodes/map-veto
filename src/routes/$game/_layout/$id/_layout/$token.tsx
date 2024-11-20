@@ -26,7 +26,7 @@ import { toast } from 'sonner'
 
 export const Route = createFileRoute('/$game/_layout/$id/_layout/$token')({
   loader: async ({ params }) => {
-    const statePromise = getInitialVetoState(params.game)
+    const statePromise = getInitialVetoState(params.id)
     const dataPromise = getVeto(params.id, params.token)
     const [vetoState, vetoData] = await Promise.all([statePromise, dataPromise])
     return { vetoState, vetoData }
@@ -233,8 +233,9 @@ function VetoPage() {
                 const mapData = config.maps.find((m) => m.name === map)
                 return (
                   <AnimatingCard
+                    holdFor={Time.MS * 300}
+                    onHoldSuccess={() => selectMapMutation.mutate(map)}
                     layoutId={map}
-                    onClick={() => selectMapMutation.mutate(map)}
                     key={idx}
                     className='h-60 cursor-pointer overflow-hidden rounded-lg'
                     render={({ distance }) => <AnimatingMapCardContents distance={distance} map={mapData!} />}
@@ -450,7 +451,7 @@ function SelectedMapCard({ map, attacker, pickedBy, ...props }: SelectedMapCardP
       initial={{ skewX: -8 }}
       animate={{ skewX: -8 }}
       className={cn(
-        'flex h-24 min-w-24 max-w-80 flex-1 cursor-pointer items-center overflow-hidden rounded-lg bg-cover bg-center shadow-md',
+        'flex h-24 min-w-24 max-w-80 flex-1 cursor-pointer items-center overflow-hidden rounded-lg bg-cover bg-center shadow-lg',
         props.className
       )}
       transition={{
