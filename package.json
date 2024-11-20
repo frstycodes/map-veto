@@ -8,7 +8,7 @@
     "build": "pnpm process-images && pnpm build:vite && pnpm build:go",
     "process-images": "cd image-optimizer && go run ./src/main.go",
     "dev": "pnpm vite --open",
-    "dev:go": "cd server && go run ./src/main.go",
+    "dev:go": "cd server && ./bin/img",
     "build:vite": "vite build",
     "build:go": "cd server && go build -o dist/server ./src/main.go",
     "clean": "rm -rf dist node_modules",

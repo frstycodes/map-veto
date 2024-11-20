@@ -1,0 +1,8 @@
+{
+  "inputDir": "../../public/maps",
+  "outputDir": "../../public/optimized",
+  "workers": 100,
+  "sizes": [360, 640, 1024, 1920],
+  "quality": 100,
+  "formats": ["png", "webp"]
+}
