@@ -32,7 +32,7 @@ export function VetoPage() {
   console.log({ tokens })
 
   return (
-    <CenteredPageLayout className='space-y-10 w-1/2 min-w-[300px] max-w-[500px]'>
+    <CenteredPageLayout className='w-1/2 min-w-[300px] max-w-[500px] space-y-10'>
       <PageHeader className='text-2xl'>
         <LinkIcon className='h-6 w-6' />
         Veto Links
@@ -54,8 +54,9 @@ function UrlInput(props: UrlInputProps) {
   return (
     <div className='space-y-2'>
       <h1 className='text-lg font-bold'>{props.label}</h1>
-      <div className='flex gap-2 items-center'>
+      <div className='flex items-center gap-2'>
         <Input
+          readOnly
           className='rounded-lg'
           value={url}
           type='password'

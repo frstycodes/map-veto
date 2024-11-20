@@ -2,19 +2,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AnimatePresence, motion, MotionValue, useSpring, useTransform } from 'framer-motion'
 import { CheckboxGroup, CheckboxItem } from './ui/custom-checkbox'
 import { Route as GameRoute } from '@/routes/$game/_layout'
+import customPool from '@/config/games/custom_pool.json'
 import { MapData } from '@/types/game-config.types'
-import { Info, Settings } from 'lucide-react'
 import { cn } from '@/utils/tailwind-utils'
 import { ComponentProps } from 'react'
+import { Info } from 'lucide-react'
+import { Image } from './image'
 
 type MapPoolSelectionDialogProps = ComponentProps<typeof Dialog>
-
-const customPool = {
-  id: 'custom',
-  name: 'Custom',
-  icon: Settings,
-  maps: []
-}
 
 export function MapPoolSelectionDialog({ ...props }: MapPoolSelectionDialogProps) {
   const { config, store } = GameRoute.useLoaderData()
@@ -45,14 +40,14 @@ export function MapPoolSelectionDialog({ ...props }: MapPoolSelectionDialogProps
               }
             })
           }
-          className='gap-2 flex-wrap grid grid-cols-12 select-none'
+          className='grid select-none grid-cols-12 flex-wrap gap-2'
         >
           {config.maps.map((map) => {
             return (
               <CheckboxItem
                 value={map.name}
                 key={map.id}
-                className='h-20 col-span-6 md:col-span-6 w-full relative group aspect-square grid place-items-center rounded-xl overflow-hidden'
+                className='group relative col-span-6 grid aspect-square h-20 w-full place-items-center overflow-hidden rounded-xl md:col-span-6'
                 render={(props) => <CheckboxCustomRender {...props} map={map} />}
               />
             )
@@ -80,7 +75,7 @@ export function MapsMinThresholdWarning({ threshold = 5, show, ...props }: MapsM
           exit={{ y: 40 }}
           {...props}
           className={cn(
-            'rounded-xl w-full flex items-center gap-2 border-yellow-500/20 text-yellow-800 dark:text-yellow-200 bg-yellow-500/10 text-xs border-2 px-4 py-3',
+            'flex w-full items-center gap-2 rounded-xl border-2 border-yellow-500/20 bg-yellow-500/10 px-4 py-3 text-xs text-yellow-800 dark:text-yellow-200',
             props.className
           )}
         >
@@ -100,15 +95,17 @@ function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
   const imageOpacity = useSpring(imageOpacitySync, {
     mass: 0.1
   })
-  const image = `./maps/${map.images[0]}`
+  const image = `/optimized/${map.images[0]}`
   return (
     <>
-      <motion.img
+      <Image
+        asMotion
         src={image}
+        setSizes={[480]}
         style={{
           opacity: imageOpacity
         }}
-        className='h-full absolute contrast-[1.1] -z-10 w-full object-cover'
+        className='absolute -z-10 h-full w-full object-cover contrast-[1.1]'
       />
       <p className='font-bold italic text-white drop-shadow-lg'>{map.name}</p>
     </>

@@ -1,10 +1,12 @@
 package veto
 
 import (
+	"errors"
 	"fmt"
 	longpoll "main/src/poll"
 	"main/src/utils"
-	"slices"
+	VetoConst "main/src/veto-constants"
+	"strings"
 	"sync"
 	"time"
 )
@@ -13,6 +15,17 @@ type Team struct {
 	Id    string `json:"id"`
 	Name  string `json:"name"`
 	Index int    `json:"index"`
+}
+
+type PickedMap struct {
+	Name     string `json:"name"`
+	By       int    `json:"by"`
+	Attacker int    `json:"attacker"`
+}
+
+type BannedMap struct {
+	Name string `json:"name"`
+	By   int    `json:"by"`
 }
 
 type Stage struct {
@@ -31,13 +44,28 @@ type VetoConfig struct {
 	Game         string
 }
 
+type Log struct {
+	Time  time.Time `json:"time"`
+	Event string    `json:"event"`
+}
+
+func NewLog(event string) Log {
+	return Log{
+		Time:  time.Now(),
+		Event: event,
+	}
+}
+
 type Veto struct {
 	Config       VetoConfig
 	CurrentStage int
-	Selected     []string
-	Banned       []string
-	poll         *longpoll.LongPoll
-	resetChan    chan struct{}
+	Selected     []PickedMap
+	Banned       []BannedMap
+	Phase        string
+	logs         []Log
+
+	poll      *longpoll.LongPoll
+	resetChan chan struct{}
 }
 
 func NewVeto(props VetoConstructorProps, timeout time.Duration) *Veto {
@@ -70,51 +98,164 @@ func NewVeto(props VetoConstructorProps, timeout time.Duration) *Veto {
 	veto := &Veto{
 		Config:       config,
 		CurrentStage: 0,
-		poll:         longpoll.New(time.Minute),
+		Phase:        VetoConst.ChooseMaps,
+
+		poll:      longpoll.New(time.Minute),
+		resetChan: make(chan struct{}),
 	}
 
-	go veto.monitor(timeout)
+	veto.monitor(timeout)
 
 	VetoMap[id] = veto
 
-	fmt.Println("Veto Created")
-	fmt.Println("New Veto Count: ", len(VetoMap))
+	log := NewLog(fmt.Sprintf("Veto created for %s with maps %s.", config.Game, strings.Join(config.Maps, ", ")))
+	veto.AddLog(log)
+
+	fmt.Println("Veto Created. New Count: ", len(VetoMap))
 
 	return veto
 }
 
+func (veto *Veto) AddLog(log Log) {
+	veto.logs = append(veto.logs, log)
+}
+
 func (veto *Veto) monitor(timeout time.Duration) {
 	timer := time.NewTimer(timeout)
-	select {
-	case <-veto.resetChan:
-		// Stop monitoring a start a new one
-		go veto.monitor(timeout)
-		return
-	case <-timer.C:
-		delete(VetoMap, veto.Config.Id)
-		fmt.Println("Veto timed out. New count: ", len(VetoMap))
-	}
+	go func() {
+		select {
+		case <-veto.resetChan:
+			// Stop monitoring a start a new one
+			veto.monitor(timeout)
+			return
+		case <-timer.C:
+			delete(VetoMap, veto.Config.Id)
+			fmt.Println("Veto timed out. New count: ", len(VetoMap))
+		}
+	}()
 }
 
 func (veto *Veto) ExtendLifetime() {
 	veto.resetChan <- struct{}{}
 }
 
-func (veto *Veto) GetCurrentStage() Stage {
-	veto.ExtendLifetime()
-	return veto.Config.Stages[veto.CurrentStage]
+func (veto *Veto) GetCurrentStage() *Stage {
+	if veto.CurrentStage >= len(veto.Config.Stages) {
+		return nil
+	}
+	return &veto.Config.Stages[veto.CurrentStage]
 }
 
 func (veto *Veto) GetRemainingMaps() []string {
-	veto.ExtendLifetime()
-
 	var remainingMaps []string
 	for _, mapName := range veto.Config.Maps {
-		if !slices.Contains(veto.Selected, mapName) && !slices.Contains(veto.Banned, mapName) {
+		if !veto.IsPicked(mapName) && !veto.IsBanned(mapName) {
 			remainingMaps = append(remainingMaps, mapName)
 		}
 	}
 	return remainingMaps
+}
+
+func (veto *Veto) IsBanned(mapName string) bool {
+	for _, bannedMaps := range veto.Banned {
+		if bannedMaps.Name == mapName {
+			return true
+		}
+	}
+	return false
+}
+
+func (veto *Veto) IsPicked(mapName string) bool {
+	for _, pickedMap := range veto.Selected {
+		if pickedMap.Name == mapName {
+			return true
+		}
+	}
+	return false
+}
+
+func (veto *Veto) GetTurnTeam() *Team {
+	stage := veto.GetCurrentStage()
+	if stage.Team == 1 {
+		return &veto.Config.Team1
+	} else if stage.Team == 2 {
+		return &veto.Config.Team2
+	}
+	return nil
+}
+
+func (veto *Veto) GetTeamFromIdx(idx int) *Team {
+	if idx == 1 {
+		return &veto.Config.Team1
+	}
+	if idx == 2 {
+		return &veto.Config.Team2
+	}
+	return nil
+}
+
+func (veto *Veto) GetSidePickStage() (int, *PickedMap) {
+	for idx, pickedMap := range veto.Selected {
+		if pickedMap.Attacker == 0 {
+			return idx, &pickedMap
+		}
+	}
+	return (-1), nil
+}
+
+func (veto *Veto) GetTeamFromID(id string) *Team {
+	if veto.Config.Team1.Id == id {
+		return &veto.Config.Team1
+	}
+	if veto.Config.Team2.Id == id {
+		return &veto.Config.Team2
+	}
+	return nil
+}
+
+func (veto *Veto) PickSide(isAttacker bool, team int) error {
+	side := team
+	if !isAttacker {
+		side = 3 - team
+	}
+
+	pickedMap := PickedMap{
+		Name:     veto.GetRemainingMaps()[0],
+		By:       team,
+		Attacker: side,
+	}
+	veto.Selected = append(veto.Selected, pickedMap)
+	return nil
+
+}
+
+func (veto *Veto) PickMap(mapName string, team int) error {
+	if veto.IsPicked(mapName) {
+		return errors.New("already-picked")
+	}
+	pickedMap := PickedMap{
+		Name: mapName,
+		By:   team,
+	}
+	veto.Selected = append(veto.Selected, pickedMap)
+	return nil
+}
+
+func (veto *Veto) BanMap(mapName string, team int) error {
+	if veto.IsBanned(mapName) {
+		return errors.New("already-banned")
+	}
+	bannedMap := BannedMap{
+		Name: mapName,
+		By:   team,
+	}
+	veto.Banned = append(veto.Banned, bannedMap)
+	return nil
+}
+
+func (veto *Veto) SendPollData() {
+	data := GetVetoPollData(veto)
+	veto.poll.Send(data)
 }
 
 func GetVeto(id string) *Veto {
@@ -132,6 +273,8 @@ func GetVetoPollData(veto *Veto) *VetoPollResponse {
 		Selected:     veto.Selected,
 		Banned:       veto.Banned,
 		CurrentStage: veto.CurrentStage,
+		Phase:        veto.Phase,
+		Logs:         veto.logs,
 	}
 }
 

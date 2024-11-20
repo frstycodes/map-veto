@@ -11,7 +11,7 @@ type TeamResponse struct {
 
 type VetoResponse struct {
 	Id           string       `json:"id"`
-	ClientType   string       `json:"clientType"`
+	ClientType   int          `json:"clientType"`
 	Team1        TeamResponse `json:"team1"`
 	Team2        TeamResponse `json:"team2"`
 	Maps         []string     `json:"maps"`
@@ -19,8 +19,8 @@ type VetoResponse struct {
 	Stages       []Stage      `json:"stages"`
 	Game         string       `json:"game"`
 	CurrentStage int          `json:"currentStage"`
-	Selected     []string     `json:"selectedMaps"`
-	Banned       []string     `json:"bannedMaps"`
+	Selected     []PickedMap  `json:"selectedMaps"`
+	Banned       []BannedMap  `json:"bannedMaps"`
 }
 
 type VetoConstructorProps struct {
@@ -31,11 +31,13 @@ type VetoConstructorProps struct {
 }
 
 type VetoPollResponse struct {
-	Team1        string `json:"team1"`
-	Team2        string `json:"team2"`
-	Selected     []string
-	Banned       []string
-	CurrentStage int
+	Team1        string      `json:"team1"`
+	Team2        string      `json:"team2"`
+	Selected     []PickedMap `json:"selected"`
+	Banned       []BannedMap `json:"banned"`
+	CurrentStage int         `json:"currentStage"`
+	Phase        string      `json:"phase"`
+	Logs         []Log       `json:"logs"`
 }
 
 type StageActionProps struct {
@@ -44,6 +46,6 @@ type StageActionProps struct {
 }
 
 type PollData struct {
-	event string `json:"event"`
-	data  g.Map  `json:"data"`
+	Event string `json:"event"`
+	Data  g.Map  `json:"data"`
 }

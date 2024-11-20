@@ -8,14 +8,9 @@ import {
   useSpring,
   useTransform
 } from 'framer-motion'
-import { Children, ComponentProps, createContext, HTMLProps, useContext, useRef } from 'react'
+import { Children, ComponentProps, createContext, HTMLProps, ReactNode, useContext, useRef } from 'react'
+import { SPRING_OPTS } from '@/config/motion-config'
 import { cn } from '@/utils/tailwind-utils'
-
-const SPRING_OPTS = {
-  stiffness: 100,
-  damping: 5,
-  mass: 0.1
-}
 
 type ContainerContextType = {
   mouseX: MotionValue<number>
@@ -72,11 +67,20 @@ export function AnimatingCardContainer({
   )
 }
 
-type AnimatingCardProps = ComponentProps<typeof motion.button> & {
-  children: React.ReactNode | ((distanceFrac: MotionValue<number>) => React.ReactNode)
+type RenderFn = (props: { distance: MotionValue<number> }) => ReactNode
+
+type AnimatingCardProps<T extends RenderFn | undefined> = Omit<ComponentProps<typeof motion.button>, 'children'> & {
+  render?: T
+  children?: T extends undefined ? ReactNode : never
 }
 
-export function AnimatingCard({ style, className, children, ...props }: AnimatingCardProps) {
+export function AnimatingCard<T extends RenderFn | undefined>({
+  style,
+  className,
+  children,
+  render: Render,
+  ...props
+}: AnimatingCardProps<T>) {
   const ref = useRef<HTMLButtonElement>(null)
 
   const { mouseX, containerWidth, sizeMultiplier } = useContext(containerContext)
@@ -89,7 +93,7 @@ export function AnimatingCard({ style, className, children, ...props }: Animatin
     return Math.abs(dist)
   })
 
-  const distanceFrac = useTransform(distance, range, [0, 1])
+  const distanceFrac = useTransform(distance, [...range, Number.MAX_VALUE], [0, 1, 0])
 
   const flexSync = useTransform(distance, range, [sizeMultiplier, 1])
   const flex = useSpring(flexSync, SPRING_OPTS)
@@ -106,7 +110,7 @@ export function AnimatingCard({ style, className, children, ...props }: Animatin
   const scaleSync = useTransform(distance, range, [1 + sizeMultiplier / 15, 1])
   const scale = useSpring(scaleSync, SPRING_OPTS)
 
-  const zIndex = useTransform(distance, range, [999, 0])
+  const zIndex = useTransform(distance, range, [100, 0])
 
   return (
     <motion.button
@@ -120,9 +124,10 @@ export function AnimatingCard({ style, className, children, ...props }: Animatin
         filter: mt`blur(${blurAmount}px)`,
         ...style
       }}
-      className={cn('outline outline-2 shadow-md -skew-x-[8deg] rounded-md', className)}
+      className={cn('rounded-md shadow-md outline outline-2', className)}
       {...props}
-      children={typeof children === 'function' ? children(distanceFrac) : children}
+      // @ts-expect-error - Render is always a react component
+      children={Render ? <Render distance={distanceFrac} /> : children}
     />
   )
 }

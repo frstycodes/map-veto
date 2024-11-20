@@ -2,6 +2,7 @@ package veto
 
 import (
 	"fmt"
+	VetoConst "main/src/veto-constants"
 	"math/rand/v2"
 	"net/http"
 	"slices"
@@ -39,6 +40,7 @@ func GetVetoHandler(r *ghttp.Request) {
 		r.Response.WriteStatus(404)
 		return
 	}
+	go veto.ExtendLifetime()
 
 	tokenInterface := r.GetQuery("token")
 	token, ok := tokenInterface.(string)
@@ -47,26 +49,35 @@ func GetVetoHandler(r *ghttp.Request) {
 		return
 	}
 
-	var clientType string
+	var clientType int = -1
 
-	if token == veto.Config.Team1.Id {
-		clientType = "team1"
-	} else if token == veto.Config.Team2.Id {
-		clientType = "team2"
-	} else if token == veto.Config.ViewersToken {
-		clientType = "viewer"
+	switch token {
+	case veto.Config.Team1.Id:
+		clientType = 1
+	case veto.Config.Team2.Id:
+		clientType = 2
+	case veto.Config.ViewersToken:
+		clientType = 0
 	}
 
-	if clientType == "" {
+	if clientType == -1 {
 		r.Response.WriteStatus(401)
 		return
+	}
+	team1Response := TeamResponse{
+		Name:  veto.Config.Team1.Name,
+		Index: veto.Config.Team1.Index,
+	}
+	team2Response := TeamResponse{
+		Name:  veto.Config.Team2.Name,
+		Index: veto.Config.Team2.Index,
 	}
 
 	vetoResponse := VetoResponse{
 		Id:         veto.Config.Id,
 		ClientType: clientType,
-		Team1:      TeamResponse{Name: veto.Config.Team1.Name, Index: veto.Config.Team1.Index},
-		Team2:      TeamResponse{Name: veto.Config.Team2.Name, Index: veto.Config.Team2.Index},
+		Team1:      team1Response,
+		Team2:      team2Response,
 		Maps:       veto.Config.Maps,
 		Rounds:     veto.Config.Rounds,
 		Stages:     veto.Config.Stages,
@@ -113,10 +124,7 @@ func UpdateTeamHandler(r *ghttp.Request) {
 		return
 	}
 
-	vetoState := GetVetoPollData(veto)
-
-	veto.poll.Send(vetoState)
-	r.Response.WriteStatus(200)
+	veto.SendPollData()
 }
 
 func VetoPollHandler(r *ghttp.Request) {
@@ -151,7 +159,6 @@ func VetoPollHandler(r *ghttp.Request) {
 
 	select {
 	case data := <-respChan:
-		fmt.Println(data)
 		r.Response.WriteJson(data)
 		return
 	case <-time.After(time.Minute):
@@ -179,24 +186,8 @@ func ActionHandler(r *ghttp.Request) {
 		return
 	}
 
-	// Check if the Team is valid
-	if stageActionProps.TeamId != veto.Config.Team1.Id && stageActionProps.TeamId != veto.Config.Team2.Id {
-		r.Response.WriteStatus(401)
-		return
-	}
-
-	// Check if the current turn is the Tea=
-	turnTeam := veto.Config.Stages[veto.CurrentStage].Team
-	turnTeamId := veto.Config.Team1.Id
-
-	if turnTeam == 2 {
-		turnTeamId = veto.Config.Team2.Id
-	}
-
-	if stageActionProps.TeamId != turnTeamId {
-		r.Response.WriteStatus(401)
-		return
-	}
+	// Check if the current turn is the Team
+	turnTeam := veto.GetTurnTeam()
 
 	// Check if the Map is valid
 	if !slices.Contains(veto.Config.Maps, stageActionProps.Map) {
@@ -204,28 +195,27 @@ func ActionHandler(r *ghttp.Request) {
 		return
 	}
 
-	// Check if the Map is already selected or banned
-	if slices.Contains(veto.Selected, stageActionProps.Map) || slices.Contains(veto.Banned, stageActionProps.Map) {
-		r.Response.WriteStatus(400, "Map already selected or banned")
-		return
-	}
-
 	stage := veto.GetCurrentStage()
 
 	switch stage.Type {
 	case "pick":
-		if slices.Contains(veto.Selected, stageActionProps.Map) {
+		err := veto.PickMap(stageActionProps.Map, stage.Team)
+		if err != nil {
 			r.Response.WriteStatus(400, "Map already selected")
 			return
 		}
-		veto.Selected = append(veto.Selected, stageActionProps.Map)
+		log := NewLog(fmt.Sprintf("Team %d(%s) picked %s.", turnTeam.Index, turnTeam.Name, stageActionProps.Map))
+		veto.AddLog(log)
 
 	case "ban":
-		if slices.Contains(veto.Banned, stageActionProps.Map) {
+		err := veto.BanMap(stageActionProps.Map, stage.Team)
+		if err != nil {
 			r.Response.WriteStatus(400, "Map already banned")
 			return
 		}
-		veto.Banned = append(veto.Banned, stageActionProps.Map)
+
+		log := NewLog(fmt.Sprintf("Team %d(%s) banned %s.", turnTeam.Index, turnTeam.Name, stageActionProps.Map))
+		veto.AddLog(log)
 
 	default:
 		r.Response.WriteStatus(400, "Invalid Action")
@@ -233,26 +223,97 @@ func ActionHandler(r *ghttp.Request) {
 	}
 
 	veto.CurrentStage++
-	vetoState := GetVetoPollData(veto)
-	veto.poll.Send(vetoState)
+	veto.SendPollData()
 
 	// If the current stage is the decider stage, send a random map to the client
 	newStage := veto.GetCurrentStage()
 	if newStage.Type == "decider" {
 		go func() {
+			time.Sleep(time.Millisecond * 500)
+			sendDeciderMap(veto)
 			time.Sleep(time.Second)
-			remainingMaps := veto.GetRemainingMaps()
-
-			randIdx := rand.IntN(len(remainingMaps))
-			randMap := remainingMaps[randIdx]
-
-			veto.Selected = append(veto.Selected, randMap)
-			vetoState := GetVetoPollData(veto)
-			veto.poll.Send(vetoState)
+			changePhase(veto)
 		}()
 	}
 
 	r.Response.WriteStatus(200)
+}
+
+type SidePickProp struct {
+	TeamId   string `json:"teamId"`
+	Attacker bool   `json:"isAttacking"`
+}
+
+func SidePickHandler(r *ghttp.Request) {
+	id := r.GetString("id")
+	veto := GetVeto(id)
+	if veto == nil {
+		r.Response.WriteStatus(404, "Veto not found")
+		return
+	}
+
+	veto.ExtendLifetime()
+
+	var sidePickProps SidePickProp
+	if err := r.GetStruct(&sidePickProps); err != nil {
+		r.Response.WriteStatus(400, "Invalid JSON")
+		return
+	}
+
+	turnTeam := veto.GetTeamFromID(sidePickProps.TeamId)
+
+	if sidePickProps.TeamId != turnTeam.Id || turnTeam == nil {
+		r.Response.WriteStatus(400, "Not your turn")
+		return
+	}
+
+	idx, sidePickStage := veto.GetSidePickStage()
+
+	if sidePickStage == nil {
+		r.Response.WriteStatus(400, "Invalid stage")
+		return
+	}
+
+	var attacker = turnTeam.Index
+	if !sidePickProps.Attacker {
+		attacker = 3 - turnTeam.Index
+	}
+
+	modifiedMap := PickedMap{
+		Name:     sidePickStage.Name,
+		By:       sidePickStage.By,
+		Attacker: attacker,
+	}
+	fmt.Println(modifiedMap, idx)
+
+	veto.Selected[idx] = modifiedMap
+
+	veto.SendPollData()
+
+	r.Response.WriteStatus(200)
+
+}
+
+func changePhase(veto *Veto) {
+	veto.Phase = VetoConst.ChooseSides
+	veto.SendPollData()
+}
+
+func sendDeciderMap(veto *Veto) {
+	remainingMaps := veto.GetRemainingMaps()
+
+	randIdx := rand.IntN(len(remainingMaps))
+	randMap := remainingMaps[randIdx]
+
+	veto.Phase = VetoConst.ChooseSides
+	veto.PickMap(randMap, 0)
+
+	veto.logs = append(veto.logs, Log{
+		Time:  time.Now(),
+		Event: fmt.Sprintf("%s was chosen as the decider map.", randMap),
+	})
+
+	veto.SendPollData()
 }
 
 func InitialVetoStateHandler(r *ghttp.Request) {
@@ -274,7 +335,7 @@ func StartVeto(r *ghttp.Request) {
 		return
 	}
 
-	veto := NewVeto(props, time.Second*10)
+	veto := NewVeto(props, 5*time.Minute)
 	r.Response.Status = http.StatusCreated
 	r.Response.WriteJsonExit(g.Map{"id": veto.Config.Id})
 }

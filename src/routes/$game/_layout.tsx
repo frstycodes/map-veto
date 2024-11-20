@@ -18,6 +18,9 @@ export const Route = createFileRoute('/$game/_layout')({
 
     return { store, config }
   },
+  onError: () => {
+    throw redirect({ to: '/$game', params: { game: 'valorant' } })
+  },
   component: Outlet,
   pendingComponent: PageLoader
 })

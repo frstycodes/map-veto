@@ -23,57 +23,57 @@
     {
       "id": 1,
       "name": "Ascent",
-      "images": ["Ascent-premier.png", "Ascent-splash.png", "Ascent-stylized.png", "Ascent-tall.png"]
+      "images": ["Ascent-premier.webp", "Ascent-splash.webp", "Ascent-stylized.webp", "Ascent-tall.webp"]
     },
     {
       "id": 2,
       "name": "Split",
-      "images": ["Split-premier.png", "Split-splash.png", "Split-stylized.png", "Split-tall.png"]
+      "images": ["Split-premier.webp", "Split-splash.webp", "Split-stylized.webp", "Split-tall.webp"]
     },
     {
       "id": 3,
       "name": "Fracture",
-      "images": ["Fracture-premier.png", "Fracture-splash.png", "Ascent-Fracture.png", "Ascent-premier.Fracture"]
+      "images": ["Fracture-premier.webp", "Fracture-splash.webp", "Fracture-stylized.webp", "Fracture-tall.webp"]
     },
     {
       "id": 4,
       "name": "Bind",
-      "images": ["Bind-premier.png", "Bind-splash.png", "Bind-stylized.png", "Bind-tall.png"]
+      "images": ["Bind-premier.webp", "Bind-splash.webp", "Bind-stylized.webp", "Bind-tall.webp"]
     },
     {
       "id": 5,
       "name": "Breeze",
-      "images": ["Breeze-premier.png", "Breeze-splash.png", "Breeze-stylized.png", "Breeze-tall.png"]
+      "images": ["Breeze-premier.webp", "Breeze-splash.webp", "Breeze-stylized.webp", "Breeze-tall.webp"]
     },
     {
       "id": 6,
       "name": "Abyss",
-      "images": ["Abyss-premier.png", "Abyss-splash.png", "Abyss-stylized.png", "Abyss-tall.png"]
+      "images": ["Abyss-premier.webp", "Abyss-splash.webp", "Abyss-stylized.webp", "Abyss-tall.webp"]
     },
     {
       "id": 7,
       "name": "Lotus",
-      "images": ["Lotus-premier.png", "Lotus-splash.png", "Lotus-stylized.png", "Lotus-tall.png"]
+      "images": ["Lotus-premier.webp", "Lotus-splash.webp", "Lotus-stylized.webp", "Lotus-tall.webp"]
     },
     {
       "id": 8,
       "name": "Sunset",
-      "images": ["Sunset-premier.png", "Sunset-splash.png", "Sunset-stylized.png", "Sunset-tall.png"]
+      "images": ["Sunset-premier.webp", "Sunset-splash.webp", "Sunset-stylized.webp", "Sunset-tall.webp"]
     },
     {
       "id": 9,
       "name": "Pearl",
-      "images": ["Pearl-premier.png", "Pearl-splash.png", "Pearl-stylized.png", "Pearl-tall.png"]
+      "images": ["Pearl-premier.webp", "Pearl-splash.webp", "Pearl-stylized.webp", "Pearl-tall.webp"]
     },
     {
       "id": 10,
       "name": "Icebox",
-      "images": ["Icebox-premier.png", "Icebox-splash.png", "Icebox-stylized.png", "Icebox-tall.png"]
+      "images": ["Icebox-premier.webp", "Icebox-splash.webp", "Icebox-stylized.webp", "Icebox-tall.webp"]
     },
     {
       "id": 11,
       "name": "Haven",
-      "images": ["Haven-premier.png", "Haven-splash.png", "Haven-stylized.png", "Haven-tall.png"]
+      "images": ["Haven-premier.webp", "Haven-splash.webp", "Haven-stylized.webp", "Haven-tall.webp"]
     }
   ]
 }

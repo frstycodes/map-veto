@@ -2,15 +2,25 @@ import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query
 
 type VetoPollerOpts<T> = Omit<UseQueryOptions<T>, 'queryKey' | 'queryFn'> & {
   queryKey?: string[]
+  afterFetchSync?: (data: T) => void
 }
 type VetoPoller<T> = UseQueryResult<T>
-export const useVetoPoller = <T>(id: string, clientId: string, opts?: VetoPollerOpts<T>): VetoPoller<T> =>
+export const useVetoPoller = <T>(
+  id: string,
+  clientId: string,
+  { afterFetchSync, ...opts }: VetoPollerOpts<T> = {}
+): VetoPoller<T> =>
   useQuery({
-    ...opts,
     queryKey: ['veto', id],
+    ...opts,
     queryFn: async () => {
-      const res = await fetch(`/api/veto/${id}/poll?token=${clientId}`)
+      const res = await fetch(`/api/veto/${id}/polltoken=${clientId}`)
       const data = await res.json()
+
+      if (!res.ok) throw new Error(data.message)
+
+      if (afterFetchSync) await afterFetchSync(data)
+
       return data as T
     },
     refetchInterval: 1, // Poll immediately after each request

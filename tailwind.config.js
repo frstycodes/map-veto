@@ -14,6 +14,7 @@ export default {
         sans: ['Montserrat', ...defaultTheme.fontFamily.sans]
       },
       boxShadow: {
+        glow: '0 0 10px 5px hsl(var(--background)/ 0.2)',
         'active-indicator': '0 0 2px var(--color-primary)',
         rim: 'inset 0 1px 0 #ffffff12, inset 0 -1px 0 #00000020, inset 0 0 0.5px 0.1px #ffffff12, inset 0 0 0.5px 0.4px #00000020'
       },

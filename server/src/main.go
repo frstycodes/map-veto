@@ -36,6 +36,7 @@ func main() {
 				idGroup.GET("/state", veto.InitialVetoStateHandler)
 				idGroup.GET("/poll", veto.VetoPollHandler)
 				idGroup.POST("/action", veto.ActionHandler)
+				idGroup.POST("/pick-side", veto.SidePickHandler)
 				idGroup.Group("/team/:teamId", func(teamGroup *ghttp.RouterGroup) {
 					teamGroup.PUT("/", veto.UpdateTeamHandler)
 				})

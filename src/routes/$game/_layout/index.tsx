@@ -64,7 +64,7 @@ function GamePage() {
           Quickly veto maps for <span className='font-bold uppercase text-primary'>{config.name}</span>
         </p>
       </header>
-      <div className='space-y-8 animate-in fade-in-0 duration-500'>
+      <div className='space-y-8 duration-500 animate-in fade-in-0'>
         <Section title='Choose Map Pool:'>
           <ChooseMapPool />
         </Section>
@@ -116,7 +116,7 @@ function ChooseMapPool() {
           <RadioItem
             key={id}
             onClick={id === 'custom' ? () => setDialogOpen(true) : undefined}
-            className='grid aspect-square z-10 h-28 w-40 place-items-center backdrop-blur-sm gap-4 rounded-2xl text-sm font-medium'
+            className='z-10 grid aspect-square h-28 w-40 place-items-center gap-4 rounded-2xl text-sm font-medium backdrop-blur-sm'
             value={id}
           >
             <div className='grid place-items-center gap-3'>
@@ -157,7 +157,7 @@ function ChooseBestOf() {
               className='relative grid aspect-square h-28 place-items-center rounded-2xl p-2 backdrop-blur-sm'
               value={mapped_bestOf.toString()}
             >
-              <div className='flex flex-wrap gap-1.5 items-center justify-center'>
+              <div className='flex flex-wrap items-center justify-center gap-1.5'>
                 {Array.from({ length: mapped_bestOf }, (_, i) => (
                   <Swords key={i} className='h-5 w-5' />
                 ))}
@@ -188,7 +188,7 @@ function StartMapVetoButton(props: StartMapVetoProps) {
       onClick={props.onClick}
       className={cn(
         'gap-2 font-bold text-background',
-        performanceMode && 'rounded-xl bg-foreground py-2 hover:bg-foreground/80 text-md h-11 px-8',
+        performanceMode && 'text-md h-11 rounded-xl bg-foreground px-8 py-2 hover:bg-foreground/80',
         props.className
       )}
     >
