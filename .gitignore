@@ -15,6 +15,7 @@ dist-ssr
 *.local
 .env
 public/optimized
+image-optimizer/bin
 
 
 # Editor directories and files

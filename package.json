@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "./server/dist/server",
-    "build": "pnpm process-images && pnpm build:vite && pnpm build:go",
-    "process-images": "cd image-optimizer && ./bin/img",
+    "start": "cd ./server && go run ./src/main.go",
+    "build": "pnpm process-images && pnpm build:vite",
+    "process-images": "cd image-optimizer && go run ./src/main.go",
     "dev": "pnpm vite --open",
     "dev:go": "cd server && go run ./src/main.go",
     "build:vite": "vite build",
