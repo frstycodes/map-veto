@@ -29,7 +29,7 @@ image-optimizer/bin
 *.sln
 *.sw?
 src/config/maps
-public/maps/*.png
+/maps
 
 .vercel
 
