@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "cd ./server && go run ./src/main.go",
-    "build": "pnpm build:vite",
+    "build": "pnpm build:go && pnpm build:vite",
     "process-images": "cd image-optimizer && go run ./src/main.go",
     "dev": "pnpm vite --open",
     "dev:go": "cd server && go run ./src/main.go",
