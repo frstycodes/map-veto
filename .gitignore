@@ -29,3 +29,6 @@ src/config/maps
 public/maps/*.png
 
 .vercel
+
+optimizer
+cli

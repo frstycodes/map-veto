@@ -3,7 +3,8 @@ import { ComponentProps, createContext, useContext } from 'react'
 import * as Radix_RadioGroup from '@radix-ui/react-radio-group'
 import { useMousePosition } from '@/hooks/use-mouse-position'
 import { useDistance } from '@/hooks/use-distance'
-import { cn, Vec2 } from '@/utils/tailwind-utils'
+import { cn } from '@/utils/tailwind-utils'
+import { Vec2 } from '@/utils/math'
 
 const groupContext = createContext({
   position: motionValue([Infinity, Infinity] as Vec2),
@@ -50,7 +51,7 @@ export function RadioItem({ children, ...props }: RadioItemProps) {
         backgroundColor: mt`hsl(var(--foreground) / ${backgroundOpacity})`
       }}
       className={cn(
-        'cursor-pointer rounded-xl w-full h-full border-2 border-foreground data-[state=checked]:!border-primary data-[state=checked]:!bg-primary/20 data-[state=checked]:text-foreground',
+        'h-full w-full cursor-pointer rounded-xl border-2 border-foreground data-[state=checked]:!border-primary data-[state=checked]:!bg-primary/20 data-[state=checked]:text-foreground',
         'disabled:cursor-not-allowed disabled:opacity-50',
         props.className
       )}
