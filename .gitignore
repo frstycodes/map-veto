@@ -14,7 +14,7 @@ dist
 dist-ssr
 *.local
 .env
-public/optimized
+
 image-optimizer/bin
 
 

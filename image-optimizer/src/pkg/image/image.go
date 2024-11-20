@@ -28,8 +28,8 @@ func PngEncoder(file *os.File, image image.Image, quality int) error {
 
 func WebpEncoder(file *os.File, image image.Image, quality int) error {
 	options := &webp.Options{
-		Lossless: false,
 		Quality:  float32(quality),
+		Lossless: false,
 	}
 	return webp.Encode(file, image, options)
 }
