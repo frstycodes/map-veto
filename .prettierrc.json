@@ -1,0 +1,12 @@
+{
+  "singleQuote": true,
+  "plugins": ["prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+  "importOrder": ["^react", "^[a-zA-Z]", "^@?\\w", "^[.]"],
+  "jsxSingleQuote": true,
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "bracketSpacing": true,
+  "printWidth": 120,
+  "trailingComma": "none",
+  "semi": false
+}

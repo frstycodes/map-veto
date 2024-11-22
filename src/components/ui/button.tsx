@@ -1,9 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import * as React from 'react'
 
-import { cn } from '@/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
+import { cn } from '@/utils/tailwind-utils'
 import { Loader2 } from 'lucide-react'
 
 const buttonVariants = cva(
@@ -12,27 +12,24 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive:
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline:
-          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline: 'border-2 border-input bg-background/10 backdrop-blur-sm hover:bg-border hover:text-accent-foreground',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-border hover:text-accent-foreground',
+        link: 'text-primary underline-offset-4 hover:underline'
       },
       size: {
         default: 'h-10 px-4 py-2',
         sm: 'h-9 rounded-md px-3',
         lg: 'h-11 rounded-md px-8',
-        icon: 'h-10 w-10',
-      },
+        icon: 'h-10 w-10'
+      }
     },
     defaultVariants: {
       variant: 'default',
-      size: 'default',
-    },
-  },
+      size: 'default'
+    }
+  }
 )
 
 type ButtonProps = React.ComponentProps<typeof motion.button> &
@@ -49,7 +46,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           buttonVariants({ variant, size, className }),
           disabled && 'cursor-not-allowed',
-          loading && 'gap-2 !opacity-100',
+          loading && 'gap-2 !opacity-100'
         )}
         ref={ref}
         {...props}
@@ -57,22 +54,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         <AnimatePresence mode='popLayout'>
           {loading && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              key='button-loader'
-            >
+            <motion.div layout initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
               <Loader2 className='animate-spin h-4 w-4' />
             </motion.div>
           )}
-          <motion.div key='button-content' layout>
+          <motion.div key='button-content' className='contents' layout>
             {children}
           </motion.div>
         </AnimatePresence>
       </motion.button>
     )
-  },
+  }
 )
 Button.displayName = 'Button'
 

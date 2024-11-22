@@ -1,50 +1,61 @@
-# React + TypeScript + Vite
+# VetoSession 🎮
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern web platform that helps gamers and teams coordinate map/game veto sessions efficiently. Create and manage veto sessions for your favorite games with real-time updates.
 
-Currently, two official plugins are available:
+## Features ✨
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Create custom veto sessions for different games
+- Real-time updates through long polling
+- Clean and intuitive user interface
+- Support for multiple veto formats (Single elimination, Best of X)
+- No account required to participate
+- Share sessions easily with a unique link
 
-## Expanding the ESLint configuration
+## Tech Stack 🛠️
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Frontend:**
 
-- Configure the top-level `parserOptions` property like this:
+  - React with TypeScript
+  - TanStack Router for type-safe routing
+  - Tailwind CSS for styling
+  - shadcn/ui for component library
+  - Long polling for real-time updates
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **Backend:**
+  - Go (Golang)
+  - RESTful API architecture
+  - PostgreSQL for data persistence
+  - Long polling implementation for real-time communication
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Getting Started 🚀
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Prerequisites
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- Bun
+- Go (v1.20 or higher)
+
+### Local Development
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/imsandeshpandey/map-veto.git
+   cd map-veto
+   ```
+
+2. Frontend setup:
+
+   ```bash
+   cd frontend
+   bun install
+   bun dev
+   ```
+
+3. Backend setup:
+   ```bash
+   cd server
+   go mod download
+   go run main.go
+   ```
+
+The frontend will be available at `http://localhost:3000` and the backend at `http://localhost:8000`.
