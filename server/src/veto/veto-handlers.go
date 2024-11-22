@@ -49,18 +49,18 @@ func GetVetoHandler(r *ghttp.Request) {
 		return
 	}
 
-	var clientType int = -1
+	var myTeam int = -1
 
 	switch token {
 	case veto.Config.Team1.Id:
-		clientType = 1
+		myTeam = 1
 	case veto.Config.Team2.Id:
-		clientType = 2
+		myTeam = 2
 	case veto.Config.ViewersToken:
-		clientType = 0
+		myTeam = 0
 	}
 
-	if clientType == -1 {
+	if myTeam == -1 {
 		r.Response.WriteStatus(401)
 		return
 	}
@@ -74,14 +74,14 @@ func GetVetoHandler(r *ghttp.Request) {
 	}
 
 	vetoResponse := VetoResponse{
-		Id:         veto.Config.Id,
-		ClientType: clientType,
-		Team1:      team1Response,
-		Team2:      team2Response,
-		Maps:       veto.Config.Maps,
-		Rounds:     veto.Config.Rounds,
-		Stages:     veto.Config.Stages,
-		Game:       veto.Config.Game,
+		Id:     veto.Config.Id,
+		MyTeam: myTeam,
+		Team1:  team1Response,
+		Team2:  team2Response,
+		Maps:   veto.Config.Maps,
+		Rounds: veto.Config.Rounds,
+		Stages: veto.Config.Stages,
+		Game:   veto.Config.Game,
 
 		CurrentStage: veto.CurrentStage,
 		Selected:     veto.Selected,
@@ -270,12 +270,17 @@ func SidePickHandler(r *ghttp.Request) {
 
 	turnTeam := veto.GetTeamFromID(sidePickProps.TeamId)
 
-	if sidePickProps.TeamId != turnTeam.Id || turnTeam == nil {
+	if turnTeam == nil {
 		r.Response.WriteStatus(400, "Not your turn")
 		return
 	}
 
 	idx, sidePickStage := veto.GetSidePickStage()
+
+	if turnTeam.Index != sidePickStage.SidePickTurn {
+		r.Response.WriteStatus(400, "Not your turn")
+		return
+	}
 
 	if sidePickStage == nil {
 		r.Response.WriteStatus(400, "Invalid stage")
@@ -283,17 +288,14 @@ func SidePickHandler(r *ghttp.Request) {
 	}
 
 	var attacker = turnTeam.Index
+
 	if !sidePickProps.Attacker {
 		attacker = 3 - turnTeam.Index
 	}
 
-	modifiedMap := PickedMap{
-		Name:     sidePickStage.Name,
-		By:       sidePickStage.By,
-		Attacker: attacker,
-	}
+	sidePickStage.Attacker = attacker
 
-	veto.Selected[idx] = modifiedMap
+	veto.Selected[idx] = *sidePickStage
 
 	veto.SendPollData()
 

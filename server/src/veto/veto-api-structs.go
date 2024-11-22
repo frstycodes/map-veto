@@ -11,7 +11,7 @@ type TeamResponse struct {
 
 type VetoResponse struct {
 	Id           string       `json:"id"`
-	ClientType   int          `json:"clientType"`
+	MyTeam       int          `json:"myTeam"`
 	Team1        TeamResponse `json:"team1"`
 	Team2        TeamResponse `json:"team2"`
 	Maps         []string     `json:"maps"`

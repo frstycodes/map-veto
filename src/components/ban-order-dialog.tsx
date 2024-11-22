@@ -35,11 +35,7 @@ export function BanOrderDialog() {
     store.set({
       stages: presets[banOrderPreset].stages ?? []
     })
-    /**
-     *  Didn't include Presets in deps because it's used in the
-     *  effect above to reset the Ban Orders anyways
-     */
-  }, [banOrderPreset, store])
+  }, [banOrderPreset, store, presets])
 
   const handlePresetChange = (banOrderPreset: BanOrderPreset) => {
     store.set({ banOrderPreset })
@@ -62,7 +58,7 @@ export function BanOrderDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant='outline' className='w-fit rounded-lg border-2 gap-2 font-semibold'>
+        <Button variant='outline' className='w-fit gap-2 rounded-lg border-2 font-semibold'>
           <Gavel /> Customize Ban Order
         </Button>
       </DialogTrigger>
@@ -82,7 +78,7 @@ export function BanOrderDialog() {
                 onClick={() => handlePresetChange(key as BanOrderPreset)}
                 key={key}
                 value={key}
-                className='h-32 flex w-full justify-center gap-2 flex-col items-center text-sm font-medium rounded-xl'
+                className='flex h-32 w-full flex-col items-center justify-center gap-2 rounded-xl text-sm font-medium'
               >
                 <div className='flex gap-2'>{icons}</div>
                 {label}
@@ -91,11 +87,11 @@ export function BanOrderDialog() {
             )
           })}
         </RadioGroup>
-        <h1 className='text-lg font-bold mt-4'>
+        <h1 className='mt-4 text-lg font-bold'>
           {banOrderPreset === BanOrderPreset.Custom ? 'Custom Ban Order' : 'Current Ban Order'}
         </h1>
         <ManualBanOrderSettings />
-        <p className='text-xs text-muted-foreground text-center'>
+        <p className='text-center text-xs text-muted-foreground'>
           Note: Invalid ban order will be reverted to <b className='text-primary'>Last Pick</b>.
         </p>
       </DialogContent>
@@ -135,7 +131,7 @@ function ManualBanOrderSettings() {
   const { stages } = store.useStore('stages')
 
   return (
-    <ul className='grid rounded-md border overflow-hidden'>
+    <ul className='grid overflow-hidden rounded-md border'>
       {stages.map((stage, idx) => (
         <StageOption key={idx} stage={stage} stageIndex={idx} />
       ))}
@@ -172,10 +168,10 @@ function StageOption({ stageIndex, stage }: StageOptionProps) {
   const selectValue = JSON.stringify([stage.team, stage.type])
   console.log({ selectValue })
   return (
-    <li className='flex gap-2 justify-between items-center odd:bg-foreground/5 pl-4'>
-      <span className='text-sm font-medium whitespace-nowrap'>Stage {stageIndex + 1}</span>
+    <li className='flex items-center justify-between gap-2 pl-4 odd:bg-foreground/5'>
+      <span className='whitespace-nowrap text-sm font-medium'>Stage {stageIndex + 1}</span>
       <Select value={selectValue} onValueChange={handleValueChange}>
-        <SelectTrigger className='rounded-lg border-0 bg-transparent focus:outline-0 w-fit gap-4 focus:ring-0 focus:ring-offset-0'>
+        <SelectTrigger className='w-fit gap-4 rounded-lg border-0 bg-transparent focus:outline-0 focus:ring-0 focus:ring-offset-0'>
           <SelectValue placeholder='Select an option' />
           <SelectContent>
             {STAGE_OPTIONS.map((stage) => {
@@ -198,7 +194,7 @@ const stageActionBadgeBaseStyles = 'text-xs border-2 px-2 py-1'
 const STAGE_ACTION_TO_BADGE_PROPS = {
   [StageAction.Ban]: {
     children: (
-      <p className='flex gap-1 items-center'>
+      <p className='flex items-center gap-1'>
         <Gavel className='h-3.5 w-3.5' /> Ban
       </p>
     ),
@@ -206,7 +202,7 @@ const STAGE_ACTION_TO_BADGE_PROPS = {
   },
   [StageAction.Pick]: {
     children: (
-      <p className='flex gap-1 items-center'>
+      <p className='flex items-center gap-1'>
         <Swords className='h-3.5 w-3.5' /> Pick
       </p>
     ),
@@ -214,7 +210,7 @@ const STAGE_ACTION_TO_BADGE_PROPS = {
   },
   [StageAction.Decider]: {
     children: (
-      <p className='flex gap-1 items-center'>
+      <p className='flex items-center gap-1'>
         <Medal className='h-3.5 w-3.5' /> Decider
       </p>
     ),

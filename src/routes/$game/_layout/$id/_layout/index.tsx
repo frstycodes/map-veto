@@ -4,8 +4,8 @@ import { ExternalLinkButton } from '@/components/external-link-button'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { PageHeader } from '@/components/page-header'
 import { PageLoader } from '@/components/page-loader'
+import { LinkIcon, NotebookText } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { LinkIcon } from 'lucide-react'
 import { z } from 'zod'
 
 async function getTokens(vetoId: string, creatorToken: string) {
@@ -36,8 +36,6 @@ export const Route = createFileRoute('/$game/_layout/$id/_layout/')({
 export function VetoPage() {
   const { tokens } = Route.useLoaderData()
 
-  console.log({ tokens })
-
   return (
     <CenteredPageLayout className='w-1/2 min-w-[300px] max-w-[500px] space-y-10'>
       <PageHeader className='text-2xl'>
@@ -47,6 +45,12 @@ export function VetoPage() {
       <UrlInput label='Team 1' token={tokens.team1} />
       <UrlInput label='Team 2' token={tokens.team2} />
       <UrlInput label='Viewers' token={tokens.viewers} />
+      <div className='space-y-1 rounded-lg border-2 bg-background/20 px-4 py-2 text-sm text-foreground backdrop-blur-sm'>
+        <h3 className='text-md flex items-center gap-1 font-bold'>
+          <NotebookText className='size-4' /> Note
+        </h3>
+        <p>Team that starts the veto process will not get to pick side for the decider map.</p>
+      </div>
     </CenteredPageLayout>
   )
 }

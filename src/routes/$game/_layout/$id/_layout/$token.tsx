@@ -1,21 +1,14 @@
-import {
-  ClientType,
-  getInitialVetoState,
-  getVeto,
-  PickedMap,
-  VetoPhase,
-  VetoResponse
-} from '@/utils/queries/veto-queries'
+import { getInitialVetoState, getVeto, PickedMap, TeamWithViewer, VetoPhase } from '@/utils/queries/veto-queries'
 import { AnimatePresence, motion, MotionValue, useMotionTemplate, useSpring, useTransform } from 'framer-motion'
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { AnimatingCard, AnimatingCardContainer } from '@/components/animating-cards'
 import { Hammer, Loader2, Shield, Swords, SwordsIcon } from 'lucide-react'
 import { pickSide, sendAction } from '@/utils/mutations/veto-mutations'
 import { CenteredPageLayout } from '@/components/centered-page-layout'
-import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useVetoPoller } from '@/hooks/queries/use-veto-poller'
 import { Route as GameRoute } from '@/routes/$game/_layout'
+import { ComponentProps, useEffect, useState } from 'react'
 import { Image as ImageComp } from '@/components/image'
 import { StageAction } from '@/types/ban-order.types'
 import { SPRING_OPTS } from '@/config/motion-config'
@@ -144,7 +137,7 @@ function VetoPage() {
     }
   })
 
-  const isViewer = vetoData.clientType === ClientType.Viewer
+  const isViewer = vetoData.myTeam === TeamWithViewer.Viewer
   const isDialogOpen_teamInit = !isViewer && (!pollQuery.data?.team1 || !pollQuery.data?.team2)
 
   /*
@@ -205,11 +198,15 @@ function VetoPage() {
       <TeamInitDialog open={isDialogOpen_teamInit} />
       <motion.h1 className='flex w-full items-center justify-between gap-2 py-4 text-2xl font-bold italic'>
         <div className='flex-1'>
-          <TeamDetail name={vetoState.team1} action={vetoState.type as BanOrPick} showIndicator={vetoState.team == 1} />
+          <ScoreBoardTeamDetail
+            name={vetoState.team1}
+            action={vetoState.type as BanOrPick}
+            showIndicator={vetoState.team == 1}
+          />
         </div>
         <p className='text-sm'>vs</p>
         <div className='flex flex-1 justify-end'>
-          <TeamDetail
+          <ScoreBoardTeamDetail
             className='flex-row-reverse'
             name={vetoState.team2}
             action={vetoState.type as BanOrPick}
@@ -287,24 +284,24 @@ function VetoPage() {
           )}
           <AnimatePresence mode='popLayout'>
             <motion.div layout className='flex w-full gap-1'>
-              {vetoState.selected?.map((map) => {
-                const mapData = config.maps.find((m) => m.name === map.name)!
-
-                return (
-                  <SelectedMapCard
-                    map={mapData}
-                    pickedBy={map.by}
-                    attacker={map.attacker}
-                    key={map.name}
-                    className={cn(isChoosingSides && 'h-60')}
-                  />
-                )
-              })}
+              {vetoState.selected?.map((map) => (
+                <SelectedMapCard
+                  key={map.name}
+                  map={map}
+                  teams={{
+                    team1: vetoState.team1,
+                    team2: vetoState.team2
+                  }}
+                  className={cn(isChoosingSides && 'h-60')}
+                />
+              ))}
             </motion.div>
           </AnimatePresence>
         </motion.div>
       </motion.div>
-      {!!currentSideChoiceMap && !isSidePickAnimating && <SidePickDialog map={currentSideChoiceMap!} />}
+      {!!currentSideChoiceMap && !isSidePickAnimating && (
+        <SidePickDialog teams={{ team1: vetoState.team1, team2: vetoState.team2 }} map={currentSideChoiceMap!} />
+      )}
     </CenteredPageLayout>
   )
 }
@@ -326,6 +323,10 @@ const FIGHT_OPTIONS = [
 
 type SidePickDialogProps = ComponentProps<typeof motion.div> & {
   map: PickedMap
+  teams: {
+    team1: string
+    team2: string
+  }
 }
 
 function SidePickDialog(props: SidePickDialogProps) {
@@ -335,11 +336,30 @@ function SidePickDialog(props: SidePickDialogProps) {
   const imageURL = `/optimized/${mapData?.images[1]}`
   const { vetoData } = Route.useLoaderData()
 
-  const isMyTurn = (vetoData.clientType === 1 || vetoData.clientType === 2) && vetoData.clientType !== props.map.by
+  const isViewer = vetoData.myTeam === TeamWithViewer.Viewer
+  const isMyTurn = !isViewer && vetoData.myTeam == props.map.sidePickTurn
 
-  const pickedByTeam = useMemo(() => getPickedByTeam(props.map.by || 0, vetoData), [props.map, vetoData])
+  const pickedByTeam = getPickedByTeam(props.map.by || 0, vetoData.myTeam, props.teams)
 
-  const message = isMyTurn ? 'Waiting for you to pick a side.' : <>Waiting for opponent to pick a side.</>
+  const message = (() => {
+    if (isMyTurn)
+      return (
+        <p>
+          Pick a side for <b>{props.map.name}</b>.
+        </p>
+      )
+
+    const team = props.map.sidePickTurn === 1 ? props.teams.team1 : props.teams.team2
+
+    if (isViewer)
+      return (
+        <p>
+          Waiting for <b>{team}</b> to pick a side.
+        </p>
+      )
+
+    return `Waiting for opponent to pick a side.`
+  })()
 
   const pickSideMutation = useMutation({
     mutationFn: async (attacker: boolean) => {
@@ -426,31 +446,19 @@ function AnimatingMapCardContents({ distance, map }: { distance: MotionValue<num
   )
 }
 
-function getPickedByTeam(picked: 0 | 1 | 2, vetoData: VetoResponse) {
-  const myTeam = vetoData.clientType
-  if (picked == myTeam) {
-    return 'You'
-  }
-  switch (picked) {
-    case 1:
-      return vetoData.team1.name || 'Team 1'
-    case 2:
-      return vetoData.team2.name || 'Team 2'
-    default:
-      return '' // which means decider
-  }
-}
-
 type SelectedMapCardProps = ComponentProps<typeof motion.div> & {
-  map: MapData
-  pickedBy?: 0 | 1 | 2
-  attacker?: 1 | 2
+  map: PickedMap
+  teams: { team1: string; team2: string }
 }
-function SelectedMapCard({ map, attacker, pickedBy, ...props }: SelectedMapCardProps) {
+function SelectedMapCard({ map, teams, ...props }: SelectedMapCardProps) {
+  const { config } = GameRoute.useLoaderData()
   const { vetoData } = Route.useLoaderData()
-  const pickedByTeam = useMemo(() => getPickedByTeam(pickedBy || 0, vetoData), [pickedBy, vetoData])
 
-  const mapUrl = `/optimized/${map?.images[3]}`
+  const mapData = config.maps.find((m) => m.name == map.name)
+
+  const pickedByTeam = getPickedByTeam(map.by || 0, vetoData.myTeam, teams)
+
+  const mapUrl = `/optimized/${mapData?.images[3]}`
 
   return (
     <motion.div
@@ -478,11 +486,11 @@ function SelectedMapCard({ map, attacker, pickedBy, ...props }: SelectedMapCardP
         className='absolute w-full'
       />
 
-      {!!attacker && (
+      {!!map.attacker && (
         <div
           className={cn(
-            'absolute top-0 flex h-10 w-full justify-between bg-gradient-to-b from-black/70 to-black/0 px-2 py-2',
-            attacker === 2 && 'flex-row-reverse'
+            'absolute top-0 flex h-10 w-full justify-between bg-gradient-to-b from-black/70 to-black/0 px-2 py-2 animate-in fade-in-0 slide-in-from-top-2',
+            map.attacker === 2 && 'flex-row-reverse'
           )}
         >
           <SwordsIcon className='size-5 fill-white/40 text-white drop-shadow-md' />
@@ -498,28 +506,19 @@ function SelectedMapCard({ map, attacker, pickedBy, ...props }: SelectedMapCardP
   )
 }
 
-type TeamDetailProps = ComponentProps<'p'> & {
+type ScoreBoardTeamDetailProps = ComponentProps<'p'> & {
   name: string
   action: BanOrPick
   showIndicator: boolean
 }
 
-function TeamDetail({ showIndicator, action, name, ...props }: TeamDetailProps) {
+function ScoreBoardTeamDetail({ showIndicator, action, name, ...props }: ScoreBoardTeamDetailProps) {
   return (
     <p {...props} className={cn('relative z-10 flex w-fit items-center gap-2', props.className)}>
       {name}
       {showIndicator && <VetoTurnIndicator vetoType={action} />}
     </p>
   )
-}
-
-type VetoTurnIndicatorProps = ComponentProps<typeof Badge> & {
-  vetoType: StageAction.Ban | StageAction.Pick
-}
-function VetoTurnIndicator({ vetoType, ...props }: VetoTurnIndicatorProps) {
-  const ActionIcon = vetoType === StageAction.Ban ? Hammer : Swords
-  const actionStyle = vetoType === StageAction.Ban ? 'text-red-500' : 'text-emerald-500'
-  return <ActionIcon className={cn('h-5 w-5', actionStyle, props.className)} />
 }
 
 function TeamInitDialog({ open }: { open: boolean }) {
@@ -576,6 +575,25 @@ function TeamInitDialog({ open }: { open: boolean }) {
       </DialogContent>
     </Dialog>
   )
+}
+
+type VetoTurnIndicatorProps = ComponentProps<typeof Badge> & {
+  vetoType: StageAction.Ban | StageAction.Pick
+}
+function VetoTurnIndicator({ vetoType, ...props }: VetoTurnIndicatorProps) {
+  const ActionIcon = vetoType === StageAction.Ban ? Hammer : Swords
+  const actionStyle = vetoType === StageAction.Ban ? 'text-red-500' : 'text-emerald-500'
+  return <ActionIcon className={cn('h-5 w-5', actionStyle, props.className)} />
+}
+
+function getPickedByTeam(pickedBy: 0 | 1 | 2, myTeam: TeamWithViewer, teams: { team1: string; team2: string }) {
+  const team = pickedBy === 1 ? teams.team1 : teams.team2
+
+  // 0 doesn't represent Viewer here, for map picked 0 represents Decider
+  if (pickedBy === 0) return 'Decider'
+  if (pickedBy === myTeam) return 'You'
+
+  return team || `Team ${pickedBy}`
 }
 
 function preloadMapImages(maps: string[]) {

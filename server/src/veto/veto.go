@@ -20,9 +20,10 @@ type Team struct {
 }
 
 type PickedMap struct {
-	Name     string `json:"name"`
-	By       int    `json:"by"`
-	Attacker int    `json:"attacker"`
+	Name         string `json:"name"`
+	By           int    `json:"by"`
+	Attacker     int    `json:"attacker"`
+	SidePickTurn int    `json:"sidePickTurn"`
 }
 
 type BannedMap struct {
@@ -237,9 +238,22 @@ func (veto *Veto) PickMap(mapName string, team int) error {
 	if veto.IsPicked(mapName) {
 		return errors.New("already-picked")
 	}
+
+	/* We check for 2 because if the map is decider [team == 0]
+	 * then we want the team 1 to pick the side on that map.
+	 * Since, Team 0 starts the ban, side pick order is Team 2 -> Team 1 -> Team 2
+	 * So, we want [0,1] to resolve to Team 2 and 2 to resolve to Team 1
+	 */
+
+	var sidePickTurn = 2
+	if team == 2 {
+		sidePickTurn = 1
+	}
+
 	pickedMap := PickedMap{
-		Name: mapName,
-		By:   team,
+		Name:         mapName,
+		By:           team,
+		SidePickTurn: sidePickTurn,
 	}
 	veto.Selected = append(veto.Selected, pickedMap)
 	return nil
