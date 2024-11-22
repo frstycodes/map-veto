@@ -9,6 +9,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Team struct {
@@ -35,6 +37,7 @@ type Stage struct {
 
 type VetoConfig struct {
 	Id           string
+	CreatorToken string
 	Team1        Team
 	Team2        Team
 	ViewersToken string
@@ -86,6 +89,7 @@ func NewVeto(props VetoConstructorProps, timeout time.Duration) *Veto {
 
 	config := VetoConfig{
 		Id:           id,
+		CreatorToken: uuid.New().String(),
 		Team1:        team1,
 		Team2:        team2,
 		ViewersToken: viewersToken,

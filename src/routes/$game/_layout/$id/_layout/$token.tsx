@@ -1,5 +1,12 @@
+import {
+  ClientType,
+  getInitialVetoState,
+  getVeto,
+  PickedMap,
+  VetoPhase,
+  VetoResponse
+} from '@/utils/queries/veto-queries'
 import { AnimatePresence, motion, MotionValue, useMotionTemplate, useSpring, useTransform } from 'framer-motion'
-import { getInitialVetoState, getVeto, PickedMap, VetoPhase, VetoResponse } from '@/utils/queries/veto-queries'
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { AnimatingCard, AnimatingCardContainer } from '@/components/animating-cards'
 import { Hammer, Loader2, Shield, Swords, SwordsIcon } from 'lucide-react'
@@ -137,7 +144,8 @@ function VetoPage() {
     }
   })
 
-  const isDialogOpen_teamInit = !pollQuery.data?.team1 || !pollQuery.data?.team2
+  const isViewer = vetoData.clientType === ClientType.Viewer
+  const isDialogOpen_teamInit = !isViewer && (!pollQuery.data?.team1 || !pollQuery.data?.team2)
 
   /*
     Using this variable to conditionally render the MapsList(AnimatingCardsContainer) which takes up space and
@@ -162,7 +170,8 @@ function VetoPage() {
     (deciderAnimationState == AnimationState.Ended && vetoState.selected?.find((map) => !map.attacker)) || null
 
   return (
-    <CenteredPageLayout className='w-[clamp(300px,80%,600px)]'>
+    <CenteredPageLayout className='relative w-[clamp(300px,80%,600px)]'>
+      {isViewer && <div className='absolute inset-0 scale-110 cursor-not-allowed' style={{ zIndex: 9999 }} />}
       {/* <div className='fixed bottom-4 left-4'>
         <div className='flex max-w-[30rem] flex-col gap-2 text-xs text-muted-foreground'>
           {vetoState.logs?.map((log, idx) => {
@@ -279,7 +288,6 @@ function VetoPage() {
           <AnimatePresence mode='popLayout'>
             <motion.div layout className='flex w-full gap-1'>
               {vetoState.selected?.map((map) => {
-                // if ((vetoState.phase === VetoPhase.ChooseSides && currentSideChoiceMap?.name) === map.name) return null
                 const mapData = config.maps.find((m) => m.name === map.name)!
 
                 return (

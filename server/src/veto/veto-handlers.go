@@ -149,9 +149,11 @@ func VetoPollHandler(r *ghttp.Request) {
 		return
 	}
 
+	var subscriberId = r.Session.Id()
+
 	respChan := make(chan interface{})
 	var once sync.Once
-	veto.poll.Sub(clientId, func(data interface{}) {
+	veto.poll.Sub(subscriberId, func(data interface{}) {
 		once.Do(func() {
 			respChan <- data
 		})
@@ -164,6 +166,7 @@ func VetoPollHandler(r *ghttp.Request) {
 	case <-time.After(time.Minute):
 		r.Response.WriteStatus(http.StatusRequestTimeout)
 	case <-ctx.Done():
+		veto.poll.Unsub(subscriberId)
 		return
 	}
 }
@@ -188,6 +191,11 @@ func ActionHandler(r *ghttp.Request) {
 
 	// Check if the current turn is the Team
 	turnTeam := veto.GetTurnTeam()
+
+	if turnTeam.Id == "" || turnTeam.Id != stageActionProps.TeamId {
+		r.Response.WriteStatus(400, "Not your turn")
+		return
+	}
 
 	// Check if the Map is valid
 	if !slices.Contains(veto.Config.Maps, stageActionProps.Map) {
@@ -284,7 +292,6 @@ func SidePickHandler(r *ghttp.Request) {
 		By:       sidePickStage.By,
 		Attacker: attacker,
 	}
-	fmt.Println(modifiedMap, idx)
 
 	veto.Selected[idx] = modifiedMap
 
@@ -328,6 +335,11 @@ func InitialVetoStateHandler(r *ghttp.Request) {
 	r.Response.WriteJson(GetVetoPollData(veto))
 }
 
+type StartVetoReponse struct {
+	Id           string `json:"id"`
+	CreatorToken string `json:"creatorToken"`
+}
+
 func StartVeto(r *ghttp.Request) {
 	var props VetoConstructorProps
 	if err := r.Parse(&props); err != nil {
@@ -337,17 +349,30 @@ func StartVeto(r *ghttp.Request) {
 
 	veto := NewVeto(props, 5*time.Minute)
 	r.Response.Status = http.StatusCreated
-	r.Response.WriteJsonExit(g.Map{"id": veto.Config.Id})
+
+	res := StartVetoReponse{
+		Id:           veto.Config.Id,
+		CreatorToken: veto.Config.CreatorToken,
+	}
+
+	r.Response.WriteJsonExit(res)
 }
 
 func GetTokens(r *ghttp.Request) {
 	id := r.GetString("id")
+	creatorToken := r.GetString("creatorToken")
 	veto := GetVeto(id)
 	if veto == nil {
 		r.Response.Status = http.StatusNotFound
 		r.Response.WriteJsonExit(g.Map{"error": "Veto not found"})
 		return
 	}
+	if veto.Config.CreatorToken != creatorToken {
+		r.Response.Status = http.StatusUnauthorized
+		r.Response.WriteJsonExit(g.Map{"error": "Unauthorized"})
+		return
+	}
+
 	tokens := g.Map{
 		"team1":   veto.Config.Team1.Id,
 		"team2":   veto.Config.Team2.Id,

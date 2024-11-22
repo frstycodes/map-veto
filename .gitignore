@@ -14,7 +14,7 @@ dist
 dist-ssr
 *.local
 .env
-
+server/tmp
 image-optimizer/bin
 
 

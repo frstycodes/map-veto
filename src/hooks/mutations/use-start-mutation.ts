@@ -7,8 +7,12 @@ type StartVetoProps = {
   rounds: number
   game: string
 }
-type StartVetoMutationOpts = UseMutationOptions<{ id: string }, DefaultError, StartVetoProps>
-type StartVetoMutation = UseMutationResult<{ id: string }, DefaultError, StartVetoProps>
+type StartVetoResponse = {
+  id: string
+  creatorToken: string
+}
+type StartVetoMutationOpts = UseMutationOptions<StartVetoResponse, DefaultError, StartVetoProps>
+type StartVetoMutation = UseMutationResult<StartVetoResponse, DefaultError, StartVetoProps>
 export const useStartVetoMutation = (opts?: StartVetoMutationOpts): StartVetoMutation =>
   useMutation({
     ...opts,
@@ -17,6 +21,10 @@ export const useStartVetoMutation = (opts?: StartVetoMutationOpts): StartVetoMut
         method: 'POST',
         body: JSON.stringify(props)
       })
+      if (!res.ok) {
+        throw new Error('Failed to start veto')
+      }
+
       return res.json()
     }
   })

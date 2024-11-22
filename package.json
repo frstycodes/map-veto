@@ -7,7 +7,7 @@
     "start": "cd ./server && go run ./src/main.go",
     "build": "pnpm build:go && pnpm build:vite",
     "process-images": "cd image-optimizer && go run ./src/main.go",
-    "dev": "pnpm vite --open",
+    "dev": "vite --open --host",
     "dev:go": "cd server && go run ./src/main.go",
     "build:vite": "vite build",
     "build:go": "cd server && go build -o dist/server ./src/main.go",

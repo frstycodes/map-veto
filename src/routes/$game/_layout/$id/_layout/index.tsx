@@ -6,19 +6,26 @@ import { PageHeader } from '@/components/page-header'
 import { PageLoader } from '@/components/page-loader'
 import { Input } from '@/components/ui/input'
 import { LinkIcon } from 'lucide-react'
+import { z } from 'zod'
 
-async function getTokens(vetoID: string) {
-  const res = await fetch(`/api/veto/${vetoID}/tokens`)
+async function getTokens(vetoId: string, creatorToken: string) {
+  const res = await fetch(`/api/veto/${vetoId}/tokens?creatorToken=${creatorToken}`)
   if (!res.ok) throw new Error('Failed to fetch tokens')
   return res.json()
 }
 
+const validateSearch = z.object({
+  creatorToken: z.string().optional()
+})
+
 export const Route = createFileRoute('/$game/_layout/$id/_layout/')({
-  loader: async ({ params }) => {
-    const data = await getTokens(params.id)
+  loader: async ({ params, location }) => {
+    const { creatorToken = '' } = validateSearch.parse(location.search)
+    const data = await getTokens(params.id, creatorToken)
     if (!data) throw new Error('Failed to fetch tokens')
     return { tokens: data.tokens }
   },
+  validateSearch,
   component: VetoPage,
   pendingComponent: PageLoader,
   onError: () => {

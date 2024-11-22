@@ -33,7 +33,8 @@ function GamePage() {
     async onSuccess(data) {
       const routeData = {
         to: '/$game/$id',
-        params: { game, id: data.id }
+        params: { game, id: data.id },
+        search: { creatorToken: data.creatorToken }
       }
       await router.preloadRoute(routeData).catch(() => {
         toast.error('Failed to prefetch route')
