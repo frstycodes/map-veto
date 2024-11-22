@@ -1,13 +1,10 @@
 package main
 
 import (
-	"main/src/utils"
 	"main/src/veto"
-	"path/filepath"
 
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
-	"github.com/gogf/gf/os/gfile"
 )
 
 func cors(r *ghttp.Request) {
@@ -45,7 +42,7 @@ func main() {
 	})
 
 	// Serve Frontend
-	utils.ServeStatic(s, filepath.Join(gfile.MainPkgPath(), "../../dist"), "index.html")
+	// utils.ServeStatic(s, filepath.Join(gfile.MainPkgPath(), "../../dist"), "index.html")
 
 	s.SetPort(8000)
 	s.Run()
