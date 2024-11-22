@@ -2,14 +2,18 @@ package main
 
 import (
 	"main/src/veto"
+	"os"
 
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func cors(r *ghttp.Request) {
+	clientURL := os.Getenv("CLIENT_URL")
 	r.Response.CORS(ghttp.CORSOptions{
-		AllowOrigin: "*",
+		AllowOrigin:  clientURL,
+		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
 	})
 	r.Middleware.Next()
 }
