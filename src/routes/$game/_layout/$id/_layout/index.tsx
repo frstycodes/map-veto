@@ -6,10 +6,11 @@ import { PageHeader } from '@/components/page-header'
 import { PageLoader } from '@/components/page-loader'
 import { LinkIcon, NotebookText } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { api } from '@/utils/helpers'
 import { z } from 'zod'
 
 async function getTokens(vetoId: string, creatorToken: string) {
-  const res = await fetch(`/api/veto/${vetoId}/tokens?creatorToken=${creatorToken}`)
+  const res = await api(`/api/veto/${vetoId}/tokens?creatorToken=${creatorToken}`)
   if (!res.ok) throw new Error('Failed to fetch tokens')
   return res.json()
 }

@@ -1,3 +1,5 @@
+import { api } from '../helpers'
+
 /**
  *
  * @param vetoId
@@ -6,7 +8,7 @@
  * @param map Map Name
  */
 export async function sendAction(vetoId: string, teamId: string, map: string) {
-  const res = await fetch(`/api/veto/${vetoId}/action`, {
+  const res = await api(`/api/veto/${vetoId}/action`, {
     method: 'POST',
     body: JSON.stringify({ teamId, map })
   })
@@ -16,7 +18,7 @@ export async function sendAction(vetoId: string, teamId: string, map: string) {
 }
 
 export async function pickSide(vetoId: string, teamId: string, attacker: boolean) {
-  const res = await fetch(`/api/veto/${vetoId}/pick-side`, {
+  const res = await api(`/api/veto/${vetoId}/pick-side`, {
     method: 'POST',
     body: JSON.stringify({ teamId, attacker })
   })

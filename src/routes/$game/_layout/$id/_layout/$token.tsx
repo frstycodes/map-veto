@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/utils/tailwind-utils'
 import { sleep, Time } from '@/utils/time'
+import { api } from '@/utils/helpers'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/$game/_layout/$id/_layout/$token')({
@@ -530,7 +531,7 @@ function TeamInitDialog({ open }: { open: boolean }) {
       if (name === '') {
         throw new Error('Team name cannot be empty')
       }
-      const res = await fetch(`/api/veto/${id}/team/${teamId}`, {
+      const res = await api(`/api/veto/${id}/team/${teamId}`, {
         method: 'PUT',
         body: JSON.stringify({ name })
       })

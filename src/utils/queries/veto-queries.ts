@@ -1,4 +1,5 @@
 import { Stage } from '@/types/ban-order.types'
+import { api } from '../helpers'
 
 export enum VetoPhase {
   ChooseSides = 'choose-sides',
@@ -59,7 +60,7 @@ export type VetoResponse = {
  * @param id Veto ID
  */
 export async function getInitialVetoState(id: string) {
-  const res = await fetch(`/api/veto/${id}/state`)
+  const res = await api(`/api/veto/${id}/state`)
   const data = await res.json()
   return data as VetoStateResponse
 }
@@ -70,7 +71,7 @@ export async function getInitialVetoState(id: string) {
  * @param token Veto Token (Viewer or Team)
  */
 export async function getVeto(id: string, token: string) {
-  const res = await fetch(`/api/veto/${id}?token=${token}`)
+  const res = await api(`/api/veto/${id}?token=${token}`)
   const data = await res.json()
   return data as VetoResponse
 }

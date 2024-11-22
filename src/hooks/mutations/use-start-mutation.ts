@@ -1,5 +1,6 @@
 import { DefaultError, useMutation, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
 import { Stage } from '@/types/ban-order.types'
+import { api } from '@/utils/helpers'
 
 type StartVetoProps = {
   stages: Stage[]
@@ -17,7 +18,7 @@ export const useStartVetoMutation = (opts?: StartVetoMutationOpts): StartVetoMut
   useMutation({
     ...opts,
     mutationFn: async (props) => {
-      const res = await fetch('/api/veto/start', {
+      const res = await api('/api/veto/start', {
         method: 'POST',
         body: JSON.stringify(props)
       })

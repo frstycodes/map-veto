@@ -1,4 +1,5 @@
 import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query'
+import { api } from '@/utils/helpers'
 
 type VetoPollerOpts<T> = Omit<UseQueryOptions<T>, 'queryKey' | 'queryFn'> & {
   queryKey?: string[]
@@ -14,7 +15,7 @@ export const useVetoPoller = <T>(
     queryKey: ['veto', id],
     ...opts,
     queryFn: async () => {
-      const res = await fetch(`/api/veto/${id}/poll?token=${clientId}`)
+      const res = await api(`/api/veto/${id}/poll?token=${clientId}`)
       const data = await res.json()
 
       if (!res.ok) throw new Error(data.message)
