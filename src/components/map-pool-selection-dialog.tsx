@@ -96,6 +96,7 @@ function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
     mass: 0.1
   })
   const image = `/optimized/${map.images[0]}`
+  console.log(image)
   return (
     <>
       <Image

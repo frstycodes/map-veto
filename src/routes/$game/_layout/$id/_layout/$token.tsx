@@ -340,7 +340,7 @@ function SidePickDialog(props: SidePickDialogProps) {
   const { id, token: teamId } = Route.useParams()
   const { config } = GameRoute.useLoaderData()
   const mapData = config.maps.find((m) => m.name === props.map?.name)
-  const imageURL = `/optimized/${mapData?.images[1]}`
+  const imageURL = `/optimized/${mapData?.images[1] ?? mapData?.images[0]}`
   const { vetoData } = Route.useLoaderData()
 
   const isViewer = vetoData.myTeam === 0
@@ -433,7 +433,7 @@ function SidePickDialog(props: SidePickDialogProps) {
 function AnimatingMapCardContents({ distance, map }: { distance: MotionValue<number>; map: MapData }) {
   const fontSizeSync = useTransform(distance, [0, 1], [1, 0.8])
   const fontSize = useSpring(fontSizeSync, SPRING_OPTS)
-
+  const { vetoData } = Route.useLoaderData()
   const imageURL = `/optimized/${map?.images[0]}`
   return (
     <div className='relative flex h-full w-full items-center justify-center bg-cover bg-center transition-all'>
@@ -444,6 +444,7 @@ function AnimatingMapCardContents({ distance, map }: { distance: MotionValue<num
         sizes='300px'
         className='absolute z-10 h-full w-full object-cover object-center transition-all'
       />
+      {vetoData.game == 'cs2' && <div className='absolute inset-0 z-10 bg-black/40' />}
       <div className='z-20 grid h-full w-full place-items-center'>
         <motion.h1
           style={{ fontSize: useMotionTemplate`${fontSize}rem` }}
@@ -469,7 +470,7 @@ function SelectedMapCard({ map, teams, ...props }: SelectedMapCardProps) {
 
   const pickedByTeam = getPickedByTeam(map.by || 0, vetoData.myTeam, teams)
 
-  const mapUrl = `/optimized/${mapData?.images[3]}`
+  const mapUrl = `/optimized/${mapData?.images[3] ?? mapData?.images[0]}`
 
   return (
     <motion.div
@@ -478,7 +479,7 @@ function SelectedMapCard({ map, teams, ...props }: SelectedMapCardProps) {
       initial={{ skewX: -8 }}
       animate={{ skewX: -8 }}
       className={cn(
-        'flex h-24 min-w-24 max-w-80 flex-1 cursor-pointer items-center overflow-hidden rounded-lg bg-cover bg-center shadow-lg',
+        'relative flex h-24 min-w-24 max-w-80 flex-1 cursor-pointer items-center overflow-hidden rounded-lg bg-cover bg-center shadow-lg',
         props.className
       )}
       transition={{
@@ -494,7 +495,7 @@ function SelectedMapCard({ map, teams, ...props }: SelectedMapCardProps) {
           duration: 0.5
         }}
         setSizes={[480]}
-        className='absolute w-full'
+        className='absolute size-full object-cover object-center'
       />
 
       {!!map.attacker && (
