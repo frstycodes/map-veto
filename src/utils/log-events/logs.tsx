@@ -109,8 +109,7 @@ export function logParser(log: Log, _teams: { team1: string; team2: string }): [
       message = (
         <p>
           <SideIcon className={cn('inline size-4', sideColor)} /> Team <b>{teams[log.data.team]}</b> chose to{' '}
-          <b>{log.data.side}</b> in <b>{log.data.map}</b>
-          <b> {log.data.map}</b>.
+          <b>{log.data.side}</b> in <b>{log.data.map}</b>.
         </p>
       )
       break
