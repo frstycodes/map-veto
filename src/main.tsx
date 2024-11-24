@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { WelcomeDialog } from './components/welcome-dialog'
 import { ThemeProvider } from './providers/theme-provider'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { Toaster } from './components/ui/sonner'
@@ -25,6 +26,7 @@ function Root() {
         <ThemeProvider defaultTheme='dark'>
           <TooltipProvider delayDuration={100}>
             <Toaster />
+            <WelcomeDialog />
             <RouterProvider router={router} context={{}} />
           </TooltipProvider>
         </ThemeProvider>
