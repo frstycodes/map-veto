@@ -5,6 +5,7 @@ import * as React from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/utils/tailwind-utils'
 import { Loader2 } from 'lucide-react'
+import { playHoverSound } from '@/assets/sfx/hover/hover'
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
@@ -50,6 +51,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         ref={ref}
         {...props}
+        onMouseEnter={e=>{
+          playHoverSound(1)
+          props.onMouseEnter?.(e)
+        }}
         disabled={loading || props.disabled}
       >
         <AnimatePresence mode='popLayout'>

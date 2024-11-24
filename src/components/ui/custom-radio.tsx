@@ -2,6 +2,7 @@ import { motion, motionValue, useMotionTemplate as mt, useSpring, useTransform }
 import { ComponentProps, createContext, useContext } from 'react'
 import * as Radix_RadioGroup from '@radix-ui/react-radio-group'
 import { useMousePosition } from '@/hooks/use-mouse-position'
+import { playHoverSound } from '@/assets/sfx/hover/hover'
 import { useDistance } from '@/hooks/use-distance'
 import { cn } from '@/utils/tailwind-utils'
 import { Vec2 } from '@/utils/math'
@@ -46,6 +47,10 @@ export function RadioItem({ children, ...props }: RadioItemProps) {
     <MotionRadioItem
       ref={ref}
       {...props}
+      onMouseEnter={(e) => {
+        playHoverSound(1)
+        props.onMouseEnter?.(e)
+      }}
       style={{
         borderColor: mt`hsl(var(--foreground) / ${borderOpacity})`,
         backgroundColor: mt`hsl(var(--foreground) / ${backgroundOpacity})`

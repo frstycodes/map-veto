@@ -30,7 +30,7 @@ export type VetoStateResponse = {
   banned: BannedMap[] | null
   currentStage: number
   phase: VetoPhase
-  logs: VetoLog[]
+  ended: boolean
 }
 
 export type TeamResponse = {

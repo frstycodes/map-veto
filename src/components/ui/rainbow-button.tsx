@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { playHoverSound } from '@/assets/sfx/hover/hover'
 import { cn } from '@/utils/tailwind-utils'
 
 type RainbowButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {}
@@ -22,6 +23,10 @@ export function RainbowButton({ children, className, ...props }: RainbowButtonPr
         className
       )}
       {...props}
+      onMouseEnter={(e) => {
+        playHoverSound(1)
+        props.onMouseEnter?.(e)
+      }}
     >
       {children}
     </button>

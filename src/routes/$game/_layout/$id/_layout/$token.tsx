@@ -1,20 +1,22 @@
 import { getInitialVetoState, getVeto, PickedMap, TeamWithViewer, VetoPhase } from '@/utils/queries/veto-queries'
 import { AnimatePresence, motion, MotionValue, useMotionTemplate, useSpring, useTransform } from 'framer-motion'
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Hammer, Loader2, NotebookText, Shield, Swords, SwordsIcon } from 'lucide-react'
 import { AnimatingCard, AnimatingCardContainer } from '@/components/animating-cards'
-import { Hammer, Loader2, Shield, Swords, SwordsIcon } from 'lucide-react'
+import { playMapsHoverSound } from '@/assets/sfx/maps-hover/maps-hover.sfx'
 import { pickSide, sendAction } from '@/utils/mutations/veto-mutations'
 import { CenteredPageLayout } from '@/components/centered-page-layout'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useVetoPoller } from '@/hooks/queries/use-veto-poller'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { Route as GameRoute } from '@/routes/$game/_layout'
 import { ComponentProps, useEffect, useState } from 'react'
 import { Image as ImageComp } from '@/components/image'
 import { StageAction } from '@/types/ban-order.types'
 import { SPRING_OPTS } from '@/config/motion-config'
 import { MapData } from '@/types/game-config.types'
-import { useMutation } from '@tanstack/react-query'
 import { useRerender } from '@/hooks/use-rerender'
+import { playUISound, Sound } from '@/utils/sfx'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@radix-ui/react-dialog'
 import { Portal } from '@radix-ui/react-portal'
@@ -96,8 +98,7 @@ function VetoPage() {
 
       if (data.phase === VetoPhase.ChooseSides) {
         setIsSidePickAnimating(true)
-        await sleep(Time.Second * 1)
-        setIsSidePickAnimating(false)
+        sleep(Time.Second * 2).then(() => setIsSidePickAnimating(false))
       }
     }
   })
@@ -132,6 +133,7 @@ function VetoPage() {
         vetoState.selected = currentMapsState.selected
         vetoState.banned = currentMapsState.banned
         rerender()
+        playUISound(Sound.Error)
         toast.error('Failed to send action')
         throw error
       }
@@ -163,39 +165,19 @@ function VetoPage() {
   const currentSideChoiceMap =
     (deciderAnimationState == AnimationState.Ended && vetoState.selected?.find((map) => !map.attacker)) || null
 
+  const logsQuery = useQuery({
+    queryKey: ['veto-logs', id],
+    queryFn: async () => {
+      const res = await api(`/api/veto/${id}/logs`)
+      if (!res.ok) throw new Error(res.statusText)
+      return await res.json()
+    },
+    enabled: vetoState.ended
+  })
+
   return (
     <CenteredPageLayout className='relative w-[clamp(300px,80%,600px)]'>
       {isViewer && <div className='absolute inset-0 scale-110 cursor-not-allowed' style={{ zIndex: 9999 }} />}
-      {/* <div className='fixed bottom-4 left-4'>
-        <div className='flex max-w-[30rem] flex-col gap-2 text-xs text-muted-foreground'>
-          {vetoState.logs?.map((log, idx) => {
-            let color = 'text-emerald-500'
-
-            if (log.event?.includes('banned')) {
-              color = 'text-red-500'
-            }
-            if (log.event?.includes('picked')) {
-              color = 'text-emerald-500'
-            }
-            if (log.event?.includes('decider')) {
-              color = 'text-yellow-500'
-            }
-
-            const logTime = new Date(log.time)
-            return (
-              <motion.div
-                layout
-                key={idx}
-                initial={{ scale: 0.8, opacity: 0 }} 
-                animate={{ scale: 1, opacity: 1 }}
-                className='flex gap-2'
-              >
-                <p className='opacity-50'>{logTime.toLocaleTimeString()}</p>:<p className={color}>{log.event}</p>
-              </motion.div>
-            )
-          })}
-        </div>
-      </div> */}
       <TeamInitDialog open={isDialogOpen_teamInit} />
       <motion.h1 className='flex w-full items-center justify-between gap-2 py-4 text-2xl font-bold italic'>
         <div className='flex-1'>
@@ -230,7 +212,7 @@ function VetoPage() {
                 const isSelected = vetoState.selected?.some((m) => m.name === map)
                 if (isBanned || isSelected) return null
 
-                /* 
+                /*
               After the decider map animation starts, we will set the isChoosingSides state to true
               and not render other maps which are eliminated and only render the decider map.
               */
@@ -240,6 +222,7 @@ function VetoPage() {
                 const mapData = config.maps.find((m) => m.name === map)
                 return (
                   <AnimatingCard
+                    onMouseEnter={() => playMapsHoverSound(1)}
                     holdFor={Time.MS * 300}
                     onHoldSuccess={() => selectMapMutation.mutate(map)}
                     layoutId={map}
@@ -277,28 +260,43 @@ function VetoPage() {
           )}
         </AnimatePresence>
       </div>
-
-      <motion.div className='space-y-4 py-4'>
-        <motion.div layout className='-z-10 flex gap-1'>
-          {!vetoState.selected?.length && (
-            <motion.div className='text-medium w-full italic text-muted-foreground'>No Maps selected</motion.div>
-          )}
-          <AnimatePresence mode='popLayout'>
-            <motion.div layout className='flex w-full gap-1'>
-              {vetoState.selected?.map((map) => (
-                <SelectedMapCard
-                  key={map.name}
-                  map={map}
-                  teams={{
-                    team1: vetoState.team1,
-                    team2: vetoState.team2
-                  }}
-                  className={cn(isChoosingSides && 'h-60')}
-                />
-              ))}
-            </motion.div>
-          </AnimatePresence>
-        </motion.div>
+      <motion.div layout className='-z-10 flex gap-1 py-4'>
+        <AnimatePresence mode='popLayout'>
+          <motion.div layout className='flex w-full gap-1'>
+            {vetoState.selected?.map((map) => (
+              <SelectedMapCard
+                key={map.name}
+                map={map}
+                teams={{
+                  team1: vetoState.team1,
+                  team2: vetoState.team2
+                }}
+                className={cn(isChoosingSides && 'h-60')}
+              />
+            ))}
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
+      {logsQuery.data && (
+        <div className='flex flex-col gap-1 py-2'>
+          <Button variant='outline' className='gap-2 rounded-lg'>
+            <NotebookText className='size-5' /> Logs are available: View
+          </Button>
+        </div>
+      )}
+      <motion.div className='fixed bottom-1 left-2 flex -skew-x-[8deg] gap-2 py-2'>
+        {vetoState.banned?.map((map) => {
+          return (
+            <motion.h1
+              layoutId={map.name}
+              transition={{ type: 'spring', duration: 0.5 }}
+              className='rounded-lg border-2 border-destructive bg-destructive/20 px-3 py-1 text-sm backdrop-blur-md'
+              key={map.name}
+            >
+              {map.name}
+            </motion.h1>
+          )
+        })}
       </motion.div>
       {!!currentSideChoiceMap && !isSidePickAnimating && (
         <SidePickDialog teams={{ team1: vetoState.team1, team2: vetoState.team2 }} map={currentSideChoiceMap!} />
@@ -363,8 +361,12 @@ function SidePickDialog(props: SidePickDialogProps) {
   })()
 
   const pickSideMutation = useMutation({
-    mutationFn: async (attacker: boolean) => {
-      return await pickSide(id, teamId, attacker)
+    mutationFn: async (isAttacker: boolean) => {
+      return pickSide(id, teamId, isAttacker)
+    },
+    onError() {
+      playUISound(Sound.Error)
+      toast.error('Failed to pick side.')
     }
   })
 
@@ -542,6 +544,7 @@ function TeamInitDialog({ open }: { open: boolean }) {
       setTeamName('')
     },
     onError() {
+      playUISound(Sound.Error)
       toast.error('Failed to update team name')
     }
   })

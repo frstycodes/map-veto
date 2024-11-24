@@ -11,6 +11,7 @@ import { DialogHeader } from './ui/dialog'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { toast } from 'sonner'
+import { playUISound, Sound } from '@/utils/sfx'
 
 export function BanOrderDialog() {
   const { store } = GameRoute.useLoaderData()
@@ -48,6 +49,7 @@ export function BanOrderDialog() {
         if (_open) return setDialogOpen(true)
         const validationErr = validateBanOrder(store.get().stages, store.get().bestOf)
         if (validationErr) {
+          playUISound(Sound.Error)
           toast.error(`Invalid Format: Falling back to Last Pick`, {
             description: validationErr
           })

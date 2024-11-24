@@ -9,6 +9,7 @@ import {
 } from 'framer-motion'
 import React, { ComponentProps, createContext, useContext, useState } from 'react'
 import { useMousePosition } from '@/hooks/use-mouse-position'
+import { playHoverSound } from '@/assets/sfx/hover/hover'
 import * as Checkbox from '@radix-ui/react-checkbox'
 import { useDistance } from '@/hooks/use-distance'
 import { cn } from '@/utils/tailwind-utils'
@@ -72,7 +73,14 @@ export function CheckboxItem({ children, render: Render, ...props }: CheckboxIte
   const borderColor = mt`hsl(var(--foreground) / ${borderOpacity})`
 
   return (
-    <Checkbox.Root {...props} className={cn('group', props.className)}>
+    <Checkbox.Root
+      {...props}
+      onMouseEnter={(e) => {
+        playHoverSound(1)
+        props.onMouseEnter?.(e)
+      }}
+      className={cn('group', props.className)}
+    >
       <motion.div
         ref={ref}
         style={{ borderColor, backgroundColor }}

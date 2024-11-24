@@ -1,7 +1,6 @@
 root = "."
 
 [build]
-pre_cmd = ["pnpm build:vite"]
 cmd= "go build -o ./tmp/main ./src/main.go"
 include_dir=["src"]
 

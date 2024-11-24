@@ -11,6 +11,7 @@ import { HTMLProps, useEffect, useState } from 'react'
 import { PageHeader } from '@/components/page-header'
 import { PageLoader } from '@/components/page-loader'
 import { Loader2, Map, Swords } from 'lucide-react'
+import { playUISound, Sound } from '@/utils/sfx'
 import { Button } from '@/components/ui/button'
 import { AppStore } from '@/state/app-store'
 import { cn } from '@/utils/tailwind-utils'
@@ -37,12 +38,14 @@ function GamePage() {
         search: { creatorToken: data.creatorToken }
       }
       await router.preloadRoute(routeData).catch(() => {
+        playUISound(Sound.Error)
         toast.error('Failed to prefetch route')
       })
       navigate(routeData)
     },
-    onError(error) {
-      toast.error(error.message)
+    onError() {
+      playUISound(Sound.Error)
+      toast.error('Failed to start veto. Please try again later.')
     }
   })
 

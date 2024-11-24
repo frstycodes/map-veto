@@ -3,6 +3,7 @@ import * as SelectPrimitive from '@radix-ui/react-select'
 import * as React from 'react'
 
 import { cn } from '@/utils/tailwind-utils'
+import { playHoverSound } from '@/assets/sfx/hover/hover'
 
 const Select = SelectPrimitive.Root
 
@@ -109,6 +110,10 @@ const SelectItem = React.forwardRef<
       className
     )}
     {...props}
+    onMouseEnter={(e) => {
+      playHoverSound(1)
+      props.onMouseEnter?.(e)
+    }}
   >
     <span className='absolute left-2 flex h-3.5 w-3.5 items-center justify-center'>
       <SelectPrimitive.ItemIndicator>
