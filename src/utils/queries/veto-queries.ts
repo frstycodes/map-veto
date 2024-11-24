@@ -1,9 +1,14 @@
 import { Stage } from '@/types/ban-order.types'
 import { api } from '../helpers'
 
-export enum VetoPhase {
+export const enum VetoPhase {
   ChooseSides = 'choose-sides',
   ChooseMaps = 'choose-maps'
+}
+
+export const enum Team {
+  Team1 = 1,
+  Team2
 }
 
 export type VetoLog = {
@@ -13,14 +18,14 @@ export type VetoLog = {
 
 export type PickedMap = {
   name: string
-  by?: 0 | 1 | 2
-  attacker?: 1 | 2
-  sidePickTurn?: 1 | 2
+  by?: Team | 0 // 0: Decider
+  attacker?: Team
+  sidePickTurn?: Team
 }
 
 export type BannedMap = {
   name: string
-  by?: 0 | 1 | 2
+  by?: Team
 }
 
 export type VetoStateResponse = {
@@ -38,15 +43,9 @@ export type TeamResponse = {
   index: number
 }
 
-export enum TeamWithViewer {
-  Viewer,
-  Team1,
-  Team2
-}
-
 export type VetoResponse = {
   id: string
-  myTeam: TeamWithViewer
+  myTeam: Team | 0 // 0: Viewer
   team1: TeamResponse
   team2: TeamResponse
   maps: string[]

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	stageAction "main/src/constants/stage-action"
 	vetoPhase "main/src/constants/veto-phase"
+	"main/src/logs"
 	"math/rand/v2"
 	"net/http"
 	"slices"
@@ -193,6 +194,11 @@ func ActionHandler(r *ghttp.Request) {
 	// Check if the current turn is the Team
 	turnTeam := veto.GetTurnTeam()
 
+	if turnTeam == nil {
+		r.Response.WriteStatus(400, "Invalid Turn")
+		return
+	}
+
 	if turnTeam.Id == "" || turnTeam.Id != stageActionProps.TeamId {
 		r.Response.WriteStatus(400, "Not your turn")
 		return
@@ -210,7 +216,7 @@ func ActionHandler(r *ghttp.Request) {
 	case stageAction.Pick:
 		err := veto.PickMap(stageActionProps.Map, stage.Team)
 		if err != nil {
-			r.Response.WriteStatus(400, "Map already selected")
+			r.Response.WriteStatus(400, "Map already picked")
 			return
 		}
 
@@ -244,8 +250,8 @@ func ActionHandler(r *ghttp.Request) {
 }
 
 type SidePickProp struct {
-	TeamId   string `json:"teamId"`
-	Attacker bool   `json:"isAttacking"`
+	TeamId      string `json:"teamId"`
+	IsAttacking bool   `json:"isAttacking"`
 }
 
 func SidePickHandler(r *ghttp.Request) {
@@ -285,7 +291,7 @@ func SidePickHandler(r *ghttp.Request) {
 
 	var attacker = turnTeam.Index
 
-	if !sidePickProps.Attacker {
+	if !sidePickProps.IsAttacking {
 		attacker = 3 - turnTeam.Index
 	}
 
@@ -293,16 +299,12 @@ func SidePickHandler(r *ghttp.Request) {
 
 	veto.Selected[idx] = *sidePickStage
 
-	var side = "defend"
-	if sidePickProps.Attacker {
-		side = "attack"
+	var side = logs.DEFENDER_SIDE
+	if sidePickProps.IsAttacking {
+		side = logs.ATTACKER_SIDE
 	}
 
-	log := NewLog(SidePickEvent{
-		Map:  sidePickStage.Name,
-		Team: turnTeam.Index,
-		Side: side,
-	})
+	log := logs.NewSidePick(sidePickStage.Name, turnTeam.Index, side)
 
 	veto.AddLog(log)
 

@@ -1,20 +1,21 @@
-import { getInitialVetoState, getVeto, PickedMap, TeamWithViewer, VetoPhase } from '@/utils/queries/veto-queries'
 import { AnimatePresence, motion, MotionValue, useMotionTemplate, useSpring, useTransform } from 'framer-motion'
-import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { getInitialVetoState, getVeto, PickedMap, Team, VetoPhase } from '@/utils/queries/veto-queries'
 import { Hammer, Loader2, NotebookText, Shield, Swords, SwordsIcon } from 'lucide-react'
 import { AnimatingCard, AnimatingCardContainer } from '@/components/animating-cards'
 import { playMapsHoverSound } from '@/assets/sfx/maps-hover/maps-hover.sfx'
 import { pickSide, sendAction } from '@/utils/mutations/veto-mutations'
 import { CenteredPageLayout } from '@/components/centered-page-layout'
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import React, { ComponentProps, useEffect, useState } from 'react'
 import { useVetoPoller } from '@/hooks/queries/use-veto-poller'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Route as GameRoute } from '@/routes/$game/_layout'
-import { ComponentProps, useEffect, useState } from 'react'
 import { Image as ImageComp } from '@/components/image'
 import { StageAction } from '@/types/ban-order.types'
 import { SPRING_OPTS } from '@/config/motion-config'
 import { MapData } from '@/types/game-config.types'
+import { Log, Logs } from '@/utils/log-events/logs'
 import { useRerender } from '@/hooks/use-rerender'
 import { playUISound, Sound } from '@/utils/sfx'
 import { Button } from '@/components/ui/button'
@@ -40,7 +41,7 @@ export const Route = createFileRoute('/$game/_layout/$id/_layout/$token')({
   }
 })
 
-enum AnimationState {
+const enum AnimationState {
   NotStarted,
   Started,
   Ended
@@ -140,28 +141,29 @@ function VetoPage() {
     }
   })
 
-  const isViewer = vetoData.myTeam === TeamWithViewer.Viewer
+  const isViewer = vetoData.myTeam === 0
   const isDialogOpen_teamInit = !isViewer && (!pollQuery.data?.team1 || !pollQuery.data?.team2)
 
   /*
-    Using this variable to conditionally render the MapsList(AnimatingCardsContainer) which takes up space and
+    Using this variable(isChoosingSides) to conditionally render the MapsList(AnimatingCardsContainer) which takes up space and
     only using isChoosingSides would be enough but since it is set to true before the animation completes
     so we need to check if the decider animation is finished, for which we will check if the 
     deciderMap_forAnimationOnly is empty string.
   */
   const isChoosingSides = vetoState.phase === VetoPhase.ChooseSides
 
-  /* 
-  Determining the current side choice stage by finding the first
-  selected map where attacker is not set. 
-*/
-
   useEffect(() => {
     if (isChoosingSides) {
       setDeciderAnimationState(AnimationState.Ended)
     }
+    // Not including the isChoosingSides because we want this to be fired only once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  /* 
+    Determining the current side choice stage by finding the first
+    selected map where attacker is not set. 
+  */
   const currentSideChoiceMap =
     (deciderAnimationState == AnimationState.Ended && vetoState.selected?.find((map) => !map.attacker)) || null
 
@@ -279,9 +281,13 @@ function VetoPage() {
       </motion.div>
       {logsQuery.data && (
         <div className='flex flex-col gap-1 py-2'>
-          <Button variant='outline' className='gap-2 rounded-lg'>
-            <NotebookText className='size-5' /> Logs are available: View
-          </Button>
+          <LogsDialog
+            logs={logsQuery.data}
+            teams={{
+              team1: vetoState.team1,
+              team2: vetoState.team2
+            }}
+          />
         </div>
       )}
       <motion.div className='fixed bottom-1 left-2 flex -skew-x-[8deg] gap-2 py-2'>
@@ -335,7 +341,7 @@ function SidePickDialog(props: SidePickDialogProps) {
   const imageURL = `/optimized/${mapData?.images[1]}`
   const { vetoData } = Route.useLoaderData()
 
-  const isViewer = vetoData.myTeam === TeamWithViewer.Viewer
+  const isViewer = vetoData.myTeam === 0
   const isMyTurn = !isViewer && vetoData.myTeam == props.map.sidePickTurn
 
   const pickedByTeam = getPickedByTeam(props.map.by || 0, vetoData.myTeam, props.teams)
@@ -581,6 +587,31 @@ function TeamInitDialog({ open }: { open: boolean }) {
   )
 }
 
+type LogsDialogProps = {
+  logs: Log[]
+  teams: {
+    team1: string
+    team2: string
+  }
+}
+
+function LogsDialog(props: LogsDialogProps) {
+  const { vetoData } = Route.useLoaderData()
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant='outline' className='gap-2 rounded-lg'>
+          <NotebookText className='size-5' /> Logs are available: View
+        </Button>
+      </DialogTrigger>
+      <DialogContent className='p-0'>
+        <Logs logs={props.logs} game={vetoData.game} teams={{ team1: props.teams.team1, team2: props.teams.team2 }} />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 type VetoTurnIndicatorProps = ComponentProps<typeof Badge> & {
   vetoType: StageAction.Ban | StageAction.Pick
 }
@@ -590,8 +621,8 @@ function VetoTurnIndicator({ vetoType, ...props }: VetoTurnIndicatorProps) {
   return <ActionIcon className={cn('h-5 w-5', actionStyle, props.className)} />
 }
 
-function getPickedByTeam(pickedBy: 0 | 1 | 2, myTeam: TeamWithViewer, teams: { team1: string; team2: string }) {
-  const team = pickedBy === 1 ? teams.team1 : teams.team2
+function getPickedByTeam(pickedBy: Team | 0, myTeam: Team | 0, teams: { team1: string; team2: string }) {
+  const team = pickedBy === Team.Team1 ? teams.team1 : teams.team2
 
   // 0 doesn't represent Viewer here, for map picked 0 represents Decider
   if (pickedBy === 0) return 'Decider'

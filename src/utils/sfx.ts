@@ -1,7 +1,7 @@
 import uiSounds from '@/assets/sfx/ui-sounds.wav'
 import { Howl } from 'howler'
 
-export enum Sound {
+export const enum Sound {
   Error = 'error',
   Success = 'success',
   Neutral = 'neutral',

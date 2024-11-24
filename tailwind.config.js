@@ -11,7 +11,8 @@ export default {
         bg: 'var(--bg-image)'
       },
       fontFamily: {
-        sans: ['Montserrat', ...defaultTheme.fontFamily.sans]
+        sans: ['Montserrat', ...defaultTheme.fontFamily.sans],
+        mono: ['Roboto Mono', ...defaultTheme.fontFamily.mono]
       },
       boxShadow: {
         glow: '0 0 10px 5px hsl(var(--background)/ 0.2)',

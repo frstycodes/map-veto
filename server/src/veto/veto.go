@@ -3,8 +3,8 @@ package veto
 import (
 	"errors"
 	"fmt"
-	stageAction "main/src/constants/stage-action"
 	vetoPhase "main/src/constants/veto-phase"
+	"main/src/logs"
 	longpoll "main/src/poll"
 	"main/src/utils"
 	"sync"
@@ -54,7 +54,7 @@ type Veto struct {
 	Selected     []PickedMap
 	Banned       []BannedMap
 	Phase        string
-	Logs         []Log
+	Logs         []logs.Log
 	Ended        bool
 
 	poll      *longpoll.LongPoll
@@ -104,10 +104,7 @@ func NewVeto(props VetoConstructorProps, timeout time.Duration) *Veto {
 
 	VetoMap[id] = veto
 
-	log := NewLog(VetoInitializationEvent{
-		Maps: props.Maps,
-	},
-	)
+	log := logs.NewVetoInitialization(veto.Config.Maps)
 	veto.AddLog(log)
 
 	fmt.Println("Veto Created. New Count: ", len(VetoMap))
@@ -115,8 +112,7 @@ func NewVeto(props VetoConstructorProps, timeout time.Duration) *Veto {
 	return veto
 }
 
-func (veto *Veto) AddLog(log Log) {
-	fmt.Println(log.Event)
+func (veto *Veto) AddLog(log logs.Log) {
 	veto.Logs = append(veto.Logs, log)
 }
 
@@ -213,35 +209,6 @@ func (veto *Veto) GetTeamFromID(id string) *Team {
 	return nil
 }
 
-func (veto *Veto) PickSide(isAttacker bool, team int) error {
-	attackingTeam := team
-	if !isAttacker {
-		attackingTeam = 3 - team
-	}
-
-	pickedMap := PickedMap{
-		Name:     veto.GetRemainingMaps()[0],
-		By:       team,
-		Attacker: attackingTeam,
-	}
-	veto.Selected = append(veto.Selected, pickedMap)
-
-	var side = "defend"
-	if isAttacker {
-		side = "attack"
-	}
-
-	log := NewLog(SidePickEvent{
-		Team: team,
-		Map:  pickedMap.Name,
-		Side: side,
-	})
-	veto.AddLog(log)
-
-	return nil
-
-}
-
 func (veto *Veto) PickMap(mapName string, team int) error {
 	if veto.IsPicked(mapName) {
 		return errors.New("already-picked")
@@ -266,16 +233,10 @@ func (veto *Veto) PickMap(mapName string, team int) error {
 	veto.Selected = append(veto.Selected, pickedMap)
 
 	if team == 0 { // team is 0 when the map is decider
-		log := NewLog(DeciderMapEvent{
-			Map: mapName,
-		})
+		log := logs.NewDeciderMap(mapName)
 		veto.AddLog(log)
 	} else {
-		log := NewLog(MapActionEvent{
-			Map:    mapName,
-			By:     team,
-			Action: stageAction.Pick,
-		})
+		log := logs.NewPick(mapName, team)
 		veto.AddLog(log)
 	}
 
@@ -292,12 +253,7 @@ func (veto *Veto) BanMap(mapName string, team int) error {
 	}
 	veto.Banned = append(veto.Banned, bannedMap)
 
-	log := NewLog(MapActionEvent{
-		Map:    mapName,
-		By:     team,
-		Action: stageAction.Ban,
-	})
-
+	log := logs.NewBan(mapName, team)
 	veto.AddLog(log)
 
 	return nil
