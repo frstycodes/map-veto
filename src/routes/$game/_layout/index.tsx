@@ -7,11 +7,11 @@ import { RainbowButton } from '@/components/ui/rainbow-button'
 import { BanOrderDialog } from '@/components/ban-order-dialog'
 import { Route as GameRoute } from '@/routes/$game/_layout'
 import { playErrorSound } from '@/assets/sfx/error/error'
+import { Info, Loader2, Map, Swords } from 'lucide-react'
 import customPool from '@/config/games/custom_pool.json'
 import { HTMLProps, useEffect, useState } from 'react'
 import { PageHeader } from '@/components/page-header'
 import { PageLoader } from '@/components/page-loader'
-import { Loader2, Map, Swords } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AppStore } from '@/state/app-store'
 import { cn } from '@/utils/tailwind-utils'
@@ -67,6 +67,9 @@ function GamePage() {
         <p>
           Quickly veto maps for <span className='font-bold uppercase text-primary'>{config.name}</span>
         </p>
+        <p className='flex items-center gap-1 text-sm text-muted-foreground'>
+          <Info className='size-4' /> Veto session will expire after 3 minutes of inactivity.
+        </p>
       </header>
       <div className='space-y-8 duration-500 animate-in fade-in-0'>
         <Section title='Choose Map Pool:'>
@@ -78,7 +81,9 @@ function GamePage() {
         <Section title='Ban Order:'>
           <BanOrderDialog />
         </Section>
-        <StartMapVetoButton className='float-right' loading={startVetoMutation.isPending} onClick={handleStart} />
+        <div className='flex justify-end'>
+          <StartMapVetoButton className='ml-auto' loading={startVetoMutation.isPending} onClick={handleStart} />
+        </div>
       </div>
     </CenteredPageLayout>
   )
