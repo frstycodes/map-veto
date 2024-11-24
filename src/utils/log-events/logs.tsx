@@ -1,6 +1,5 @@
 import { Download, Gavel, MousePointerClick, NotepadText, Scale, Shield, Sword } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Link } from '@tanstack/react-router'
 import { ReactNode, useRef } from 'react'
 import { cn } from '../tailwind-utils'
 import { motion } from 'framer-motion'
@@ -186,9 +185,9 @@ export function Logs(props: LogsProps) {
           <p className='bottom-2 left-2 font-mono'>Date: {today}</p>
           <p className='bottom-2 left-2 font-mono'>
             Created using{' '}
-            <Link className='text-semibold text-foreground underline' href={window.location.origin}>
+            <a className='text-semibold text-foreground underline' href={window.location.origin} target='_blank'>
               {window.location.origin.replace(/http(s)?:\/\//, '')}
-            </Link>
+            </a>
           </p>
         </div>
       </div>

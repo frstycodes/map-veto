@@ -290,20 +290,22 @@ function VetoPage() {
           />
         </div>
       )}
-      <motion.div className='fixed bottom-1 left-2 flex -skew-x-[8deg] gap-2 py-2'>
-        {vetoState.banned?.map((map) => {
-          return (
-            <motion.h1
-              layoutId={map.name}
-              transition={{ type: 'spring', duration: 0.5 }}
-              className='rounded-lg border-2 border-destructive bg-destructive/20 px-3 py-1 text-sm backdrop-blur-md'
-              key={map.name}
-            >
-              {map.name}
-            </motion.h1>
-          )
-        })}
-      </motion.div>
+      <Portal>
+        <motion.div className='fixed bottom-1 left-2 flex -skew-x-[8deg] gap-2 py-2'>
+          {vetoState.banned?.map((map) => {
+            return (
+              <motion.h1
+                layoutId={map.name}
+                transition={{ type: 'spring', duration: 0.5 }}
+                className='rounded-lg border-2 border-destructive bg-destructive/20 px-3 py-1 text-sm backdrop-blur-md'
+                key={map.name}
+              >
+                {map.name}
+              </motion.h1>
+            )
+          })}
+        </motion.div>
+      </Portal>
       {!!currentSideChoiceMap && !isSidePickAnimating && (
         <SidePickDialog teams={{ team1: vetoState.team1, team2: vetoState.team2 }} map={currentSideChoiceMap!} />
       )}

@@ -1,11 +1,16 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
 import { DiscordBlue } from '@/assets/svgs/discord-blue'
-import { Mail, Map } from 'lucide-react'
+import { AlertCircle, Mail, Map } from 'lucide-react'
 import { Button } from './ui/button'
 
 export function WelcomeDialog() {
   return (
-    <Dialog defaultOpen>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant='ghost' className='gap-2 rounded-lg'>
+          <AlertCircle className='size-4' /> Report Issue
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className='font-bold'>
@@ -22,7 +27,7 @@ export function WelcomeDialog() {
                 <Mail className='size-4' /> Mail
               </Button>
             </a>
-            <a href='https://discordapp.com/users/454188684002983946'>
+            <a href='https://discordapp.com/users/454188684002983946' target='_blank'>
               <Button variant='outline' className='text-medium h-9 gap-2 rounded-lg'>
                 <DiscordBlue className='size-4' /> Discord
               </Button>
