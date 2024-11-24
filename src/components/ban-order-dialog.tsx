@@ -1,17 +1,16 @@
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { StageAction, Stage, BanOrderPreset } from '@/types/ban-order.types'
-import { getAvailableBanOrderPresets } from '@/utils/ban-order'
+import { getAvailableBanOrderPresets, validateBanOrder } from '@/utils/ban-order'
+import { BanOrderPreset, Stage, StageAction } from '@/types/ban-order.types'
 import { Route as GameRoute } from '@/routes/$game/_layout'
+import { playErrorSound } from '@/assets/sfx/error/error'
 import { RadioGroup, RadioItem } from './ui/custom-radio'
-import { validateBanOrder } from '@/utils/ban-order'
 import { useEffect, useMemo, useState } from 'react'
 import { Gavel, Medal, Swords } from 'lucide-react'
 import { DialogHeader } from './ui/dialog'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { toast } from 'sonner'
-import { playUISound, Sound } from '@/utils/sfx'
 
 export function BanOrderDialog() {
   const { store } = GameRoute.useLoaderData()
@@ -49,7 +48,7 @@ export function BanOrderDialog() {
         if (_open) return setDialogOpen(true)
         const validationErr = validateBanOrder(store.get().stages, store.get().bestOf)
         if (validationErr) {
-          playUISound(Sound.Error)
+          playErrorSound()
           toast.error(`Invalid Format: Falling back to Last Pick`, {
             description: validationErr
           })

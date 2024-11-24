@@ -1,6 +1,6 @@
 import { AlertCircle, CheckCheckIcon, ClipboardList } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
-import { playUISound, Sound } from '@/utils/sfx'
+import { playErrorSound } from '@/assets/sfx/error/error'
 import { ComponentProps, useState } from 'react'
 import { cn } from '@/utils/tailwind-utils'
 import { Button } from './ui/button'
@@ -21,7 +21,7 @@ export function CopyToClipBoardButton({ textToCopy, ...props }: CopyToClipBoardB
     } catch {
       setError(true)
       toast.error('Failed to copy!')
-      playUISound(Sound.Error)
+      playErrorSound()
     }
   }
 

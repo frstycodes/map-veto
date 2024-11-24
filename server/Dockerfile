@@ -4,11 +4,11 @@ FROM golang:1.23.1 as builder
 WORKDIR /build
 
 # Copy only go.mod and go.sum first to leverage Docker cache
-COPY server/go.mod server/go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the server directory
-COPY server/ ./
+# # Copy the server directory
+COPY / ./
 
 # Build the application
 RUN go build -o dist/server src/main.go

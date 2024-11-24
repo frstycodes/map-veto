@@ -7,17 +7,17 @@ import { playMapsHoverSound } from '@/assets/sfx/maps-hover/maps-hover.sfx'
 import { pickSide, sendAction } from '@/utils/mutations/veto-mutations'
 import { CenteredPageLayout } from '@/components/centered-page-layout'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import React, { ComponentProps, useEffect, useState } from 'react'
 import { useVetoPoller } from '@/hooks/queries/use-veto-poller'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Route as GameRoute } from '@/routes/$game/_layout'
+import { ComponentProps, useEffect, useState } from 'react'
+import { playErrorSound } from '@/assets/sfx/error/error'
 import { Image as ImageComp } from '@/components/image'
 import { StageAction } from '@/types/ban-order.types'
 import { SPRING_OPTS } from '@/config/motion-config'
 import { MapData } from '@/types/game-config.types'
 import { Log, Logs } from '@/utils/log-events/logs'
 import { useRerender } from '@/hooks/use-rerender'
-import { playUISound, Sound } from '@/utils/sfx'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@radix-ui/react-dialog'
 import { Portal } from '@radix-ui/react-portal'
@@ -134,7 +134,7 @@ function VetoPage() {
         vetoState.selected = currentMapsState.selected
         vetoState.banned = currentMapsState.banned
         rerender()
-        playUISound(Sound.Error)
+        playErrorSound()
         toast.error('Failed to send action')
         throw error
       }
@@ -371,7 +371,7 @@ function SidePickDialog(props: SidePickDialogProps) {
       return pickSide(id, teamId, isAttacker)
     },
     onError() {
-      playUISound(Sound.Error)
+      playErrorSound()
       toast.error('Failed to pick side.')
     }
   })
@@ -550,7 +550,7 @@ function TeamInitDialog({ open }: { open: boolean }) {
       setTeamName('')
     },
     onError() {
-      playUISound(Sound.Error)
+      playErrorSound()
       toast.error('Failed to update team name')
     }
   })
