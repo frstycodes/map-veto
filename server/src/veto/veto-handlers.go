@@ -2,7 +2,8 @@ package veto
 
 import (
 	"fmt"
-	VetoConst "main/src/veto-constants"
+	stageAction "main/src/constants/stage-action"
+	vetoPhase "main/src/constants/veto-phase"
 	"math/rand/v2"
 	"net/http"
 	"slices"
@@ -206,24 +207,19 @@ func ActionHandler(r *ghttp.Request) {
 	stage := veto.GetCurrentStage()
 
 	switch stage.Type {
-	case "pick":
+	case stageAction.Pick:
 		err := veto.PickMap(stageActionProps.Map, stage.Team)
 		if err != nil {
 			r.Response.WriteStatus(400, "Map already selected")
 			return
 		}
-		log := NewLog(fmt.Sprintf("Team %d(%s) picked %s.", turnTeam.Index, turnTeam.Name, stageActionProps.Map))
-		veto.AddLog(log)
 
-	case "ban":
+	case stageAction.Ban:
 		err := veto.BanMap(stageActionProps.Map, stage.Team)
 		if err != nil {
 			r.Response.WriteStatus(400, "Map already banned")
 			return
 		}
-
-		log := NewLog(fmt.Sprintf("Team %d(%s) banned %s.", turnTeam.Index, turnTeam.Name, stageActionProps.Map))
-		veto.AddLog(log)
 
 	default:
 		r.Response.WriteStatus(400, "Invalid Action")
@@ -297,6 +293,21 @@ func SidePickHandler(r *ghttp.Request) {
 
 	veto.Selected[idx] = *sidePickStage
 
+	var side = "defend"
+	if sidePickProps.Attacker {
+		side = "attack"
+	}
+
+	log := NewLog(SidePickEvent{
+		Map:  sidePickStage.Name,
+		Team: turnTeam.Index,
+		Side: side,
+	})
+
+	veto.AddLog(log)
+
+	veto.CheckIfEnded()
+
 	veto.SendPollData()
 
 	r.Response.WriteStatus(200)
@@ -304,7 +315,7 @@ func SidePickHandler(r *ghttp.Request) {
 }
 
 func changePhase(veto *Veto) {
-	veto.Phase = VetoConst.ChooseSides
+	veto.Phase = vetoPhase.ChooseSides
 	veto.SendPollData()
 }
 
@@ -314,13 +325,8 @@ func sendDeciderMap(veto *Veto) {
 	randIdx := rand.IntN(len(remainingMaps))
 	randMap := remainingMaps[randIdx]
 
-	veto.Phase = VetoConst.ChooseSides
+	veto.Phase = vetoPhase.ChooseSides
 	veto.PickMap(randMap, 0)
-
-	veto.logs = append(veto.logs, Log{
-		Time:  time.Now(),
-		Event: fmt.Sprintf("%s was chosen as the decider map.", randMap),
-	})
 
 	veto.SendPollData()
 }
@@ -342,14 +348,14 @@ type StartVetoReponse struct {
 	CreatorToken string `json:"creatorToken"`
 }
 
-func StartVeto(r *ghttp.Request) {
+func StartVeto(r *ghttp.Request, timeout int) {
 	var props VetoConstructorProps
 	if err := r.Parse(&props); err != nil {
 		r.Response.WriteJsonExit(g.Map{"error": "Invalid request body"})
 		return
 	}
 
-	veto := NewVeto(props, 5*time.Minute)
+	veto := NewVeto(props, time.Duration(timeout)*time.Second)
 	r.Response.Status = http.StatusCreated
 
 	res := StartVetoReponse{
@@ -358,6 +364,7 @@ func StartVeto(r *ghttp.Request) {
 	}
 
 	r.Response.WriteJsonExit(res)
+
 }
 
 func GetTokens(r *ghttp.Request) {
@@ -381,4 +388,17 @@ func GetTokens(r *ghttp.Request) {
 		"viewers": veto.Config.ViewersToken,
 	}
 	r.Response.WriteJsonExit(g.Map{"tokens": tokens})
+}
+
+func GetLogsHandler(r *ghttp.Request) {
+	id := r.GetString("id")
+	veto := GetVeto(id)
+	if veto == nil {
+		r.Response.WriteStatus(404)
+		return
+	}
+
+	fmt.Printf("Logs: %v\n", veto.Logs)
+
+	r.Response.WriteJson(veto.Logs)
 }

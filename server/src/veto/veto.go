@@ -3,10 +3,10 @@ package veto
 import (
 	"errors"
 	"fmt"
+	stageAction "main/src/constants/stage-action"
+	vetoPhase "main/src/constants/veto-phase"
 	longpoll "main/src/poll"
 	"main/src/utils"
-	VetoConst "main/src/veto-constants"
-	"strings"
 	"sync"
 	"time"
 
@@ -48,25 +48,14 @@ type VetoConfig struct {
 	Game         string
 }
 
-type Log struct {
-	Time  time.Time `json:"time"`
-	Event string    `json:"event"`
-}
-
-func NewLog(event string) Log {
-	return Log{
-		Time:  time.Now(),
-		Event: event,
-	}
-}
-
 type Veto struct {
 	Config       VetoConfig
 	CurrentStage int
 	Selected     []PickedMap
 	Banned       []BannedMap
 	Phase        string
-	logs         []Log
+	Logs         []Log
+	Ended        bool
 
 	poll      *longpoll.LongPoll
 	resetChan chan struct{}
@@ -89,21 +78,23 @@ func NewVeto(props VetoConstructorProps, timeout time.Duration) *Veto {
 	}
 
 	config := VetoConfig{
-		Id:           id,
+		Id:    id,
+		Team1: team1,
+		Team2: team2,
+
 		CreatorToken: uuid.New().String(),
-		Team1:        team1,
-		Team2:        team2,
 		ViewersToken: viewersToken,
-		Maps:         props.Maps,
-		Rounds:       props.Rounds,
-		Stages:       props.Stages,
-		Game:         props.Game,
+
+		Maps:   props.Maps,
+		Rounds: props.Rounds,
+		Stages: props.Stages,
+		Game:   props.Game,
 	}
 
 	veto := &Veto{
 		Config:       config,
 		CurrentStage: 0,
-		Phase:        VetoConst.ChooseMaps,
+		Phase:        vetoPhase.ChooseMaps,
 
 		poll:      longpoll.New(time.Minute),
 		resetChan: make(chan struct{}),
@@ -113,7 +104,10 @@ func NewVeto(props VetoConstructorProps, timeout time.Duration) *Veto {
 
 	VetoMap[id] = veto
 
-	log := NewLog(fmt.Sprintf("Veto created for %s with maps %s.", config.Game, strings.Join(config.Maps, ", ")))
+	log := NewLog(VetoInitializationEvent{
+		Maps: props.Maps,
+	},
+	)
 	veto.AddLog(log)
 
 	fmt.Println("Veto Created. New Count: ", len(VetoMap))
@@ -122,7 +116,8 @@ func NewVeto(props VetoConstructorProps, timeout time.Duration) *Veto {
 }
 
 func (veto *Veto) AddLog(log Log) {
-	veto.logs = append(veto.logs, log)
+	fmt.Println(log.Event)
+	veto.Logs = append(veto.Logs, log)
 }
 
 func (veto *Veto) monitor(timeout time.Duration) {
@@ -219,17 +214,30 @@ func (veto *Veto) GetTeamFromID(id string) *Team {
 }
 
 func (veto *Veto) PickSide(isAttacker bool, team int) error {
-	side := team
+	attackingTeam := team
 	if !isAttacker {
-		side = 3 - team
+		attackingTeam = 3 - team
 	}
 
 	pickedMap := PickedMap{
 		Name:     veto.GetRemainingMaps()[0],
 		By:       team,
-		Attacker: side,
+		Attacker: attackingTeam,
 	}
 	veto.Selected = append(veto.Selected, pickedMap)
+
+	var side = "defend"
+	if isAttacker {
+		side = "attack"
+	}
+
+	log := NewLog(SidePickEvent{
+		Team: team,
+		Map:  pickedMap.Name,
+		Side: side,
+	})
+	veto.AddLog(log)
+
 	return nil
 
 }
@@ -256,6 +264,21 @@ func (veto *Veto) PickMap(mapName string, team int) error {
 		SidePickTurn: sidePickTurn,
 	}
 	veto.Selected = append(veto.Selected, pickedMap)
+
+	if team == 0 { // team is 0 when the map is decider
+		log := NewLog(DeciderMapEvent{
+			Map: mapName,
+		})
+		veto.AddLog(log)
+	} else {
+		log := NewLog(MapActionEvent{
+			Map:    mapName,
+			By:     team,
+			Action: stageAction.Pick,
+		})
+		veto.AddLog(log)
+	}
+
 	return nil
 }
 
@@ -268,6 +291,15 @@ func (veto *Veto) BanMap(mapName string, team int) error {
 		By:   team,
 	}
 	veto.Banned = append(veto.Banned, bannedMap)
+
+	log := NewLog(MapActionEvent{
+		Map:    mapName,
+		By:     team,
+		Action: stageAction.Ban,
+	})
+
+	veto.AddLog(log)
+
 	return nil
 }
 
@@ -284,6 +316,14 @@ func GetVeto(id string) *Veto {
 	return veto
 }
 
+func (v *Veto) CheckIfEnded() {
+	_, stage := v.GetSidePickStage()
+	if stage == nil {
+		v.Ended = true
+	}
+
+}
+
 func GetVetoPollData(veto *Veto) *VetoPollResponse {
 	return &VetoPollResponse{
 		Team1:        veto.Config.Team1.Name,
@@ -292,7 +332,7 @@ func GetVetoPollData(veto *Veto) *VetoPollResponse {
 		Banned:       veto.Banned,
 		CurrentStage: veto.CurrentStage,
 		Phase:        veto.Phase,
-		Logs:         veto.logs,
+		Ended:        veto.Ended,
 	}
 }
 

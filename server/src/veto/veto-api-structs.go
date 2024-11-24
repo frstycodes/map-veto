@@ -37,7 +37,7 @@ type VetoPollResponse struct {
 	Banned       []BannedMap `json:"banned"`
 	CurrentStage int         `json:"currentStage"`
 	Phase        string      `json:"phase"`
-	Logs         []Log       `json:"logs"`
+	Ended        bool        `json:"ended"`
 }
 
 type StageActionProps struct {

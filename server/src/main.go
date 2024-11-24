@@ -1,8 +1,10 @@
 package main
 
 import (
+	"log"
 	"main/src/veto"
 	"os"
+	"strconv"
 
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
@@ -21,6 +23,11 @@ func cors(r *ghttp.Request) {
 func main() {
 	s := g.Server()
 	s.BindMiddlewareDefault(cors)
+	timeout_var := os.Getenv("VETO_TIMEOUT")
+	timeout, err := strconv.Atoi(timeout_var)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// API Handlers
 	s.Group("/api", func(group *ghttp.RouterGroup) {
@@ -30,7 +37,9 @@ func main() {
 			})
 		})
 		group.Group("/veto", func(vetoGroup *ghttp.RouterGroup) {
-			vetoGroup.POST("/start", veto.StartVeto)
+			vetoGroup.POST("/start", func(r *ghttp.Request) {
+				veto.StartVeto(r, timeout)
+			})
 			vetoGroup.Group("/:id", func(idGroup *ghttp.RouterGroup) {
 				idGroup.GET("/", veto.GetVetoHandler)
 				idGroup.GET("/tokens", veto.GetTokens)
@@ -41,6 +50,7 @@ func main() {
 				idGroup.Group("/team/:teamId", func(teamGroup *ghttp.RouterGroup) {
 					teamGroup.PUT("/", veto.UpdateTeamHandler)
 				})
+				idGroup.GET("/logs", veto.GetLogsHandler)
 			})
 		})
 	})
