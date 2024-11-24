@@ -1,4 +1,4 @@
-import error from '@/assets/error/error.wav'
+import error from './error.wav'
 import { Howl } from 'howler'
 
 const soundHowl = new Howl({
