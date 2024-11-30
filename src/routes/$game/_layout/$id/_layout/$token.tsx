@@ -14,8 +14,8 @@ import { ComponentProps, useEffect, useState } from 'react'
 import { playErrorSound } from '@/assets/sfx/error/error'
 import { Image as ImageComp } from '@/components/image'
 import { StageAction } from '@/types/ban-order.types'
+import { MapData } from '@/config/game-config.types'
 import { SPRING_OPTS } from '@/config/motion-config'
-import { MapData } from '@/types/game-config.types'
 import { Log, Logs } from '@/utils/log-events/logs'
 import { useRerender } from '@/hooks/use-rerender'
 import { Button } from '@/components/ui/button'
@@ -390,7 +390,7 @@ function SidePickDialog(props: SidePickDialogProps) {
         >
           <ImageComp
             src={imageURL}
-            setSizes={[640, 1024]}
+            srcSet={{ 640: 640, 1024: 1024 }}
             role='presentantion'
             sizes='(max-width: 700px) 100vw, 600px'
             className='absolute size-full object-cover object-center'
@@ -440,7 +440,8 @@ function AnimatingMapCardContents({ distance, map }: { distance: MotionValue<num
       <ImageComp
         role='presentation'
         src={imageURL}
-        setSizes={[640, { imageSize: 1024, screenWidth: 900 }]}
+        // We have screen width smaller than the image width, because its for the height
+        srcSet={{ 640: 640, 1024: 900 }}
         sizes='300px'
         className='absolute z-10 h-full w-full object-cover object-center transition-all'
       />
@@ -489,12 +490,13 @@ function SelectedMapCard({ map, teams, ...props }: SelectedMapCardProps) {
       }}
     >
       <ImageComp
+        asMotion
         src={mapUrl}
         transition={{
           type: 'spring',
           duration: 0.5
         }}
-        setSizes={[480]}
+        srcSet={{ 480: 480 }}
         className='absolute size-full object-cover object-center'
       />
 

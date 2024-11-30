@@ -121,7 +121,14 @@ func processImage(task cfg.Task, quality int) error {
 	}
 	resized := imaging.Resize(src, task.Width, 0, imaging.Lanczos)
 
+	_, statErr := os.Stat(task.OutputPath)
+	if statErr == nil {
+		fmt.Printf("Skipping! File already exists: %s\n", task.OutputPath)
+		return nil
+	}
+
 	output, err := os.Create(task.OutputPath)
+
 	if err != nil {
 		return err
 	}
@@ -140,7 +147,7 @@ func processResults(results chan cfg.Result) {
 	for r := range results {
 		if r.Err != nil {
 			log.Printf("Error processing %s: %v\n", r.Task.Filename, r.Err)
-			continue // Changed from return to continue to keep processing other results
+			continue
 		}
 		fmt.Printf("Completed processing %s at %dpx width to %s\n", r.Task.Filename, r.Task.Width, r.Task.Format)
 	}

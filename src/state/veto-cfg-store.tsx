@@ -1,6 +1,6 @@
 import { Stage, BanOrderPreset } from '@/types/ban-order.types'
 import { createSelector } from 'better-zustand-selector'
-import { MapPool } from '@/types/game-config.types'
+import { MapPool } from '@/config/game-config.types'
 import { create } from 'zustand'
 
 export type VetoConfigStore = {

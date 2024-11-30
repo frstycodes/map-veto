@@ -7,7 +7,7 @@ export const Route = createFileRoute('/$game/_layout')({
   loader: async ({ params }) => {
     const [err, config] = await getGameConfig(params.game)
 
-    if (err != null) throw redirect({ to: '/$game', params: { game: 'valorant' } })
+    if (err != null) throw redirect({ to: '/' })
 
     if (config.color) updatePrimaryColor(config.color)
 
@@ -19,7 +19,7 @@ export const Route = createFileRoute('/$game/_layout')({
     return { store, config }
   },
   onError: () => {
-    throw redirect({ to: '/$game', params: { game: 'valorant' } })
+    throw redirect({ to: '/' })
   },
   component: Outlet,
   pendingComponent: PageLoader

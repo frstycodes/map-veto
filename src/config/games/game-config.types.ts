@@ -11,6 +11,7 @@ export type MapData = {
 }
 
 export type GameConfig = {
+  slug: string
   name: string
   maps: MapData[]
   pools: Record<string, MapPool>

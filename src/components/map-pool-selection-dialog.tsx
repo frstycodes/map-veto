@@ -2,8 +2,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AnimatePresence, motion, MotionValue, useSpring, useTransform } from 'framer-motion'
 import { CheckboxGroup, CheckboxItem } from './ui/custom-checkbox'
 import { Route as GameRoute } from '@/routes/$game/_layout'
+import { MapData } from '@/config/games/game-config.types'
 import customPool from '@/config/games/custom_pool.json'
-import { MapData } from '@/types/game-config.types'
 import { cn } from '@/utils/tailwind-utils'
 import { ComponentProps } from 'react'
 import { Info } from 'lucide-react'
@@ -96,13 +96,12 @@ function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
     mass: 0.1
   })
   const image = `/optimized/${map.images[0]}`
-  console.log(image)
   return (
     <>
       <Image
         asMotion
         src={image}
-        setSizes={[480]}
+        srcSet={{ 480: 480 }}
         style={{
           opacity: imageOpacity
         }}

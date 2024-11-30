@@ -1,10 +1,10 @@
-import { GameConfig } from '@/types/game-config.types'
+import { GameConfig } from '@/config/games/game-config.types'
 import { games } from '@/config/games'
 
 type GameConfigResult = Promise<Result<Error, GameConfig>>
 
 export async function getGameConfig(game: string): GameConfigResult {
-  const isValidGame = games.has(game)
+  const isValidGame = games.includes(game)
   if (!isValidGame) return [new Error(`Game ${game} not found`), null]
 
   const importRes = await import(`@/config/games/${game}.json`)

@@ -17,6 +17,7 @@ import { AppStore } from '@/state/app-store'
 import { cn } from '@/utils/tailwind-utils'
 import { Logo } from '@/components/logo'
 import { Svg } from '@/components/svg'
+import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/$game/_layout/')({
@@ -64,9 +65,9 @@ function GamePage() {
         <PageHeader>
           <Logo />
         </PageHeader>
-        <p>
+        <motion.p layoutId='logo-description' transition={{ type: 'spring', duration: 0.8 }}>
           Quickly veto maps for <span className='font-bold uppercase text-primary'>{config.name}</span>
-        </p>
+        </motion.p>
         <p className='flex items-center gap-1 text-sm text-muted-foreground'>
           <Info className='size-4' /> Veto session will expire after 3 minutes of inactivity.
         </p>

@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
+import { createRouter, redirect, RouterProvider } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { ThemeProvider } from './providers/theme-provider'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { Toaster } from './components/ui/sonner'
@@ -25,7 +25,14 @@ function Root() {
         <ThemeProvider defaultTheme='dark'>
           <TooltipProvider delayDuration={100}>
             <Toaster />
-            <RouterProvider router={router} context={{}} />
+            <RouterProvider
+              defaultErrorComponent={() => {
+                throw redirect({ to: '/' })
+              }}
+              defaultPendingMinMs={0}
+              router={router}
+              context={{}}
+            />
           </TooltipProvider>
         </ThemeProvider>
       </QueryClientProvider>
