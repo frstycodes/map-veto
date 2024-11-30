@@ -12,7 +12,8 @@ export function OnekoToggle() {
       variant='ghost'
       className={cn('gap-2 rounded-lg border-2 border-transparent text-sm', enabled && 'border-primary bg-primary/20')}
     >
-      <Cat className='size-4' /> Toggle Oneko Cat
+      <Cat className='size-4' />
+      Oneko
     </Button>
   )
 }
