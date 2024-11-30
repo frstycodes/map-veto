@@ -4,12 +4,14 @@ import { create } from 'zustand'
 
 export type AppStore = {
   performanceMode: boolean
+  onekoEnabled: boolean
 }
 
 const appStore = create(
   persist<AppStore>(
     () => ({
-      performanceMode: false
+      performanceMode: false,
+      onekoEnabled: false
     }),
     {
       name: 'config',

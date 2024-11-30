@@ -2,8 +2,10 @@ import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { PerformanceModeToggle } from '@/components/performance-toggle'
 import { WelcomeDialog } from '@/components/welcome-dialog'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { OnekoToggle } from '@/components/oneko-toggle'
 import { useTheme } from '@/providers/theme-provider'
 import Particles from '@/components/ui/particles'
+import { OnekoCat } from '@/components/oneko'
 import { AppStore } from '@/state/app-store'
 import Ripple from '@/components/ui/ripple'
 
@@ -15,9 +17,11 @@ function Root() {
   return (
     <>
       <Background />
+      <OnekoCat />
       <Outlet />
       <div className='fixed bottom-4 right-4 flex items-center gap-2'>
         <WelcomeDialog />
+        <OnekoToggle />
         <PerformanceModeToggle />
         <ThemeToggle />
       </div>
