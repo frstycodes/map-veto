@@ -47,27 +47,27 @@ export function MapPoolSelectionDialog({ ...props }: MapPoolSelectionDialogProps
               <CheckboxItem
                 value={map.name}
                 key={map.id}
-                className='group relative col-span-6 grid aspect-square h-20 w-full place-items-center overflow-hidden rounded-xl md:col-span-6'
+                className='group relative col-span-6 flex aspect-square h-20 w-full items-end overflow-hidden rounded-xl group-data-[state=checked]:!bg-primary/10 md:col-span-6'
                 render={(props) => <CheckboxCustomRender {...props} map={map} />}
               />
             )
           })}
         </CheckboxGroup>
         <DialogFooter>
-          <MapsMinThresholdWarning threshold={3} show={pool.maps.length < 3} />
+          <MapsMinThresholdWarning threshold={3} mapsCount={pool.maps.length} />
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
 }
 type MapsMinThresholdWarningProps = ComponentProps<typeof motion.div> & {
-  show: boolean
   threshold: number
+  mapsCount: number
 }
-export function MapsMinThresholdWarning({ threshold = 5, show, ...props }: MapsMinThresholdWarningProps) {
+export function MapsMinThresholdWarning({ threshold = 5, mapsCount, ...props }: MapsMinThresholdWarningProps) {
   return (
     <AnimatePresence mode='popLayout' initial={false}>
-      {show && (
+      {mapsCount < threshold && (
         <motion.div
           key='min-5-warn'
           initial={{ y: 40 }}
@@ -91,23 +91,23 @@ type CheckboxCustomRenderProps = {
   map: MapData
 }
 function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
-  const imageOpacitySync = useTransform(distance, [0, 1], [1, 0.6])
-  const imageOpacity = useSpring(imageOpacitySync, {
+  const overlayOpacitySync = useTransform(distance, [0, 1], [0.1, 0])
+  const imageOpacity = useSpring(overlayOpacitySync, {
     mass: 0.1
   })
-  const image = `/optimized/${map.images[0]}`
+  const imageURL = `/optimized/${map.selectedImage}`
   return (
     <>
-      <Image
-        asMotion
-        src={image}
-        srcSet={{ 480: 480 }}
+      <Image asMotion src={imageURL} srcSet={{ 480: 480 }} className='absolute -z-10 h-full w-full object-cover' />
+      <motion.div
         style={{
           opacity: imageOpacity
         }}
-        className='absolute -z-10 h-full w-full object-cover contrast-[1.1]'
+        className='absolute inset-0 z-0 bg-background'
       />
-      <p className='font-bold italic text-white drop-shadow-lg'>{map.name}</p>
+      <p className='-z-10 -ml-2 w-[calc(100%+12px)] -skew-x-[8deg] bg-gradient-to-t from-black/80 to-transparent px-4 pt-2 text-left text-sm font-bold text-white drop-shadow-lg group-data-[state=checked]:w-auto group-data-[state=checked]:bg-primary group-data-[state=checked]:from-transparent group-data-[state=checked]:pt-0'>
+        {map.name}
+      </p>
     </>
   )
 }

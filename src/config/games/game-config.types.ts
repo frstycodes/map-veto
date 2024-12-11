@@ -7,7 +7,10 @@ export type MapPool = {
 export type MapData = {
   id: string
   name: string
-  images: string[]
+  poolImage: string
+  cardImage: string
+  selectedImage: string
+  sidePickImage: string
 }
 
 export type GameConfig = {

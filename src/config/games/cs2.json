@@ -23,52 +23,82 @@
     {
       "id": 1,
       "name": "Ancient",
-      "images": ["Ancient.webp"]
+      "poolImage": "Ancient.webp",
+      "cardImage": "Ancient.webp",
+      "selectedImage": "Ancient.webp",
+      "sidePickImage": "Ancient.webp"
     },
     {
       "id": 2,
       "name": "Anubis",
-      "images": ["Anubis.webp"]
+      "poolImage": "Anubis.webp",
+      "cardImage": "Anubis.webp",
+      "selectedImage": "Anubis.webp",
+      "sidePickImage": "Anubis.webp"
     },
     {
       "id": 3,
       "name": "Inferno",
-      "images": ["Inferno.webp"]
+      "poolImage": "Inferno.webp",
+      "cardImage": "Inferno.webp",
+      "selectedImage": "Inferno.webp",
+      "sidePickImage": "Inferno.webp"
     },
     {
       "id": 4,
       "name": "Mirage",
-      "images": ["Mirage.webp"]
+      "poolImage": "Mirage.webp",
+      "cardImage": "Mirage.webp",
+      "selectedImage": "Mirage.webp",
+      "sidePickImage": "Mirage.webp"
     },
     {
       "id": 5,
       "name": "Nuke",
-      "images": ["Nuke.webp"]
+      "poolImage": "Nuke.webp",
+      "cardImage": "Nuke.webp",
+      "selectedImage": "Nuke.webp",
+      "sidePickImage": "Nuke.webp"
     },
     {
       "id": 6,
       "name": "Overpass",
-      "images": ["Overpass.webp"]
+      "poolImage": "Overpass.webp",
+      "cardImage": "Overpass.webp",
+      "selectedImage": "Overpass.webp",
+      "sidePickImage": "Overpass.webp"
     },
     {
       "id": 7,
       "name": "Vertigo",
-      "images": ["Vertigo.webp"]
+      "poolImage": "Vertigo.webp",
+      "cardImage": "Vertigo.webp",
+      "selectedImage": "Vertigo.webp",
+      "sidePickImage": "Vertigo.webp"
     },
     {
       "id": 8,
       "name": "Office",
-      "images": ["Office.webp"]
+      "poolImage": "Office.webp",
+      "cardImage": "Office.webp",
+      "selectedImage": "Office.webp",
+      "sidePickImage": "Office.webp"
     },
     {
       "id": 9,
       "name": "Dust II",
-      "images": ["Dust-II.webp"]
+      "poolImage": "Dust-II.webp",
+      "cardImage": "Dust-II.webp",
+      "selectedImage": "Dust-II.webp",
+      "sidePickImage": "Dust-II.webp"
     },
     {
       "id": 10,
       "name": "Italy",
-      "images": ["Italy.webp"]
+      "poolImage": "Italy.webp",
+      "cardImage": "Italy.webp",
+      "selectedImage": "Italy.webp",
+      "sidePickImage": "Italy.webp"
     }
   ]
 }

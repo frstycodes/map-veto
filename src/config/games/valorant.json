@@ -24,57 +24,90 @@
     {
       "id": 1,
       "name": "Ascent",
-      "images": ["Ascent-premier.webp", "Ascent-splash.webp", "Ascent-stylized.webp", "Ascent-tall.webp"]
+      "poolImage": "Ascent-premier.webp",
+      "cardImage": "Ascent-premier.webp",
+      "selectedImage": "Ascent-tall.webp",
+      "sidePickImage": "Ascent-splash.webp"
     },
     {
       "id": 2,
       "name": "Split",
-      "images": ["Split-premier.webp", "Split-splash.webp", "Split-stylized.webp", "Split-tall.webp"]
+      "poolImage": "Split-premier.webp",
+      "cardImage": "Split-premier.webp",
+      "selectedImage": "Split-tall.webp",
+      "sidePickImage": "Split-splash.webp"
     },
     {
       "id": 3,
       "name": "Fracture",
-      "images": ["Fracture-premier.webp", "Fracture-splash.webp", "Fracture-stylized.webp", "Fracture-tall.webp"]
+      "poolImage": "Fracture-premier.webp",
+      "cardImage": "Fracture-premier.webp",
+      "selectedImage": "Fracture-tall.webp",
+      "sidePickImage": "Fracture-splash.webp"
     },
     {
       "id": 4,
       "name": "Bind",
-      "images": ["Bind-premier.webp", "Bind-splash.webp", "Bind-stylized.webp", "Bind-tall.webp"]
+      "poolImage": "Bind-premier.webp",
+      "cardImage": "Bind-premier.webp",
+      "selectedImage": "Bind-tall.webp",
+      "sidePickImage": "Bind-splash.webp"
     },
     {
       "id": 5,
       "name": "Breeze",
-      "images": ["Breeze-premier.webp", "Breeze-splash.webp", "Breeze-stylized.webp", "Breeze-tall.webp"]
+      "poolImage": "Breeze-premier.webp",
+      "cardImage": "Breeze-premier.webp",
+      "selectedImage": "Breeze-tall.webp",
+      "sidePickImage": "Breeze-splash.webp"
     },
     {
       "id": 6,
       "name": "Abyss",
-      "images": ["Abyss-premier.webp", "Abyss-splash.webp", "Abyss-stylized.webp", "Abyss-tall.webp"]
+      "poolImage": "Abyss-premier.webp",
+      "cardImage": "Abyss-premier.webp",
+      "selectedImage": "Abyss-tall.webp",
+      "sidePickImage": "Abyss-splash.webp"
     },
     {
       "id": 7,
       "name": "Lotus",
-      "images": ["Lotus-premier.webp", "Lotus-splash.webp", "Lotus-stylized.webp", "Lotus-tall.webp"]
+      "poolImage": "Lotus-premier.webp",
+      "cardImage": "Lotus-premier.webp",
+      "selectedImage": "Lotus-tall.webp",
+      "sidePickImage": "Lotus-splash.webp"
     },
     {
       "id": 8,
       "name": "Sunset",
-      "images": ["Sunset-premier.webp", "Sunset-splash.webp", "Sunset-stylized.webp", "Sunset-tall.webp"]
+      "poolImage": "Sunset-premier.webp",
+      "cardImage": "Sunset-premier.webp",
+      "selectedImage": "Sunset-tall.webp",
+      "sidePickImage": "Sunset-splash.webp"
     },
     {
       "id": 9,
       "name": "Pearl",
-      "images": ["Pearl-premier.webp", "Pearl-splash.webp", "Pearl-stylized.webp", "Pearl-tall.webp"]
+      "poolImage": "Pearl-premier.webp",
+      "cardImage": "Pearl-premier.webp",
+      "selectedImage": "Pearl-tall.webp",
+      "sidePickImage": "Pearl-splash.webp"
     },
     {
       "id": 10,
       "name": "Icebox",
-      "images": ["Icebox-premier.webp", "Icebox-splash.webp", "Icebox-stylized.webp", "Icebox-tall.webp"]
+      "poolImage": "Icebox-premier.webp",
+      "cardImage": "Icebox-premier.webp",
+      "selectedImage": "Icebox-tall.webp",
+      "sidePickImage": "Icebox-splash.webp"
     },
     {
       "id": 11,
       "name": "Haven",
-      "images": ["Haven-premier.webp", "Haven-splash.webp", "Haven-stylized.webp", "Haven-tall.webp"]
+      "poolImage": "Haven-premier.webp",
+      "cardImage": "Haven-premier.webp",
+      "selectedImage": "Haven-tall.webp",
+      "sidePickImage": "Haven-splash.webp"
     }
   ]
 }

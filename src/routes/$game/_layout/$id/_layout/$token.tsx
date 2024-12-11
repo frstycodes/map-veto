@@ -84,7 +84,12 @@ function VetoPage() {
       // Preload the last rounds images
       const dirtyMapCount = (data.selected?.length || 0) + (data.banned?.length || 0)
       if (vetoData.maps.length - dirtyMapCount == vetoData.rounds) {
-        const dirtyMaps = vetoData.maps.filter((map) => !data.banned?.some((m) => m.name === map))
+        const dirtyMaps = vetoData.maps
+          .filter((map) => !data.banned?.some((m) => m.name === map))
+          .map((map) => {
+            const mapData = config.maps.find((m) => m.name === map)
+            return mapData!
+          })
         preloadMapImages(dirtyMaps)
       }
 
@@ -340,7 +345,7 @@ function SidePickDialog(props: SidePickDialogProps) {
   const { id, token: teamId } = Route.useParams()
   const { config } = GameRoute.useLoaderData()
   const mapData = config.maps.find((m) => m.name === props.map?.name)
-  const imageURL = `/optimized/${mapData?.images[1] ?? mapData?.images[0]}`
+  const imageURL = `/optimized/${mapData?.sidePickImage}`
   const { vetoData } = Route.useLoaderData()
 
   const isViewer = vetoData.myTeam === 0
@@ -351,18 +356,18 @@ function SidePickDialog(props: SidePickDialogProps) {
   const message = (() => {
     if (isMyTurn)
       return (
-        <p>
+        <span>
           Pick a side for <b>{props.map.name}</b>.
-        </p>
+        </span>
       )
 
     const team = props.map.sidePickTurn === 1 ? props.teams.team1 : props.teams.team2
 
     if (isViewer)
       return (
-        <p>
+        <span>
           Waiting for <b>{team}</b> to pick a side.
-        </p>
+        </span>
       )
 
     return `Waiting for opponent to pick a side.`
@@ -390,7 +395,7 @@ function SidePickDialog(props: SidePickDialogProps) {
         >
           <ImageComp
             src={imageURL}
-            srcSet={{ 640: 640, 1024: 1024 }}
+            srcSet={{ 480: 480, 1024: 1024 }}
             role='presentantion'
             sizes='(max-width: 700px) 100vw, 600px'
             className='absolute size-full object-cover object-center'
@@ -434,14 +439,14 @@ function AnimatingMapCardContents({ distance, map }: { distance: MotionValue<num
   const fontSizeSync = useTransform(distance, [0, 1], [1, 0.8])
   const fontSize = useSpring(fontSizeSync, SPRING_OPTS)
   const { vetoData } = Route.useLoaderData()
-  const imageURL = `/optimized/${map?.images[0]}`
+  const imageURL = `/optimized/${map.cardImage}`
   return (
     <div className='relative flex h-full w-full items-center justify-center bg-cover bg-center transition-all'>
       <ImageComp
         role='presentation'
         src={imageURL}
         // We have screen width smaller than the image width, because its for the height
-        srcSet={{ 640: 640, 1024: 900 }}
+        srcSet={{ 360: 640, 480: 900 }}
         sizes='300px'
         className='absolute z-10 h-full w-full object-cover object-center transition-all'
       />
@@ -471,7 +476,7 @@ function SelectedMapCard({ map, teams, ...props }: SelectedMapCardProps) {
 
   const pickedByTeam = getPickedByTeam(map.by || 0, vetoData.myTeam, teams)
 
-  const mapUrl = `/optimized/${mapData?.images[3] ?? mapData?.images[0]}`
+  const mapUrl = `/optimized/${mapData?.selectedImage}`
 
   return (
     <motion.div
@@ -623,7 +628,12 @@ type VetoTurnIndicatorProps = ComponentProps<typeof Badge> & {
 function VetoTurnIndicator({ vetoType, ...props }: VetoTurnIndicatorProps) {
   const ActionIcon = vetoType === StageAction.Ban ? Hammer : Swords
   const actionStyle = vetoType === StageAction.Ban ? 'text-red-500' : 'text-emerald-500'
-  return <ActionIcon className={cn('h-5 w-5', actionStyle, props.className)} />
+
+  return (
+    <motion.div layoutId='veto-indicator'>
+      <ActionIcon className={cn('h-5 w-5', actionStyle, props.className)} />
+    </motion.div>
+  )
 }
 
 function getPickedByTeam(pickedBy: Team | 0, myTeam: Team | 0, teams: { team1: string; team2: string }) {
@@ -636,11 +646,12 @@ function getPickedByTeam(pickedBy: Team | 0, myTeam: Team | 0, teams: { team1: s
   return team || `Team ${pickedBy}`
 }
 
-function preloadMapImages(maps: string[]) {
+function preloadMapImages(maps: MapData[]) {
   for (const map of maps) {
-    const splash = new Image()
-    const tall = new Image()
-    splash.src = `/optimized/${map}-splash-1024w.webp`
-    tall.src = `/optimized/${map}-tall-480w.webp`
+    const sidePickImage = new Image()
+    const selectedImage = new Image()
+
+    sidePickImage.src = `/optimized/${map.sidePickImage.slice(0, -5)}-1024w.webp`
+    selectedImage.src = `/optimized/${map.sidePickImage.slice(0, -5)}-480w.webp`
   }
 }
