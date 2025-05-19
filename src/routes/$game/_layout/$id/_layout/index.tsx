@@ -1,11 +1,9 @@
-import { CopyToClipBoardButton } from '@/components/copy-to-clipboard-button'
 import { CenteredPageLayout } from '@/components/centered-page-layout'
-import { ExternalLinkButton } from '@/components/external-link-button'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { PageHeader } from '@/components/page-header'
 import { PageLoader } from '@/components/page-loader'
 import { LinkIcon, NotebookText } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { UrlInput } from './-components/url-input'
 import { api } from '@/utils/helpers'
 import { z } from 'zod'
 
@@ -34,6 +32,11 @@ export const Route = createFileRoute('/$game/_layout/$id/_layout/')({
   }
 })
 
+const TOKEN_GROUPS = [
+  { label: 'Team 1', key: 'team1' },
+  { label: 'Team 2', key: 'team2' },
+  { label: 'Viewers', key: 'viewers' }
+]
 export function VetoPage() {
   const { tokens } = Route.useLoaderData()
 
@@ -43,41 +46,21 @@ export function VetoPage() {
         <LinkIcon className='h-6 w-6' />
         Veto Links
       </PageHeader>
-      <UrlInput label='Team 1' token={tokens.team1} />
-      <UrlInput label='Team 2' token={tokens.team2} />
-      <UrlInput label='Viewers' token={tokens.viewers} />
-      <div className='space-y-1 rounded-lg border-2 bg-background/20 px-4 py-2 text-sm text-foreground backdrop-blur-sm'>
-        <h3 className='text-md flex items-center gap-1 font-bold'>
-          <NotebookText className='size-4' /> Note
-        </h3>
-        <p>Team that starts the veto process will not get to pick side for the decider map.</p>
-      </div>
+      {TOKEN_GROUPS.map((group) => (
+        <UrlInput label={group.label} token={tokens[group.key]} />
+      ))}
+      <Note />
     </CenteredPageLayout>
   )
 }
 
-type UrlInputProps = {
-  token: string
-  label: string
-}
-function UrlInput(props: UrlInputProps) {
-  const { game, id } = Route.useParams()
-  const url = `${window.location.origin}/${game}/${id}/${props.token}`
+function Note() {
   return (
-    <div className='space-y-2'>
-      <h1 className='text-lg font-bold'>{props.label}</h1>
-      <div className='flex items-center gap-2'>
-        <Input
-          readOnly
-          className='rounded-lg'
-          value={url}
-          type='password'
-          onMouseEnter={(e) => (e.currentTarget.type = 'text')}
-          onMouseLeave={(e) => (e.currentTarget.type = 'password')}
-        />
-        <CopyToClipBoardButton textToCopy={url} />
-        <ExternalLinkButton url={url} />
-      </div>
+    <div className='space-y-1 rounded-lg border-2 bg-background/20 px-4 py-2 text-sm text-foreground backdrop-blur-sm'>
+      <h3 className='text-md flex items-center gap-1 font-bold'>
+        <NotebookText className='size-4' /> Note
+      </h3>
+      <p>Team that starts the veto process will not get to pick side for the decider map.</p>
     </div>
   )
 }

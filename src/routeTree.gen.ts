@@ -18,7 +18,7 @@ import { Route as GameLayoutImport } from './routes/$game/_layout'
 import { Route as GameLayoutIndexImport } from './routes/$game/_layout/index'
 import { Route as GameLayoutIdLayoutImport } from './routes/$game/_layout/$id/_layout'
 import { Route as GameLayoutIdLayoutIndexImport } from './routes/$game/_layout/$id/_layout/index'
-import { Route as GameLayoutIdLayoutTokenImport } from './routes/$game/_layout/$id/_layout/$token'
+import { Route as GameLayoutIdLayoutTokenIndexImport } from './routes/$game/_layout/$id/_layout/$token/index'
 
 // Create Virtual Routes
 
@@ -67,11 +67,12 @@ const GameLayoutIdLayoutIndexRoute = GameLayoutIdLayoutIndexImport.update({
   getParentRoute: () => GameLayoutIdLayoutRoute,
 } as any)
 
-const GameLayoutIdLayoutTokenRoute = GameLayoutIdLayoutTokenImport.update({
-  id: '/$token',
-  path: '/$token',
-  getParentRoute: () => GameLayoutIdLayoutRoute,
-} as any)
+const GameLayoutIdLayoutTokenIndexRoute =
+  GameLayoutIdLayoutTokenIndexImport.update({
+    id: '/$token/',
+    path: '/$token/',
+    getParentRoute: () => GameLayoutIdLayoutRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -119,18 +120,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GameLayoutIdLayoutImport
       parentRoute: typeof GameLayoutIdRoute
     }
-    '/$game/_layout/$id/_layout/$token': {
-      id: '/$game/_layout/$id/_layout/$token'
-      path: '/$token'
-      fullPath: '/$game/$id/$token'
-      preLoaderRoute: typeof GameLayoutIdLayoutTokenImport
-      parentRoute: typeof GameLayoutIdLayoutImport
-    }
     '/$game/_layout/$id/_layout/': {
       id: '/$game/_layout/$id/_layout/'
       path: '/'
       fullPath: '/$game/$id/'
       preLoaderRoute: typeof GameLayoutIdLayoutIndexImport
+      parentRoute: typeof GameLayoutIdLayoutImport
+    }
+    '/$game/_layout/$id/_layout/$token/': {
+      id: '/$game/_layout/$id/_layout/$token/'
+      path: '/$token'
+      fullPath: '/$game/$id/$token'
+      preLoaderRoute: typeof GameLayoutIdLayoutTokenIndexImport
       parentRoute: typeof GameLayoutIdLayoutImport
     }
   }
@@ -139,13 +140,13 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface GameLayoutIdLayoutRouteChildren {
-  GameLayoutIdLayoutTokenRoute: typeof GameLayoutIdLayoutTokenRoute
   GameLayoutIdLayoutIndexRoute: typeof GameLayoutIdLayoutIndexRoute
+  GameLayoutIdLayoutTokenIndexRoute: typeof GameLayoutIdLayoutTokenIndexRoute
 }
 
 const GameLayoutIdLayoutRouteChildren: GameLayoutIdLayoutRouteChildren = {
-  GameLayoutIdLayoutTokenRoute: GameLayoutIdLayoutTokenRoute,
   GameLayoutIdLayoutIndexRoute: GameLayoutIdLayoutIndexRoute,
+  GameLayoutIdLayoutTokenIndexRoute: GameLayoutIdLayoutTokenIndexRoute,
 }
 
 const GameLayoutIdLayoutRouteWithChildren =
@@ -192,15 +193,15 @@ export interface FileRoutesByFullPath {
   '/$game': typeof GameLayoutRouteWithChildren
   '/$game/': typeof GameLayoutIndexRoute
   '/$game/$id': typeof GameLayoutIdLayoutRouteWithChildren
-  '/$game/$id/$token': typeof GameLayoutIdLayoutTokenRoute
   '/$game/$id/': typeof GameLayoutIdLayoutIndexRoute
+  '/$game/$id/$token': typeof GameLayoutIdLayoutTokenIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$game': typeof GameLayoutIndexRoute
   '/$game/$id': typeof GameLayoutIdLayoutIndexRoute
-  '/$game/$id/$token': typeof GameLayoutIdLayoutTokenRoute
+  '/$game/$id/$token': typeof GameLayoutIdLayoutTokenIndexRoute
 }
 
 export interface FileRoutesById {
@@ -211,8 +212,8 @@ export interface FileRoutesById {
   '/$game/_layout/': typeof GameLayoutIndexRoute
   '/$game/_layout/$id': typeof GameLayoutIdRouteWithChildren
   '/$game/_layout/$id/_layout': typeof GameLayoutIdLayoutRouteWithChildren
-  '/$game/_layout/$id/_layout/$token': typeof GameLayoutIdLayoutTokenRoute
   '/$game/_layout/$id/_layout/': typeof GameLayoutIdLayoutIndexRoute
+  '/$game/_layout/$id/_layout/$token/': typeof GameLayoutIdLayoutTokenIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -222,8 +223,8 @@ export interface FileRouteTypes {
     | '/$game'
     | '/$game/'
     | '/$game/$id'
-    | '/$game/$id/$token'
     | '/$game/$id/'
+    | '/$game/$id/$token'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/$game' | '/$game/$id' | '/$game/$id/$token'
   id:
@@ -234,8 +235,8 @@ export interface FileRouteTypes {
     | '/$game/_layout/'
     | '/$game/_layout/$id'
     | '/$game/_layout/$id/_layout'
-    | '/$game/_layout/$id/_layout/$token'
     | '/$game/_layout/$id/_layout/'
+    | '/$game/_layout/$id/_layout/$token/'
   fileRoutesById: FileRoutesById
 }
 
@@ -295,16 +296,16 @@ export const routeTree = rootRoute
       "filePath": "$game/_layout/$id/_layout.tsx",
       "parent": "/$game/_layout/$id",
       "children": [
-        "/$game/_layout/$id/_layout/$token",
-        "/$game/_layout/$id/_layout/"
+        "/$game/_layout/$id/_layout/",
+        "/$game/_layout/$id/_layout/$token/"
       ]
-    },
-    "/$game/_layout/$id/_layout/$token": {
-      "filePath": "$game/_layout/$id/_layout/$token.tsx",
-      "parent": "/$game/_layout/$id/_layout"
     },
     "/$game/_layout/$id/_layout/": {
       "filePath": "$game/_layout/$id/_layout/index.tsx",
+      "parent": "/$game/_layout/$id/_layout"
+    },
+    "/$game/_layout/$id/_layout/$token/": {
+      "filePath": "$game/_layout/$id/_layout/$token/index.tsx",
       "parent": "/$game/_layout/$id/_layout"
     }
   }

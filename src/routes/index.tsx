@@ -5,7 +5,6 @@ import { PageHeader } from '@/components/page-header'
 import { PageLoader } from '@/components/page-loader'
 import { Image } from '@/components/image'
 import { Logo } from '@/components/logo'
-import { motion } from 'framer-motion'
 
 export const Route = createFileRoute('/')({
   loader: () => import('@/config/games/config-list').then((m) => m.gameConfigList),
@@ -20,9 +19,7 @@ function IndexPage() {
       <PageHeader>
         <Logo />
       </PageHeader>
-      <motion.p layoutId='logo-description' className='py-2' transition={{ type: 'spring', duration: 0.8 }}>
-        Quickly veto maps for follwing games:
-      </motion.p>
+      <p className='py-2'>Quickly veto maps for follwing games:</p>
       <p className='pb-1 pt-4 text-lg font-bold'>Choose your game:</p>
       <div className='flex gap-4'>
         {gameConfigList.map((game) => {

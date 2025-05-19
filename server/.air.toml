@@ -1,8 +1,8 @@
 root = "."
 
 [build]
-cmd= "go build -o ./tmp/main ./src/main.go"
-include_dir=["src"]
+cmd = "go build -o ./tmp/main.exe ./src/main.go"
+include_dir = ["src"]
 
 [run]
-cmd="./tmp/main"
+cmd = "./tmp/main.exe"

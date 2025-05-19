@@ -55,9 +55,6 @@ func main() {
 		})
 	})
 
-	// Serve Frontend
-	// utils.ServeStatic(s, filepath.Join(gfile.MainPkgPath(), "../../dist"), "index.html")
-
 	s.SetPort(8000)
 	s.Run()
 }

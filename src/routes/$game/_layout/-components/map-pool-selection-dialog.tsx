@@ -1,0 +1,120 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
+import { AnimatePresence, motion, MotionValue, useSpring, useTransform } from 'framer-motion'
+import { CheckboxGroup, CheckboxItem } from '@/components/ui/custom-checkbox'
+import { MapData } from '@/config/games/game-config.types'
+import customPool from '@/config/games/custom_pool.json'
+import { useLoaderData } from '@tanstack/react-router'
+import { cn } from '@/utils/tailwind-utils'
+import { Image } from '@/components/image'
+import { ComponentProps } from 'react'
+import { Info } from 'lucide-react'
+
+type MapPoolSelectionDialogProps = ComponentProps<typeof Dialog>
+
+export function MapPoolSelectionDialog({ ...props }: MapPoolSelectionDialogProps) {
+  const { config, store } = useLoaderData({ from: '/$game/_layout' })
+  const { pool } = store.useStore('pool')
+
+  const onOpenChange = (open: boolean) => {
+    if (!open && pool.maps.length < 3) {
+      const pool = config.pools[config.defaultPool]
+      store.set({ pool })
+    }
+    props.onOpenChange?.(open)
+  }
+
+  return (
+    <Dialog {...props} onOpenChange={onOpenChange}>
+      <DialogContent className='overflow-hidden'>
+        <DialogHeader>
+          <DialogTitle>Create Map Pool</DialogTitle>
+          <DialogDescription>Create a custom map pool by selecting the maps you want to include.</DialogDescription>
+        </DialogHeader>
+        <CheckboxGroup
+          value={pool.maps}
+          onValueChange={(pool) =>
+            store.set({
+              pool: {
+                ...customPool,
+                maps: pool
+              }
+            })
+          }
+          className='grid select-none grid-cols-12 flex-wrap gap-2'
+        >
+          {config.maps.map((map) => {
+            return (
+              <CheckboxItem
+                value={map.name}
+                key={map.id}
+                className='group relative col-span-6 flex aspect-square h-20 w-full items-end overflow-hidden rounded-xl group-data-[state=checked]:!bg-primary/10 md:col-span-6'
+                render={(props) => <CheckboxCustomRender {...props} map={map} />}
+              />
+            )
+          })}
+        </CheckboxGroup>
+        <DialogFooter>
+          <MapsMinThresholdWarning threshold={3} mapsCount={pool.maps.length} />
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+type MapsMinThresholdWarningProps = ComponentProps<typeof motion.div> & {
+  threshold: number
+  mapsCount: number
+}
+export function MapsMinThresholdWarning({ threshold = 5, mapsCount, ...props }: MapsMinThresholdWarningProps) {
+  return (
+    <AnimatePresence mode='popLayout' initial={false}>
+      {mapsCount < threshold && (
+        <motion.div
+          key='min-5-warn'
+          initial={{ y: 40 }}
+          animate={{ y: 0 }}
+          exit={{ y: 40 }}
+          {...props}
+          className={cn(
+            'flex w-full items-center gap-2 rounded-xl border-2 border-yellow-500/20 bg-yellow-500/10 px-4 py-3 text-xs text-yellow-800 dark:text-yellow-200',
+            props.className
+          )}
+        >
+          <Info /> Minimum {threshold} maps required or competitive pool will be automatically selected.
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+type CheckboxCustomRenderProps = {
+  distance: MotionValue<number>
+  map: MapData
+}
+function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
+  const overlayOpacitySync = useTransform(distance, [0, 1], [0.1, 0])
+  const imageOpacity = useSpring(overlayOpacitySync, {
+    mass: 0.1
+  })
+  const imageURL = `/optimized/${map.selectedImage}`
+  return (
+    <>
+      <Image asMotion src={imageURL} srcSet={{ 480: 480 }} className='absolute -z-10 h-full w-full object-cover' />
+      <motion.div
+        style={{
+          opacity: imageOpacity
+        }}
+        className='absolute inset-0 z-0 bg-background'
+      />
+      <p className='-z-10 -ml-2 w-[calc(100%+12px)] -skew-x-[8deg] bg-gradient-to-t from-black/80 to-transparent px-4 pt-2 text-left text-sm font-bold text-white drop-shadow-lg group-data-[state=checked]:w-auto group-data-[state=checked]:bg-primary group-data-[state=checked]:from-transparent group-data-[state=checked]:pt-0'>
+        {map.name}
+      </p>
+    </>
+  )
+}

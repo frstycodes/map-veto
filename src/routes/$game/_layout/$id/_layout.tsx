@@ -3,15 +3,15 @@ import { AnimatePresence } from 'framer-motion'
 import { Logo } from '@/components/logo'
 
 export const Route = createFileRoute('/$game/_layout/$id/_layout')({
-  component: $idLayout
+  component: GameIdLayout
 })
 
-export function $idLayout() {
+function GameIdLayout() {
   return (
     <>
-      <div className='fixed w-full container transition-all left-1/2 -translate-x-1/2'>
+      <div className='container fixed left-1/2 w-full -translate-x-1/2 transition-all'>
         <AnimatePresence initial={false}>
-          <Logo animate={{ scale: 0.8 }} className='absolute top-3 left-3' />
+          <Logo animate={{ scale: 0.8 }} className='absolute left-3 top-3' />
         </AnimatePresence>
       </div>
       <Outlet />

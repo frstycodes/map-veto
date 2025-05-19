@@ -1,6 +1,6 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { playHoverSound } from '@/assets/sfx/hover/hover'
-import { Button, buttonVariants } from './ui/button'
 import { ExternalLinkIcon } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { cn } from '@/utils/tailwind-utils'

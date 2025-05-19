@@ -11,6 +11,7 @@ export function Logo(props: LogoProps) {
     <Link to='/'>
       <motion.div
         layoutId='logo'
+        layout='preserve-aspect'
         {...props}
         onMouseEnter={(e) => {
           playHoverSound(1)
