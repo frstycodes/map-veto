@@ -12,6 +12,8 @@ struct Config {
     output_dir: PathBuf,
     sizes: Vec<u32>,
     quality: u8,
+    /// If true, will delete the existing output directory before processing
+    clean: bool,
 }
 
 impl Default for Config {
@@ -21,6 +23,7 @@ impl Default for Config {
             output_dir: PathBuf::from("./output"),
             sizes: vec![360, 480, 640, 1024, 1920],
             quality: 85,
+            clean: false,
         }
     }
 }
@@ -107,8 +110,15 @@ fn process_dir(config: Config) {
         }
 
         for size in sizes {
-            let output_file_name = format!("{}-{}w.webp", file_name_without_ext, size,);
+            let output_file_name = format!("{}-{}w.webp", file_name_without_ext, size);
             let output_path = config.output_dir.join(&output_file_name);
+            if !config.clean && output_path.exists() {
+                println!(
+                    "Skipping {} as it already exists in output directory",
+                    output_file_name
+                );
+                continue;
+            }
 
             let props = ProcessImageProps {
                 input_path: input_path.clone(),
