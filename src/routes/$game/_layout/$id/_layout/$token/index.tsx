@@ -1,32 +1,31 @@
-import { AnimatePresence, motion } from 'framer-motion'
 import { getInitialVetoState, getVeto, VetoPhase } from '@/utils/queries/veto-queries'
-import { playMapsHoverSound } from '@/assets/sfx/maps-hover/maps-hover.sfx'
-import { sendAction } from '@/utils/mutations/veto-mutations'
-import { CenteredPageLayout } from '@/components/centered-page-layout'
-import { createFileRoute, redirect } from '@tanstack/react-router'
 import { AnimatingCard, AnimatingCardContainer } from '@/components/animating-cards'
+import { createFileRoute, redirect, useLoaderData } from '@tanstack/react-router'
+import { playMapsHoverSound } from '@/assets/sfx/maps-hover/maps-hover.sfx'
+import { CenteredPageLayout } from '@/components/centered-page-layout'
 import { useVetoPoller } from '@/hooks/queries/use-veto-poller'
+import { sendAction } from '@/utils/mutations/veto-mutations'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Route as GameRoute } from '@/routes/$game/_layout'
-import { useEffect } from 'react'
 import { playErrorSound } from '@/assets/sfx/error/error'
+import { AnimatePresence, motion } from 'framer-motion'
 import { StageAction } from '@/types/ban-order.types'
 import { useRerender } from '@/hooks/use-rerender'
 import { Portal } from '@radix-ui/react-portal'
 import { cn } from '@/utils/tailwind-utils'
-import { Time } from '@/utils/time'
 import { api } from '@/utils/helpers'
+import { Time } from '@/utils/time'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 
 import {
   AnimatingMapCardContents,
   AnimationState,
   LogsDialog,
+  preloadMapImages,
   ScoreBoardTeamDetail,
   SelectedMapCard,
   SidePickDialog,
   TeamInitDialog,
-  preloadMapImages,
   useDeciderAnimation,
   useSidePickAnimation
 } from './-components'
@@ -48,20 +47,17 @@ type BanOrPick = StageAction.Ban | StageAction.Pick
 
 function VetoPage() {
   const rerender = useRerender()
-  const { config } = GameRoute.useLoaderData()
+  const { config } = useLoaderData({ from: '/$game/_layout' })
   const { id, token } = Route.useParams()
   const { vetoState: loader_vetoState, vetoData } = Route.useLoaderData()
 
-  const { 
-    deciderMap: deciderMap_forAnimationOnly, 
-    animationState: deciderAnimationState, 
-    animateDecider 
+  const {
+    deciderMap: deciderMap_forAnimationOnly,
+    animationState: deciderAnimationState,
+    animateDecider
   } = useDeciderAnimation()
-  
-  const { 
-    isSidePickAnimating, 
-    animateSidePick 
-  } = useSidePickAnimation()
+
+  const { isSidePickAnimating, animateSidePick } = useSidePickAnimation()
 
   const pollQuery = useVetoPoller(id, token, {
     initialData: loader_vetoState,
@@ -145,12 +141,14 @@ function VetoPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  /* 
+  /*
     Determining the current side choice map by finding the first
-    selected map where attacker is not set. 
+    selected map where attacker is not set.
   */
   const currentSideChoiceMap =
-    (deciderAnimationState === AnimationState.Ended && vetoState.selected?.find((map) => !map.attacker)) || null
+    (deciderAnimationState === AnimationState.Ended &&
+      vetoState.selected?.find((map) => !map.attacker)) ||
+    null
 
   const logsQuery = useQuery({
     queryKey: ['veto-logs', id],
@@ -164,7 +162,9 @@ function VetoPage() {
 
   return (
     <CenteredPageLayout className='relative w-[clamp(300px,80%,600px)]'>
-      {isViewer && <div className='absolute inset-0 scale-110 cursor-not-allowed' style={{ zIndex: 9999 }} />}
+      {isViewer && (
+        <div className='absolute inset-0 scale-110 cursor-not-allowed' style={{ zIndex: 9999 }} />
+      )}
       <TeamInitDialog open={isDialogOpen_teamInit} />
       <motion.h1 className='flex w-full items-center justify-between gap-2 py-4 text-2xl font-bold italic'>
         <div className='flex-1'>
@@ -203,7 +203,10 @@ function VetoPage() {
                   After the decider map animation starts, we will set the isChoosingSides state to true
                   and not render other maps which are eliminated and only render the decider map.
                 */
-                if (deciderAnimationState === AnimationState.Started && deciderMap_forAnimationOnly?.name !== map)
+                if (
+                  deciderAnimationState === AnimationState.Started &&
+                  deciderMap_forAnimationOnly?.name !== map
+                )
                   return null
 
                 const mapData = config.maps.find((m) => m.name === map)
@@ -215,7 +218,9 @@ function VetoPage() {
                     layoutId={map}
                     key={idx}
                     className='h-60 cursor-pointer overflow-hidden rounded-lg'
-                    render={({ distance }) => <AnimatingMapCardContents distance={distance} map={mapData!} />}
+                    render={({ distance }) => (
+                      <AnimatingMapCardContents distance={distance} map={mapData!} />
+                    )}
                   />
                 )
               })}
@@ -292,7 +297,10 @@ function VetoPage() {
         </motion.div>
       </Portal>
       {!!currentSideChoiceMap && !isSidePickAnimating && (
-        <SidePickDialog teams={{ team1: vetoState.team1, team2: vetoState.team2 }} map={currentSideChoiceMap!} />
+        <SidePickDialog
+          teams={{ team1: vetoState.team1, team2: vetoState.team2 }}
+          map={currentSideChoiceMap!}
+        />
       )}
     </CenteredPageLayout>
   )

@@ -1,9 +1,9 @@
 import { DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { useLoaderData } from '@tanstack/react-router'
+import { Log, Logs } from '@/utils/log-events/logs'
 import { Dialog } from '@radix-ui/react-dialog'
 import { Button } from '@/components/ui/button'
 import { NotebookText } from 'lucide-react'
-import { Log, Logs } from '@/utils/log-events/logs'
-import { Route } from '../index'
 
 type Teams = {
   team1: string
@@ -16,7 +16,7 @@ type LogsDialogProps = {
 }
 
 export function LogsDialog(props: LogsDialogProps) {
-  const { vetoData } = Route.useLoaderData()
+  const { vetoData } = useLoaderData({ from: '/$game/_layout/$id/_layout/$token/' })
 
   return (
     <Dialog>
@@ -26,7 +26,11 @@ export function LogsDialog(props: LogsDialogProps) {
         </Button>
       </DialogTrigger>
       <DialogContent className='p-0'>
-        <Logs logs={props.logs} game={vetoData.game} teams={{ team1: props.teams.team1, team2: props.teams.team2 }} />
+        <Logs
+          logs={props.logs}
+          game={vetoData.game}
+          teams={{ team1: props.teams.team1, team2: props.teams.team2 }}
+        />
       </DialogContent>
     </Dialog>
   )

@@ -1,26 +1,31 @@
 import { motion, MotionValue, useMotionTemplate, useSpring, useTransform } from 'framer-motion'
-import { ComponentProps } from 'react'
+import { MapData } from '@/config/games/game-config.types'
+import { PickedMap } from '@/utils/queries/veto-queries'
 import { Image as ImageComp } from '@/components/image'
+import { useLoaderData } from '@tanstack/react-router'
+import { SPRING_OPTS } from '@/config/motion-config'
+import { getPickedByTeam } from './side-pick-dialog'
 import { Shield, SwordsIcon } from 'lucide-react'
 import { cn } from '@/utils/tailwind-utils'
-import { PickedMap } from '@/utils/queries/veto-queries'
-import { SPRING_OPTS } from '@/config/motion-config'
-import { MapData } from '@/config/games/game-config.types'
-import { Route as GameRoute } from '@/routes/$game/_layout'
-import { Route } from '../index'
-import { getPickedByTeam } from './side-pick-dialog'
+import { ComponentProps } from 'react'
 
 type Teams = {
   team1: string
   team2: string
 }
 
-export function AnimatingMapCardContents({ distance, map }: { distance: MotionValue<number>; map: MapData }) {
+export function AnimatingMapCardContents({
+  distance,
+  map
+}: {
+  distance: MotionValue<number>
+  map: MapData
+}) {
   const fontSizeSync = useTransform(distance, [0, 1], [1, 0.8])
   const fontSize = useSpring(fontSizeSync, SPRING_OPTS)
-  const { vetoData } = Route.useLoaderData()
+  const { vetoData } = useLoaderData({ from: '/$game/_layout/$id/_layout/$token/' })
   const imageURL = `/optimized/${map.cardImage}`
-  
+
   return (
     <div className='relative flex h-full w-full items-center justify-center bg-cover bg-center transition-all'>
       <ImageComp
@@ -51,8 +56,8 @@ type SelectedMapCardProps = ComponentProps<typeof motion.div> & {
 }
 
 export function SelectedMapCard({ map, teams, ...props }: SelectedMapCardProps) {
-  const { config } = GameRoute.useLoaderData()
-  const { vetoData } = Route.useLoaderData()
+  const { config } = useLoaderData({ from: '/$game/_layout' })
+  const { vetoData } = useLoaderData({ from: '/$game/_layout/$id/_layout/$token/' })
 
   const mapData = config.maps.find((m) => m.name === map.name)
   const pickedByTeam = getPickedByTeam(map.by || 0, vetoData.myTeam, teams)

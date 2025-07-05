@@ -1,10 +1,16 @@
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { getAvailableBanOrderPresets, validateBanOrder } from '@/utils/ban-order'
 import { BanOrderPreset, Stage, StageAction } from '@/types/ban-order.types'
-import { Route as GameRoute } from '@/routes/$game/_layout'
 import { playErrorSound } from '@/assets/sfx/error/error'
 import { RadioGroup, RadioItem } from './ui/custom-radio'
+import { useLoaderData } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 import { Gavel, Medal, Swords } from 'lucide-react'
 import { DialogHeader } from './ui/dialog'
@@ -13,11 +19,14 @@ import { Badge } from './ui/badge'
 import { toast } from 'sonner'
 
 export function BanOrderDialog() {
-  const { store } = GameRoute.useLoaderData()
+  const { store } = useLoaderData({ from: '/$game/_layout' })
   const [dialogOpen, setDialogOpen] = useState(false)
   const { bestOf, pool, banOrderPreset } = store.useStore('bestOf', 'pool', 'banOrderPreset')
 
-  const presets = useMemo(() => getAvailableBanOrderPresets(pool.maps.length, bestOf), [bestOf, pool])
+  const presets = useMemo(
+    () => getAvailableBanOrderPresets(pool.maps.length, bestOf),
+    [bestOf, pool]
+  )
 
   // Every time the Preset changes, reset the Ban Orders
   useEffect(() => {
@@ -68,7 +77,9 @@ export function BanOrderDialog() {
           <DialogTitle className='inline-flex items-center gap-2'>
             <Gavel className='h-8 w-8' /> Ban Order Settings
           </DialogTitle>
-          <DialogDescription>Customize the order in which maps are picked for the ban rounds.</DialogDescription>
+          <DialogDescription>
+            Customize the order in which maps are picked for the ban rounds.
+          </DialogDescription>
         </DialogHeader>
         <h1 className='text-lg font-bold'>Choose Preset</h1>
         <RadioGroup className='flex gap-4' value={banOrderPreset}>
@@ -128,7 +139,7 @@ const STAGE_OPTIONS: Stage[] = [
 ]
 
 function ManualBanOrderSettings() {
-  const { store } = GameRoute.useLoaderData()
+  const { store } = useLoaderData({ from: '/$game/_layout' })
   const { stages } = store.useStore('stages')
 
   return (
@@ -145,7 +156,7 @@ type StageOptionProps = {
 }
 
 function StageOption({ stageIndex, stage }: StageOptionProps) {
-  const { store } = GameRoute.useLoaderData()
+  const { store } = useLoaderData({ from: '/$game/_layout' })
 
   const handleValueChange = (value: string) => {
     const [team, type] = JSON.parse(value)

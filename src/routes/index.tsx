@@ -1,19 +1,18 @@
 import { CenteredPageLayout } from '@/components/centered-page-layout'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { gameConfigList } from '@/config/games/config-list'
 import { playHoverSound } from '@/assets/sfx/hover/hover'
-import { PageHeader } from '@/components/page-header'
 import { PageLoader } from '@/components/page-loader'
+import { PageHeader } from '@/components/page-header'
 import { Image } from '@/components/image'
 import { Logo } from '@/components/logo'
 
 export const Route = createFileRoute('/')({
-  loader: () => import('@/config/games/config-list').then((m) => m.gameConfigList),
   pendingComponent: PageLoader,
   component: IndexPage
 })
 
 function IndexPage() {
-  const gameConfigList = Route.useLoaderData()
   return (
     <CenteredPageLayout>
       <PageHeader>

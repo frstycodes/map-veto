@@ -1,18 +1,18 @@
-import { ComponentProps, useState } from 'react'
-import { StageAction } from '@/types/ban-order.types'
-import { Hammer, Swords } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { cn } from '@/utils/tailwind-utils'
-import { Badge } from '@/components/ui/badge'
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Dialog } from '@radix-ui/react-dialog'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { useMutation } from '@tanstack/react-query'
-import { api } from '@/utils/helpers'
 import { playErrorSound } from '@/assets/sfx/error/error'
+import { StageAction } from '@/types/ban-order.types'
+import { useMutation } from '@tanstack/react-query'
+import { useParams } from '@tanstack/react-router'
+import { ComponentProps, useState } from 'react'
+import { Dialog } from '@radix-ui/react-dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Hammer, Swords } from 'lucide-react'
+import { cn } from '@/utils/tailwind-utils'
+import { motion } from 'framer-motion'
+import { api } from '@/utils/helpers'
 import { toast } from 'sonner'
-import { Route } from '../index'
 
 type BanOrPick = StageAction.Ban | StageAction.Pick
 
@@ -22,7 +22,12 @@ type ScoreBoardTeamDetailProps = ComponentProps<'p'> & {
   showIndicator: boolean
 }
 
-export function ScoreBoardTeamDetail({ showIndicator, action, name, ...props }: ScoreBoardTeamDetailProps) {
+export function ScoreBoardTeamDetail({
+  showIndicator,
+  action,
+  name,
+  ...props
+}: ScoreBoardTeamDetailProps) {
   return (
     <p {...props} className={cn('relative z-10 flex w-fit items-center gap-2', props.className)}>
       {name}
@@ -48,7 +53,7 @@ export function VetoTurnIndicator({ vetoType, ...props }: VetoTurnIndicatorProps
 
 export function TeamInitDialog({ open }: { open: boolean }) {
   const [teamName, setTeamName] = useState('')
-  const { id, token } = Route.useParams()
+  const { id, token } = useParams({ from: '/$game/_layout/$id/_layout/$token/' })
 
   const updateTeamMutation = useMutation({
     mutationFn: async ({ id, teamId, name }: { id: string; teamId: string; name: string }) => {
@@ -89,8 +94,16 @@ export function TeamInitDialog({ open }: { open: boolean }) {
           }}
         >
           <div className='flex items-center gap-2'>
-            <Input placeholder='My Team' value={teamName} onChange={(e) => setTeamName(e.target.value)} />
-            <Button loading={updateTeamMutation.isPending} type='submit' className='float-right rounded-lg'>
+            <Input
+              placeholder='My Team'
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
+            />
+            <Button
+              loading={updateTeamMutation.isPending}
+              type='submit'
+              className='float-right rounded-lg'
+            >
               Submit
             </Button>
           </div>

@@ -1,6 +1,6 @@
+import { useLoaderData, useParams } from '@tanstack/react-router'
 import { PickedMap, Team } from '@/utils/queries/veto-queries'
 import { pickSide } from '@/utils/mutations/veto-mutations'
-import { Route as GameRoute } from '@/routes/$game/_layout'
 import { playErrorSound } from '@/assets/sfx/error/error'
 import { Image as ImageComp } from '@/components/image'
 import { Loader2, Shield, Swords } from 'lucide-react'
@@ -9,7 +9,6 @@ import { Portal } from '@radix-ui/react-portal'
 import { cn } from '@/utils/tailwind-utils'
 import { motion } from 'framer-motion'
 import { ComponentProps } from 'react'
-import { Route } from '../index'
 import { toast } from 'sonner'
 
 type Teams = {
@@ -38,9 +37,9 @@ const SIDE_OPTIONS = [
 ]
 
 export function SidePickDialog(props: SidePickDialogProps) {
-  const { id, token: teamId } = Route.useParams()
-  const { config } = GameRoute.useLoaderData()
-  const { vetoData } = Route.useLoaderData()
+  const { id, token: teamId } = useParams({ from: '/$game/_layout/$id/_layout/$token/' })
+  const { config } = useLoaderData({ from: '/$game/_layout' })
+  const { vetoData } = useLoaderData({ from: '/$game/_layout/$id/_layout/$token/' })
 
   const mapData = config.maps.find((m) => m.name === props.map?.name)
   const imageURL = `/optimized/${mapData?.sidePickImage}`
@@ -81,7 +80,9 @@ export function SidePickDialog(props: SidePickDialogProps) {
           <div className='absolute z-0 size-full bg-gradient-to-t from-black/50 from-30% to-black/0' />
 
           {/* Content */}
-          <p className='z-10 flex items-center gap-1 text-lg font-medium text-white drop-shadow-md'>{message}</p>
+          <p className='z-10 flex items-center gap-1 text-lg font-medium text-white drop-shadow-md'>
+            {message}
+          </p>
 
           {SIDE_OPTIONS.map((option, idx) => (
             <button
@@ -113,7 +114,12 @@ export function SidePickDialog(props: SidePickDialogProps) {
   )
 }
 
-function generateSidePickMessage(isMyTurn: boolean, isViewer: boolean, map: PickedMap, teams: Teams): React.ReactNode {
+function generateSidePickMessage(
+  isMyTurn: boolean,
+  isViewer: boolean,
+  map: PickedMap,
+  teams: Teams
+): React.ReactNode {
   if (isMyTurn)
     return (
       <span>
