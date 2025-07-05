@@ -10,6 +10,7 @@ lerna-debug.log*
 
 nvim
 node_modules
+target
 dist
 dist-ssr
 *.local
