@@ -8,7 +8,7 @@ function parseViteEnv(env: unknown) {
 
 const envSchema = z.preprocess(
   parseViteEnv,
-  z.object({ SERVER_URL: z.string().optional().default('https://valorant-map-ban.fly.dev/') })
+  z.object({ SERVER_URL: z.string().optional().default('https://map-veto-server.workers.dev') })
 )
 
 export const env = envSchema.parse(import.meta.env)
