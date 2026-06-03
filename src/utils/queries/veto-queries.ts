@@ -1,5 +1,6 @@
-import { Stage } from '@/types/ban-order.types'
-import { api } from '../helpers'
+import { orpc } from '@/lib/orpc'
+
+// ─── Phase / Team enums (used as values in component code, keep as-is) ───────
 
 export const enum VetoPhase {
   ChooseSides = 'choose-sides',
@@ -11,68 +12,20 @@ export const enum Team {
   Team2
 }
 
-export type VetoLog = {
-  time: string
-  event: string
+// ─── Types inferred from server router (single source of truth) ──────────────
+
+export type VetoStateResponse = Awaited<ReturnType<typeof orpc.veto.state>>
+export type VetoResponse = Awaited<ReturnType<typeof orpc.veto.get>>
+export type PickedMap = VetoStateResponse['selected'][number]
+export type BannedMap = VetoStateResponse['banned'][number]
+export type VetoLog = Awaited<ReturnType<typeof orpc.veto.logs>>[number]
+
+// ─── Query functions ─────────────────────────────────────────────────────────
+
+export async function getInitialVetoState(id: string): Promise<VetoStateResponse> {
+  return orpc.veto.state({ id })
 }
 
-export type PickedMap = {
-  name: string
-  by?: Team | 0 // 0: Decider
-  attacker?: Team
-  sidePickTurn?: Team
+export async function getVeto(id: string, token: string): Promise<VetoResponse> {
+  return orpc.veto.get({ id, token })
 }
-
-export type BannedMap = {
-  name: string
-  by?: Team
-}
-
-export type VetoStateResponse = {
-  team1: string
-  team2: string
-  selected: PickedMap[] | null
-  banned: BannedMap[] | null
-  currentStage: number
-  phase: VetoPhase
-  ended: boolean
-}
-
-export type TeamResponse = {
-  name: string
-  index: number
-}
-
-export type VetoResponse = {
-  id: string
-  myTeam: Team | 0 // 0: Viewer
-  team1: TeamResponse
-  team2: TeamResponse
-  maps: string[]
-  rounds: number
-  stages: Stage[]
-  game: string
-}
-
-/**
- *
- * @param id Veto ID
- */
-export async function getInitialVetoState(id: string) {
-  const res = await api(`/api/veto/${id}/state`)
-  const data = await res.json()
-  return data as VetoStateResponse
-}
-
-/**
- *
- * @param id Veto ID
- * @param token Veto Token (Viewer or Team)
- */
-export async function getVeto(id: string, token: string) {
-  const res = await api(`/api/veto/${id}?token=${token}`)
-  const data = await res.json()
-  return data as VetoResponse
-}
-
-// Utils

@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Hammer, Swords } from 'lucide-react'
+import { updateTeam } from '@/utils/mutations/veto-mutations'
 import { cn } from '@/utils/tailwind-utils'
 import { motion } from 'framer-motion'
-import { api } from '@/utils/helpers'
 import { toast } from 'sonner'
 
 type BanOrPick = StageAction.Ban | StageAction.Pick
@@ -60,11 +60,7 @@ export function TeamInitDialog({ open }: { open: boolean }) {
       if (name === '') {
         throw new Error('Team name cannot be empty')
       }
-      const res = await api(`/api/veto/${id}/team/${teamId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ name })
-      })
-      if (!res.ok) throw new Error(res.statusText)
+      await updateTeam(id, teamId, name)
     },
     onSuccess() {
       toast.success('Successfully updated team name')

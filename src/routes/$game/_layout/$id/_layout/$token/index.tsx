@@ -12,7 +12,7 @@ import { StageAction } from '@/types/ban-order.types'
 import { useRerender } from '@/hooks/use-rerender'
 import { Portal } from '@radix-ui/react-portal'
 import { cn } from '@/utils/tailwind-utils'
-import { api } from '@/utils/helpers'
+import { orpc } from '@/lib/orpc'
 import { Time } from '@/utils/time'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
@@ -152,11 +152,7 @@ function VetoPage() {
 
   const logsQuery = useQuery({
     queryKey: ['veto-logs', id],
-    queryFn: async () => {
-      const res = await api(`/api/veto/${id}/logs`)
-      if (!res.ok) throw new Error(res.statusText)
-      return await res.json()
-    },
+    queryFn: () => orpc.veto.logs({ id }),
     enabled: vetoState.ended
   })
 
