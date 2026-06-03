@@ -2,6 +2,7 @@
 
 A modern web platform that helps gamers and teams coordinate map/game veto sessions efficiently. Create and manage veto sessions for your favorite games with real-time updates.
 
+
 ## Features ✨
 
 - Create custom veto sessions for different games
