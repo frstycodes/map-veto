@@ -1,9 +1,11 @@
+import type { RouterClient } from '@orpc/server'
+import type { router } from '../../server/src/router'
 import { createORPCClient } from '@orpc/client'
 import { RPCLink } from '@orpc/client/fetch'
-import type { Router } from '../../server/src/router'
 
-// Re-export Router type so components can use it for inference
-export type { Router }
+type AppRouter = RouterClient<typeof router>
+
+export type { AppRouter }
 
 function getServerUrl() {
   const raw = import.meta.env['VITE_SERVER_URL'] as string | undefined
@@ -12,4 +14,4 @@ function getServerUrl() {
 
 const link = new RPCLink({ url: `${getServerUrl()}/rpc` })
 
-export const orpc = createORPCClient<Router>(link)
+export const orpc = createORPCClient<AppRouter>(link)

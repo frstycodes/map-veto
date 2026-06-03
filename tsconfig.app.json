@@ -25,5 +25,5 @@
       "@root/*": ["./*"]
     }
   },
-  "include": ["src", "**/*.ts", "**/*.tsx"]
+  "include": ["src"]
 }
