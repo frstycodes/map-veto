@@ -6,8 +6,8 @@ export type Stage = {
 export type PickedMap = {
   name: string
   by: number // 1 | 2 | 0 (decider)
-  attacker: number // 1 | 2 | 0 (not yet picked)
-  sidePickTurn: number // 1 | 2
+  attacker?: number // 1 | 2, undefined until side pick
+  sidePickTurn?: number // 1 | 2, undefined until side pick
 }
 
 export type BannedMap = {
@@ -21,9 +21,16 @@ export type Team = {
   index: number // 1 | 2
 }
 
+type VetoInitializationEvent = { event: 'init'; maps: string[] }
+type MapActionEvent = { event: 'ban' | 'pick'; map: string; by: 1 | 2 }
+type DeciderEvent = { event: 'decider'; map: string }
+type SidePickEvent = { event: 'side-pick'; map: string; side: 'attack' | 'defend'; team: 1 | 2 }
+
+export type VetoLogData = VetoInitializationEvent | MapActionEvent | DeciderEvent | SidePickEvent
+
 export type VetoLog = {
   time: string
-  event: string
+  data: VetoLogData
 }
 
 export type VetoConfig = {
