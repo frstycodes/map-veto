@@ -110,9 +110,9 @@ function VetoPage() {
       try {
         // Optimistically update the selected or banned maps
         if (vetoState.type === StageAction.Ban) {
-          currentMapsState.banned.push({ name: map })
+          currentMapsState.banned.push({ name: map, by: 0 })
         } else {
-          currentMapsState.selected.push({ name: map })
+          currentMapsState.selected.push({ name: map, by: 0 })
         }
         rerender()
         await sendAction(id, token, map)

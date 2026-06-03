@@ -24,25 +24,25 @@ export type Log = {
 }
 
 type VetoInitializationEvent = {
-  event: LogEvent.Init
+  event: 'init'
   maps: string[]
 }
 
 type MapActionEvent = {
-  event: LogEvent.Ban | LogEvent.Pick
+  event: 'ban' | 'pick'
   map: string
   by: 1 | 2
 }
 
 type DeciderEvent = {
-  event: LogEvent.Decider
+  event: 'decider'
   map: string
 }
 
 type SidePickEvent = {
-  event: LogEvent.SidePick
+  event: 'side-pick'
   map: string
-  side: Side
+  side: 'attack' | 'defend'
   team: 1 | 2
 }
 
