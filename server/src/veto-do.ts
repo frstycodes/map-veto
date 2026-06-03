@@ -146,7 +146,7 @@ export class VetoDurableObject {
     return null
   }
 
-  private banMap(mapName: string, team: number): void {
+  private banMap(mapName: string, team: 0 | 1 | 2): void {
     const s = this.state!
     s.banned.push({ name: mapName, by: team })
     s.logs.push({
@@ -155,7 +155,7 @@ export class VetoDurableObject {
     })
   }
 
-  private pickMap(mapName: string, team: number): void {
+  private pickMap(mapName: string, team: 0 | 1 | 2): void {
     const s = this.state!
     // sidePickTurn: opponent picks sides for your picked map.
     // team 0 (decider) → team 2 picks side first.
