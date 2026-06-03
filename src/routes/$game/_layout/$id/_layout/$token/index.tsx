@@ -3,7 +3,7 @@ import { AnimatingCard, AnimatingCardContainer } from '@/components/animating-ca
 import { createFileRoute, redirect, useLoaderData } from '@tanstack/react-router'
 import { playMapsHoverSound } from '@/assets/sfx/maps-hover/maps-hover.sfx'
 import { CenteredPageLayout } from '@/components/centered-page-layout'
-import { useVetoPoller } from '@/hooks/queries/use-veto-poller'
+import { useVetoSSE } from '@/hooks/queries/use-veto-sse'
 import { sendAction } from '@/utils/mutations/veto-mutations'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { playErrorSound } from '@/assets/sfx/error/error'
@@ -59,11 +59,9 @@ function VetoPage() {
 
   const { isSidePickAnimating, animateSidePick } = useSidePickAnimation()
 
-  const pollQuery = useVetoPoller(id, token, {
+  const sseResult = useVetoSSE(id, token, {
     initialData: loader_vetoState,
-
-    // The interceptor responsible for checking the decider map.
-    async afterFetchSync(data) {
+    async onData(data) {
       // Preload the last rounds images
       const dirtyMapCount = (data.selected?.length || 0) + (data.banned?.length || 0)
       if (vetoData.maps.length - dirtyMapCount === vetoData.rounds) {
@@ -85,17 +83,18 @@ function VetoPage() {
         return
       }
 
-      if (data.phase === VetoPhase.ChooseSides) {
-        animateSidePick()
+      // side pick animation
+      if (data.phase === VetoPhase.ChooseSides && vetoState.phase !== data.phase) {
+        await animateSidePick()
       }
-    }
+    },
   })
 
-  const stage = vetoData.stages[pollQuery.data?.currentStage ?? 0]
+  const stage = vetoData.stages[sseResult.data?.currentStage ?? 0]
   const vetoState = {
-    ...pollQuery.data,
-    team1: pollQuery.data?.team1 || 'Team 1',
-    team2: pollQuery.data?.team2 || 'Team 2',
+    ...sseResult.data,
+    team1: sseResult.data?.team1 || 'Team 1',
+    team2: sseResult.data?.team2 || 'Team 2',
     type: stage.type,
     team: stage.team
   }
@@ -129,7 +128,7 @@ function VetoPage() {
   })
 
   const isViewer = vetoData.myTeam === 0
-  const isDialogOpen_teamInit = !isViewer && (!pollQuery.data?.team1 || !pollQuery.data?.team2)
+  const isDialogOpen_teamInit = !isViewer && (!sseResult.data?.team1 || !sseResult.data?.team2)
   const isChoosingSides = vetoState.phase === VetoPhase.ChooseSides
 
   useEffect(() => {
