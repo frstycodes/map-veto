@@ -1,8 +1,9 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import type { Env, StartVetoBody } from './types'
+import { RPCHandler } from '@orpc/server/fetch'
+import type { Env } from './types'
 import { VetoDurableObject } from './veto-do'
-import { generateId } from './utils'
+import { router } from './router'
 
 export { VetoDurableObject }
 
@@ -18,34 +19,20 @@ app.use('*', async (c, next) => {
 
 app.get('/api/status', (c) => c.json({ status: 'ok' }))
 
-// Create a new veto session.
-// Worker generates the veto ID (7-char), names the DO by that same ID,
-// then calls /api/veto/init on the DO to set initial state.
-app.post('/api/veto/start', async (c) => {
-  const body = await c.req.json<StartVetoBody>()
+// oRPC handler — all typed API procedures
+const rpcHandler = new RPCHandler(router)
 
-  const vetoId = generateId(7)
-  const stub = c.env.VETO.get(c.env.VETO.idFromName(vetoId))
-
-  const initRes = await stub.fetch(
-    new Request('https://do/api/veto/init', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...body, id: vetoId }),
-    })
-  )
-
-  if (!initRes.ok) {
-    return c.json({ error: 'Failed to start veto' }, 500)
-  }
-
-  const data = await initRes.json<{ id: string; creatorToken: string }>()
-  return c.json(data, 201)
+app.all('/rpc/*', async (c) => {
+  const { matched, response } = await rpcHandler.handle(c.req.raw, {
+    context: { env: c.env },
+    prefix: '/rpc',
+  })
+  if (matched) return response
+  return c.json({ error: 'Not found' }, 404)
 })
 
-// Forward all /api/veto/:id/* requests to the matching DO.
-// The DO is named by the veto ID (same as the session ID generated above).
-app.all('/api/veto/:id/*', async (c) => {
+// Plain SSE route — not suited to oRPC's request/response model
+app.get('/api/veto/:id/sse', async (c) => {
   const id = c.req.param('id')
   const stub = c.env.VETO.get(c.env.VETO.idFromName(id))
   return stub.fetch(c.req.raw)
