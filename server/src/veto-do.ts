@@ -3,7 +3,6 @@ import type {
   VetoConfig,
   VetoLog,
   VetoState,
-  BannedMap,
   PickedMap,
   VetoPollPayload,
   Stage,
@@ -20,7 +19,7 @@ export class VetoDurableObject {
 
   constructor(
     private ctx: DurableObjectState,
-    private env: { CLIENT_URL: string; VETO_TIMEOUT: string }
+    env: { CLIENT_URL: string; VETO_TIMEOUT: string }
   ) {
     this.timeoutMs = parseInt(env.VETO_TIMEOUT || '3600', 10) * 1000
     this.app = new Hono()
@@ -184,13 +183,15 @@ export class VetoDurableObject {
 
   private async runDeciderSequence(): Promise<void> {
     await new Promise((r) => setTimeout(r, 500))
+    if (!this.state) return
     const remaining = this.getRemainingMaps()
     const randMap = remaining[Math.floor(Math.random() * remaining.length)]!
     this.pickMap(randMap, 0)
     this.broadcast()
 
     await new Promise((r) => setTimeout(r, 1000))
-    this.state!.phase = 'choose-sides'
+    if (!this.state) return
+    this.state.phase = 'choose-sides'
     this.broadcast()
   }
 
@@ -212,8 +213,11 @@ export class VetoDurableObject {
     // GET /api/veto/:id/sse — SSE stream
     this.app.get('/api/veto/:id/sse', (c) => {
       if (!this.state) return c.json({ error: 'Not found' }, 404)
-      const clientId = c.req.query('token')
-      if (!clientId) return c.json({ error: 'Token required' }, 400)
+      const token = c.req.query('token')
+      if (!token) return c.json({ error: 'Token required' }, 400)
+
+      // Use a unique key per connection to prevent collision on client reconnect
+      const subscriberId = crypto.randomUUID()
 
       const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>()
       const writer = writable.getWriter()
@@ -225,7 +229,7 @@ export class VetoDurableObject {
         close: () => { writer.close().catch(() => {}) },
       } as unknown as ReadableStreamDefaultController
 
-      this.subscribers.set(clientId, controller)
+      this.subscribers.set(subscriberId, controller)
 
       // Send current state immediately on connect
       writer.write(encoder.encode(`data: ${JSON.stringify(this.getPollPayload())}\n\n`))
@@ -234,14 +238,14 @@ export class VetoDurableObject {
       const heartbeat = setInterval(() => {
         writer.write(encoder.encode(':\n\n')).catch(() => {
           clearInterval(heartbeat)
-          this.subscribers.delete(clientId)
+          this.subscribers.delete(subscriberId)
         })
       }, 25_000)
 
       // Cleanup on client disconnect
       c.req.raw.signal.addEventListener('abort', () => {
         clearInterval(heartbeat)
-        this.subscribers.delete(clientId)
+        this.subscribers.delete(subscriberId)
         writer.close().catch(() => {})
       })
 
@@ -326,19 +330,13 @@ export class VetoDurableObject {
         return c.json({ error: 'Not your turn' }, 400)
       }
 
-      if (!s.config.maps.includes(body.map)) {
+      if (!this.getRemainingMaps().includes(body.map)) {
         return c.json({ error: 'Invalid map' }, 400)
       }
 
       if (stage.type === 'ban') {
-        if (s.banned.some((m) => m.name === body.map)) {
-          return c.json({ error: 'Map already banned' }, 400)
-        }
         this.banMap(body.map, stage.team)
       } else if (stage.type === 'pick') {
-        if (s.selected.some((m) => m.name === body.map)) {
-          return c.json({ error: 'Map already picked' }, 400)
-        }
         this.pickMap(body.map, stage.team)
       } else {
         return c.json({ error: 'Invalid action' }, 400)
