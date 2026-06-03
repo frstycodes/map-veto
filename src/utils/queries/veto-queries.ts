@@ -1,4 +1,5 @@
 import { orpc } from '@/lib/orpc'
+import type { AppClient } from '@/lib/orpc'
 
 // ─── Phase / Team enums (used as values in component code, keep as-is) ───────
 
@@ -14,11 +15,11 @@ export const enum Team {
 
 // ─── Types inferred from server router (single source of truth) ──────────────
 
-export type VetoStateResponse = Awaited<ReturnType<typeof orpc.veto.state>>
-export type VetoResponse = Awaited<ReturnType<typeof orpc.veto.get>>
+export type VetoStateResponse = Awaited<ReturnType<AppClient['veto']['state']>>
+export type VetoResponse = Awaited<ReturnType<AppClient['veto']['get']>>
 export type PickedMap = VetoStateResponse['selected'][number]
 export type BannedMap = VetoStateResponse['banned'][number]
-export type VetoLog = Awaited<ReturnType<typeof orpc.veto.logs>>[number]
+export type VetoLog = Awaited<ReturnType<AppClient['veto']['logs']>>[number]
 
 // ─── Query functions ─────────────────────────────────────────────────────────
 
