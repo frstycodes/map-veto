@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "map-veto-server",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-06-03",
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "VETO",
+        "class_name": "VetoDurableObject"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": ["VetoDurableObject"]
+    }
+  ]
+}
