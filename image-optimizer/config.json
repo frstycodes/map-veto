@@ -1,7 +1,0 @@
-{
-  "input_dir": "../public/maps",
-  "output_dir": "../public/optimized",
-  "sizes": [360, 480, 640, 1024, 1920],
-  "quality": 85,
-  "clean": false
-}
