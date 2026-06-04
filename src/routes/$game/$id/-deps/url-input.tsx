@@ -1,5 +1,5 @@
-import { CopyToClipBoardButton } from '@/routes/$game/_layout/$id/_layout/-components/copy-to-clipboard-button'
-import { ExternalLinkButton } from '@/routes/$game/_layout/$id/_layout/-components/external-link-button'
+import { CopyToClipBoardButton } from '@/routes/$game/$id/-deps/copy-to-clipboard-button'
+import { ExternalLinkButton } from '@/routes/$game/$id/-deps/external-link-button'
 import { useParams } from '@tanstack/react-router'
 import { Input } from '@/components/ui/input'
 
@@ -8,8 +8,10 @@ type UrlInputProps = {
   label: string
 }
 export function UrlInput(props: UrlInputProps) {
-  const { game, id } = useParams({ from: '/$game/_layout/$id' })
+  const { game, id } = useParams({ from: '/$game/$id' })
+
   const url = `${window.location.origin}/${game}/${id}/${props.token}`
+
   return (
     <div className='space-y-2'>
       <h1 className='text-lg font-bold'>{props.label}</h1>

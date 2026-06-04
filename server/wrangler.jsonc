@@ -14,7 +14,7 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_classes": ["VetoDurableObject"]
+      "new_sqlite_classes": ["VetoDurableObject"]
     }
   ]
 }

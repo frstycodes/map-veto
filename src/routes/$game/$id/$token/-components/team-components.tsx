@@ -1,6 +1,4 @@
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { playErrorSound } from '@/assets/sfx/error/error'
-import { StageAction } from '@/types/ban-order.types'
 import { useMutation } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
 import { ComponentProps, useState } from 'react'
@@ -9,12 +7,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Hammer, Swords } from 'lucide-react'
-import { updateTeam } from '@/utils/mutations/veto-mutations'
 import { cn } from '@/utils/tailwind-utils'
 import { motion } from 'framer-motion'
+import { orpc } from '@/lib/orpc'
 import { toast } from 'sonner'
 
-type BanOrPick = StageAction.Ban | StageAction.Pick
+type BanOrPick = 'ban' | 'pick'
 
 type ScoreBoardTeamDetailProps = ComponentProps<'p'> & {
   name: string
@@ -37,12 +35,12 @@ export function ScoreBoardTeamDetail({
 }
 
 type VetoTurnIndicatorProps = ComponentProps<typeof Badge> & {
-  vetoType: StageAction.Ban | StageAction.Pick
+  vetoType: BanOrPick
 }
 
 export function VetoTurnIndicator({ vetoType, ...props }: VetoTurnIndicatorProps) {
-  const ActionIcon = vetoType === StageAction.Ban ? Hammer : Swords
-  const actionStyle = vetoType === StageAction.Ban ? 'text-red-500' : 'text-emerald-500'
+  const ActionIcon = vetoType === 'ban' ? Hammer : Swords
+  const actionStyle = vetoType === 'ban' ? 'text-red-500' : 'text-emerald-500'
 
   return (
     <motion.div layoutId='veto-indicator'>
@@ -53,24 +51,19 @@ export function VetoTurnIndicator({ vetoType, ...props }: VetoTurnIndicatorProps
 
 export function TeamInitDialog({ open }: { open: boolean }) {
   const [teamName, setTeamName] = useState('')
-  const { id, token } = useParams({ from: '/$game/_layout/$id/_layout/$token/' })
+  const { id, token } = useParams({ from: '/$game/$id/$token/' })
 
-  const updateTeamMutation = useMutation({
-    mutationFn: async ({ id, teamId, name }: { id: string; teamId: string; name: string }) => {
-      if (name === '') {
-        throw new Error('Team name cannot be empty')
+  const updateTeamMutation = useMutation(
+    orpc.veto.updateTeam.mutationOptions({
+      onSuccess() {
+        toast.success('Successfully updated team name')
+        setTeamName('')
+      },
+      onError() {
+        toast.error('Failed to update team name')
       }
-      await updateTeam(id, teamId, name)
-    },
-    onSuccess() {
-      toast.success('Successfully updated team name')
-      setTeamName('')
-    },
-    onError() {
-      playErrorSound()
-      toast.error('Failed to update team name')
-    }
-  })
+    })
+  )
 
   return (
     <Dialog open={open}>

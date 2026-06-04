@@ -84,7 +84,7 @@ export const PickSideInputSchema = z.object({
 export const UpdateTeamInputSchema = z.object({
   id: z.string(),
   teamId: z.string(),
-  name: z.string()
+  name: z.string().min(3).max(50)
 })
 
 export const GetLogsInputSchema = z.object({
@@ -100,7 +100,7 @@ export const StartVetoOutputSchema = z.object({
 
 export const GetVetoOutputSchema = z.object({
   id: z.string(),
-  myTeam: z.number(), // 0 (viewer) | 1 | 2
+  myTeam: teamsSchema, // 0 (viewer) | 1 | 2
   team1: z.object({ name: z.string(), index: z.number() }),
   team2: z.object({ name: z.string(), index: z.number() }),
   maps: z.array(z.string()),

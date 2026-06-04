@@ -140,11 +140,7 @@ server/
   tsconfig.json
 ```
 
-Frontend files touched:
-- `src/hooks/queries/use-veto-poller.ts` → deleted, replaced by `use-veto-sse.ts`
-- `src/routes/$game/_layout/$id/_layout/$token/index.tsx` → swap hook
-- `src/utils/queries/veto-queries.ts` → no changes needed
-
+/$id/
 ---
 
 ## wrangler.jsonc (server)

@@ -4,12 +4,16 @@ import { WelcomeDialog } from '@/components/welcome-dialog'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { OnekoToggle } from '@/components/oneko-toggle'
 import { useTheme } from '@/providers/theme-provider'
+import { QueryClient } from '@tanstack/react-query'
 import Particles from '@/components/ui/particles'
 import { OnekoCat } from '@/components/oneko'
 import { AppStore } from '@/state/app-store'
 import Ripple from '@/components/ui/ripple'
 
-export const Route = createRootRouteWithContext()({
+type Context = {
+  queryClient: QueryClient
+}
+export const Route = createRootRouteWithContext<Context>()({
   component: Root
 })
 

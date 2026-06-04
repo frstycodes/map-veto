@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
 import type { VetoStateResponse } from '@/utils/queries/veto-queries'
+import { useEffect, useRef, useState } from 'react'
+import { env } from '@root/env'
 
 type UseVetoSSEOpts = {
   initialData: VetoStateResponse
@@ -20,7 +21,7 @@ export function useVetoSSE(
   onDataRef.current = onData
 
   useEffect(() => {
-    const serverUrl = (import.meta.env['VITE_SERVER_URL'] as string | undefined) ?? 'https://map-veto-server.workers.dev'
+    const serverUrl = env.VITE_SERVER_URL
     const url = `${serverUrl}/api/veto/${id}/sse?token=${clientId}`
     const es = new EventSource(url)
 

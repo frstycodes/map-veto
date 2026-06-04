@@ -9,7 +9,15 @@ import {
   useSpring,
   useTransform
 } from 'framer-motion'
-import { Children, ComponentProps, createContext, HTMLProps, ReactNode, useContext, useRef } from 'react'
+import {
+  Children,
+  ComponentProps,
+  createContext,
+  HTMLProps,
+  ReactNode,
+  useContext,
+  useRef
+} from 'react'
 import { SPRING_OPTS } from '@/config/motion-config'
 import { cn } from '@/utils/tailwind-utils'
 import { Time } from '@/utils/time'
@@ -71,7 +79,10 @@ export function AnimatingCardContainer({
 
 type RenderFn = (props: { distance: MotionValue<number> }) => ReactNode
 
-type AnimatingCardProps<T extends RenderFn | undefined> = Omit<ComponentProps<typeof motion.button>, 'children'> & {
+type AnimatingCardProps<T extends RenderFn | undefined> = Omit<
+  ComponentProps<typeof motion.button>,
+  'children'
+> & {
   render?: T
   children?: T extends undefined ? ReactNode : never
   holdFor: Time
@@ -118,7 +129,7 @@ export function AnimatingCard<T extends RenderFn | undefined>({
 
   const zIndex = useTransform(distance, range, [100, 0])
 
-  const holdTimeoutRef = useRef<NodeJS.Timer | null>()
+  const holdTimeoutRef = useRef<NodeJS.Timer | null>(null)
 
   const holdProgress = useMotionValue(0)
 

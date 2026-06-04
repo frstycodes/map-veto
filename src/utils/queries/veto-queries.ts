@@ -1,5 +1,5 @@
-import { orpc } from '@/lib/orpc'
 import type { AppClient } from '@/lib/orpc'
+import { orpc } from '@/lib/orpc'
 
 // ─── Phase / Team enums (used as values in component code, keep as-is) ───────
 
@@ -20,13 +20,3 @@ export type VetoResponse = Awaited<ReturnType<AppClient['veto']['get']>>
 export type PickedMap = VetoStateResponse['selected'][number]
 export type BannedMap = VetoStateResponse['banned'][number]
 export type VetoLog = Awaited<ReturnType<AppClient['veto']['logs']>>[number]
-
-// ─── Query functions ─────────────────────────────────────────────────────────
-
-export async function getInitialVetoState(id: string): Promise<VetoStateResponse> {
-  return orpc.veto.state({ id })
-}
-
-export async function getVeto(id: string, token: string): Promise<VetoResponse> {
-  return orpc.veto.get({ id, token })
-}

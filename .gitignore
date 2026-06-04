@@ -36,3 +36,5 @@ src/config/maps
 
 optimizer
 cli
+.wrangler
+.tanstack

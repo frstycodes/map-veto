@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { getAvailableBanOrderPresets, validateBanOrder } from '@/utils/ban-order'
-import { BanOrderPreset, Stage, StageAction } from '@/types/ban-order.types'
+import { BanOrderPreset, Stage } from '@/types/ban-order.types'
 import { playErrorSound } from '@/assets/sfx/error/error'
 import { RadioGroup, RadioItem } from './ui/custom-radio'
 import { useLoaderData } from '@tanstack/react-router'
@@ -19,7 +19,7 @@ import { Badge } from './ui/badge'
 import { toast } from 'sonner'
 
 export function BanOrderDialog() {
-  const { store } = useLoaderData({ from: '/$game/_layout' })
+  const { store } = useLoaderData({ from: '/$game' })
   const [dialogOpen, setDialogOpen] = useState(false)
   const { bestOf, pool, banOrderPreset } = store.useStore('bestOf', 'pool', 'banOrderPreset')
 
@@ -31,7 +31,7 @@ export function BanOrderDialog() {
   // Every time the Preset changes, reset the Ban Orders
   useEffect(() => {
     const lastPreset = store.get().banOrderPreset
-    const newPreset = lastPreset == BanOrderPreset.Custom ? BanOrderPreset.LastPick : lastPreset
+    const newPreset = lastPreset == 'custom' ? 'lastPick' : lastPreset
 
     store.set({
       banOrderPreset: newPreset,
@@ -40,7 +40,8 @@ export function BanOrderDialog() {
   }, [presets, store])
 
   useEffect(() => {
-    if (banOrderPreset === BanOrderPreset.Custom) return
+    if (banOrderPreset === 'custom') return
+
     store.set({
       stages: presets[banOrderPreset].stages ?? []
     })
@@ -62,7 +63,7 @@ export function BanOrderDialog() {
             description: validationErr
           })
 
-          store.set({ banOrderPreset: BanOrderPreset.LastPick })
+          store.set({ banOrderPreset: 'lastPick' })
         }
         setDialogOpen(false)
       }}
@@ -100,7 +101,7 @@ export function BanOrderDialog() {
           })}
         </RadioGroup>
         <h1 className='mt-4 text-lg font-bold'>
-          {banOrderPreset === BanOrderPreset.Custom ? 'Custom Ban Order' : 'Current Ban Order'}
+          {banOrderPreset === 'custom' ? 'Custom Ban Order' : 'Current Ban Order'}
         </h1>
         <ManualBanOrderSettings />
         <p className='text-center text-xs text-muted-foreground'>
@@ -114,23 +115,23 @@ export function BanOrderDialog() {
 const STAGE_OPTIONS: Stage[] = [
   {
     team: 1,
-    type: StageAction.Ban
+    type: 'ban'
   },
   {
     team: 2,
-    type: StageAction.Ban
+    type: 'ban'
   },
   {
     team: 1,
-    type: StageAction.Pick
+    type: 'pick'
   },
   {
     team: 2,
-    type: StageAction.Pick
+    type: 'pick'
   },
   {
     team: 0,
-    type: StageAction.Decider
+    type: 'decider'
   },
   {
     team: 0,
@@ -139,7 +140,7 @@ const STAGE_OPTIONS: Stage[] = [
 ]
 
 function ManualBanOrderSettings() {
-  const { store } = useLoaderData({ from: '/$game/_layout' })
+  const { store } = useLoaderData({ from: '/$game' })
   const { stages } = store.useStore('stages')
 
   return (
@@ -150,13 +151,14 @@ function ManualBanOrderSettings() {
     </ul>
   )
 }
+
 type StageOptionProps = {
   stageIndex: number
   stage: Stage
 }
 
 function StageOption({ stageIndex, stage }: StageOptionProps) {
-  const { store } = useLoaderData({ from: '/$game/_layout' })
+  const { store } = useLoaderData({ from: '/$game' })
 
   const handleValueChange = (value: string) => {
     const [team, type] = JSON.parse(value)
@@ -172,13 +174,12 @@ function StageOption({ stageIndex, stage }: StageOptionProps) {
 
       return {
         stages: newStages,
-        banOrderPreset: BanOrderPreset.Custom
+        banOrderPreset: 'custom'
       }
     })
   }
 
   const selectValue = JSON.stringify([stage.team, stage.type])
-  console.log({ selectValue })
   return (
     <li className='flex items-center justify-between gap-2 pl-4 odd:bg-foreground/5'>
       <span className='whitespace-nowrap text-sm font-medium'>Stage {stageIndex + 1}</span>
@@ -204,7 +205,7 @@ function StageOption({ stageIndex, stage }: StageOptionProps) {
 const stageActionBadgeBaseStyles = 'text-xs border-2 px-2 py-1'
 
 const STAGE_ACTION_TO_BADGE_PROPS = {
-  [StageAction.Ban]: {
+  ban: {
     children: (
       <p className='flex items-center gap-1'>
         <Gavel className='h-3.5 w-3.5' /> Ban
@@ -212,7 +213,7 @@ const STAGE_ACTION_TO_BADGE_PROPS = {
     ),
     className: `border-red-500 bg-red-500/20 ${stageActionBadgeBaseStyles}`
   },
-  [StageAction.Pick]: {
+  pick: {
     children: (
       <p className='flex items-center gap-1'>
         <Swords className='h-3.5 w-3.5' /> Pick
@@ -220,7 +221,7 @@ const STAGE_ACTION_TO_BADGE_PROPS = {
     ),
     className: `border-emerald-500 bg-emerald-500/20 ${stageActionBadgeBaseStyles}`
   },
-  [StageAction.Decider]: {
+  decider: {
     children: (
       <p className='flex items-center gap-1'>
         <Medal className='h-3.5 w-3.5' /> Decider
@@ -233,6 +234,7 @@ const STAGE_ACTION_TO_BADGE_PROPS = {
     className: `text-xs ${stageActionBadgeBaseStyles}`
   }
 }
+
 const TEAM_TO_BADGE_PROPS = {
   1: {
     children: 'Team 1',

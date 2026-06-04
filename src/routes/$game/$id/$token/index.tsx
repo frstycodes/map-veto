@@ -1,19 +1,18 @@
-import { getInitialVetoState, getVeto, VetoPhase } from '@/utils/queries/veto-queries'
 import { AnimatingCard, AnimatingCardContainer } from '@/components/animating-cards'
 import { createFileRoute, redirect, useLoaderData } from '@tanstack/react-router'
 import { playMapsHoverSound } from '@/assets/sfx/maps-hover/maps-hover.sfx'
 import { CenteredPageLayout } from '@/components/centered-page-layout'
-import { useVetoSSE } from '@/hooks/queries/use-veto-sse'
 import { sendAction } from '@/utils/mutations/veto-mutations'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { useVetoSSE } from '@/hooks/queries/use-veto-sse'
 import { playErrorSound } from '@/assets/sfx/error/error'
+import { VetoPhase } from '@/utils/queries/veto-queries'
 import { AnimatePresence, motion } from 'framer-motion'
-import { StageAction } from '@/types/ban-order.types'
 import { useRerender } from '@/hooks/use-rerender'
 import { Portal } from '@radix-ui/react-portal'
 import { cn } from '@/utils/tailwind-utils'
-import { orpc } from '@/lib/orpc'
 import { Time } from '@/utils/time'
+import { orpc } from '@/lib/orpc'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
@@ -30,10 +29,15 @@ import {
   useSidePickAnimation
 } from './-components'
 
-export const Route = createFileRoute('/$game/_layout/$id/_layout/$token/')({
-  loader: async ({ params }) => {
-    const statePromise = getInitialVetoState(params.id)
-    const dataPromise = getVeto(params.id, params.token)
+export const Route = createFileRoute('/$game/$id/$token/')({
+  loader: async ({ params, context }) => {
+    const statePromise = context.queryClient.ensureQueryData(
+      orpc.veto.state.queryOptions({ input: { id: params.id } })
+    )
+    const dataPromise = context.queryClient.ensureQueryData(
+      orpc.veto.get.queryOptions({ input: { id: params.id, token: params.token } })
+    )
+
     const [vetoState, vetoData] = await Promise.all([statePromise, dataPromise])
     return { vetoState, vetoData }
   },
@@ -43,11 +47,11 @@ export const Route = createFileRoute('/$game/_layout/$id/_layout/$token/')({
   }
 })
 
-type BanOrPick = StageAction.Ban | StageAction.Pick
+type BanOrPick = 'ban' | 'pick'
 
 function VetoPage() {
   const rerender = useRerender()
-  const { config } = useLoaderData({ from: '/$game/_layout' })
+  const { config } = useLoaderData({ from: '/$game' })
   const { id, token } = Route.useParams()
   const { vetoState: loader_vetoState, vetoData } = Route.useLoaderData()
 
@@ -87,7 +91,7 @@ function VetoPage() {
       if (data.phase === VetoPhase.ChooseSides && vetoState.phase !== data.phase) {
         await animateSidePick()
       }
-    },
+    }
   })
 
   const stage = vetoData.stages[sseResult.data?.currentStage ?? 0]
@@ -108,7 +112,7 @@ function VetoPage() {
 
       try {
         // Optimistically update the selected or banned maps
-        if (vetoState.type === StageAction.Ban) {
+        if (vetoState.type === 'ban') {
           currentMapsState.banned.push({ name: map, by: 0 })
         } else {
           currentMapsState.selected.push({ name: map, by: 0 })
@@ -149,11 +153,7 @@ function VetoPage() {
       vetoState.selected?.find((map) => !map.attacker)) ||
     null
 
-  const logsQuery = useQuery({
-    queryKey: ['veto-logs', id],
-    queryFn: () => orpc.veto.logs({ id }),
-    enabled: vetoState.ended
-  })
+  const logsQuery = useQuery(orpc.veto.logs.queryOptions({ input: { id } }))
 
   return (
     <CenteredPageLayout className='relative w-[clamp(300px,80%,600px)]'>

@@ -16,7 +16,7 @@ type LogsDialogProps = {
 }
 
 export function LogsDialog(props: LogsDialogProps) {
-  const { vetoData } = useLoaderData({ from: '/$game/_layout/$id/_layout/$token/' })
+  const { vetoData } = useLoaderData({ from: '/$game/$id/$token/' })
 
   return (
     <Dialog>

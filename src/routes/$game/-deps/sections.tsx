@@ -27,7 +27,7 @@ export function Section({ title, description, ...props }: SectionProps) {
 }
 //region Choose Map Pool
 export function ChooseMapPool() {
-  const { store, config } = useLoaderData({ from: '/$game/_layout' })
+  const { store, config } = useLoaderData({ from: '/$game' })
   const { pool } = store.useStore('pool')
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -70,7 +70,7 @@ export function ChooseMapPool() {
 
 //region Choose Best Of
 export function ChooseBestOf() {
-  const { config, store } = useLoaderData({ from: '/$game/_layout' })
+  const { config, store } = useLoaderData({ from: '/$game' })
   const { bestOf, pool } = store.useStore('bestOf', 'pool')
 
   useEffect(() => {

@@ -1,26 +1,22 @@
-import { createORPCClient } from '@orpc/client'
-import { RPCLink } from '@orpc/client/fetch'
-import type { InferRouterInputs, InferRouterOutputs } from '@orpc/server'
+import { createTanstackQueryUtils } from '@orpc/tanstack-query'
+import { createORPCClient, onError } from '@orpc/client'
 import type { router } from '../../server/src/router'
+import { RPCLink } from '@orpc/client/fetch'
+import { RouterClient } from '@orpc/server'
+import { env } from '@root/env'
 
-type I = InferRouterInputs<typeof router>
-type O = InferRouterOutputs<typeof router>
+const URL = env.VITE_SERVER_URL
 
-// Plain callable client type derived entirely from server Zod schemas.
-// Inputs and outputs are inferred from @orpc/server — no duplicate type definitions.
-export type AppClient = {
-  veto: {
-    [K in keyof I['veto'] & keyof O['veto']]: (input: I['veto'][K]) => Promise<O['veto'][K]>
-  }
-}
+const link = new RPCLink({
+  url: `${URL}/rpc`,
+  interceptors: [
+    onError((error) => {
+      console.error(error)
+    })
+  ]
+})
 
-function getServerUrl() {
-  const raw = import.meta.env['VITE_SERVER_URL'] as string | undefined
-  return raw ?? 'https://map-veto-server.workers.dev'
-}
-
-// createORPCClient<any> bypasses the NestedClient constraint — the runtime proxy
-// handles actual calls correctly regardless of the generic parameter.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const _client = createORPCClient<any>(new RPCLink({ url: `${getServerUrl()}/rpc` }))
-export const orpc = _client as AppClient
+// Create a client for your router
+export const orpcClient: RouterClient<typeof router> = createORPCClient(link)
+export type AppClient = typeof orpcClient
+export const orpc = createTanstackQueryUtils(orpcClient)

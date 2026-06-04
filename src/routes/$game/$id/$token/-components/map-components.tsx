@@ -23,7 +23,7 @@ export function AnimatingMapCardContents({
 }) {
   const fontSizeSync = useTransform(distance, [0, 1], [1, 0.8])
   const fontSize = useSpring(fontSizeSync, SPRING_OPTS)
-  const { vetoData } = useLoaderData({ from: '/$game/_layout/$id/_layout/$token/' })
+  const { vetoData } = useLoaderData({ from: '/$game/$id/$token/' })
   const imageURL = `/optimized/${map.cardImage}`
 
   return (
@@ -56,8 +56,8 @@ type SelectedMapCardProps = ComponentProps<typeof motion.div> & {
 }
 
 export function SelectedMapCard({ map, teams, ...props }: SelectedMapCardProps) {
-  const { config } = useLoaderData({ from: '/$game/_layout' })
-  const { vetoData } = useLoaderData({ from: '/$game/_layout/$id/_layout/$token/' })
+  const { config } = useLoaderData({ from: '/$game' })
+  const { vetoData } = useLoaderData({ from: '/$game/$id/$token/' })
 
   const mapData = config.maps.find((m) => m.name === map.name)
   const pickedByTeam = getPickedByTeam(map.by || 0, vetoData.myTeam, teams)

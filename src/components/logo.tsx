@@ -5,23 +5,25 @@ import { motion } from 'framer-motion'
 import { ComponentProps } from 'react'
 import { Map } from 'lucide-react'
 
-type LogoProps = ComponentProps<typeof motion.div>
+const MotionLink = motion.create(Link)
+type LogoProps = ComponentProps<typeof MotionLink>
+
 export function Logo(props: LogoProps) {
   return (
-    <Link to='/'>
-      <motion.div
-        layoutId='logo'
-        layout='preserve-aspect'
-        {...props}
-        onMouseEnter={(e) => {
-          playHoverSound(1)
-          props.onMouseEnter?.(e)
-        }}
-        transition={{ duration: 0.8, type: 'spring', ...props.transition }}
-        className={cn('text-3xl font-bold', props.className)}
-      >
-        <Map className='inline h-8 w-8' /> Map Veto
-      </motion.div>
-    </Link>
+    <MotionLink
+      key='logo'
+      to='/'
+      layoutId='logo'
+      layout='position'
+      {...props}
+      onMouseEnter={(e) => {
+        playHoverSound(1)
+        props.onMouseEnter?.(e)
+      }}
+      transition={{ visualDuration: 5, type: 'spring', bounce: 0.2, ...props.transition }}
+      className={cn('text-3xl font-bold', props.className)}
+    >
+      <Map className='inline h-8 w-8' /> Map Veto
+    </MotionLink>
   )
 }

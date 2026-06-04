@@ -2,7 +2,7 @@ import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { AnimatePresence } from 'framer-motion'
 import { Logo } from '@/components/logo'
 
-export const Route = createFileRoute('/$game/_layout/$id/_layout')({
+export const Route = createFileRoute('/$game/$id')({
   component: GameIdLayout
 })
 

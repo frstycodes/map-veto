@@ -8,20 +8,15 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as GameRouteRouteImport } from './routes/$game/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as GameLayoutRouteImport } from './routes/$game/_layout'
-import { Route as GameLayoutIndexRouteImport } from './routes/$game/_layout/index'
-import { Route as GameLayoutIdLayoutRouteImport } from './routes/$game/_layout/$id/_layout'
-import { Route as GameLayoutIdLayoutIndexRouteImport } from './routes/$game/_layout/$id/_layout/index'
-import { Route as GameLayoutIdLayoutTokenIndexRouteImport } from './routes/$game/_layout/$id/_layout/$token/index'
+import { Route as GameIndexRouteImport } from './routes/$game/index'
+import { Route as GameIdRouteRouteImport } from './routes/$game/$id/route'
+import { Route as GameIdIndexRouteImport } from './routes/$game/$id/index'
+import { Route as GameIdTokenIndexRouteImport } from './routes/$game/$id/$token/index'
 
-const GameRouteImport = createFileRoute('/$game')()
-const GameLayoutIdRouteImport = createFileRoute('/$game/_layout/$id')()
-
-const GameRoute = GameRouteImport.update({
+const GameRouteRoute = GameRouteRouteImport.update({
   id: '/$game',
   path: '/$game',
   getParentRoute: () => rootRouteImport,
@@ -31,87 +26,74 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GameLayoutRoute = GameLayoutRouteImport.update({
-  id: '/_layout',
-  getParentRoute: () => GameRoute,
+const GameIndexRoute = GameIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GameRouteRoute,
 } as any)
-const GameLayoutIdRoute = GameLayoutIdRouteImport.update({
+const GameIdRouteRoute = GameIdRouteRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => GameLayoutRoute,
+  getParentRoute: () => GameRouteRoute,
 } as any)
-const GameLayoutIndexRoute = GameLayoutIndexRouteImport.update({
+const GameIdIndexRoute = GameIdIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => GameLayoutRoute,
+  getParentRoute: () => GameIdRouteRoute,
 } as any)
-const GameLayoutIdLayoutRoute = GameLayoutIdLayoutRouteImport.update({
-  id: '/_layout',
-  getParentRoute: () => GameLayoutIdRoute,
+const GameIdTokenIndexRoute = GameIdTokenIndexRouteImport.update({
+  id: '/$token/',
+  path: '/$token/',
+  getParentRoute: () => GameIdRouteRoute,
 } as any)
-const GameLayoutIdLayoutIndexRoute = GameLayoutIdLayoutIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => GameLayoutIdLayoutRoute,
-} as any)
-const GameLayoutIdLayoutTokenIndexRoute =
-  GameLayoutIdLayoutTokenIndexRouteImport.update({
-    id: '/$token/',
-    path: '/$token/',
-    getParentRoute: () => GameLayoutIdLayoutRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$game': typeof GameLayoutRouteWithChildren
-  '/$game/': typeof GameLayoutIndexRoute
-  '/$game/$id': typeof GameLayoutIdLayoutRouteWithChildren
-  '/$game/$id/': typeof GameLayoutIdLayoutIndexRoute
-  '/$game/$id/$token': typeof GameLayoutIdLayoutTokenIndexRoute
+  '/$game': typeof GameRouteRouteWithChildren
+  '/$game/$id': typeof GameIdRouteRouteWithChildren
+  '/$game/': typeof GameIndexRoute
+  '/$game/$id/': typeof GameIdIndexRoute
+  '/$game/$id/$token/': typeof GameIdTokenIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$game': typeof GameLayoutIndexRoute
-  '/$game/$id': typeof GameLayoutIdLayoutIndexRoute
-  '/$game/$id/$token': typeof GameLayoutIdLayoutTokenIndexRoute
+  '/$game': typeof GameIndexRoute
+  '/$game/$id': typeof GameIdIndexRoute
+  '/$game/$id/$token': typeof GameIdTokenIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/$game': typeof GameRouteWithChildren
-  '/$game/_layout': typeof GameLayoutRouteWithChildren
-  '/$game/_layout/': typeof GameLayoutIndexRoute
-  '/$game/_layout/$id': typeof GameLayoutIdRouteWithChildren
-  '/$game/_layout/$id/_layout': typeof GameLayoutIdLayoutRouteWithChildren
-  '/$game/_layout/$id/_layout/': typeof GameLayoutIdLayoutIndexRoute
-  '/$game/_layout/$id/_layout/$token/': typeof GameLayoutIdLayoutTokenIndexRoute
+  '/$game': typeof GameRouteRouteWithChildren
+  '/$game/$id': typeof GameIdRouteRouteWithChildren
+  '/$game/': typeof GameIndexRoute
+  '/$game/$id/': typeof GameIdIndexRoute
+  '/$game/$id/$token/': typeof GameIdTokenIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/$game'
-    | '/$game/'
     | '/$game/$id'
+    | '/$game/'
     | '/$game/$id/'
-    | '/$game/$id/$token'
+    | '/$game/$id/$token/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/$game' | '/$game/$id' | '/$game/$id/$token'
   id:
     | '__root__'
     | '/'
     | '/$game'
-    | '/$game/_layout'
-    | '/$game/_layout/'
-    | '/$game/_layout/$id'
-    | '/$game/_layout/$id/_layout'
-    | '/$game/_layout/$id/_layout/'
-    | '/$game/_layout/$id/_layout/$token/'
+    | '/$game/$id'
+    | '/$game/'
+    | '/$game/$id/'
+    | '/$game/$id/$token/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  GameRoute: typeof GameRouteWithChildren
+  GameRouteRoute: typeof GameRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -120,7 +102,7 @@ declare module '@tanstack/react-router' {
       id: '/$game'
       path: '/$game'
       fullPath: '/$game'
-      preLoaderRoute: typeof GameRouteImport
+      preLoaderRoute: typeof GameRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -130,103 +112,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$game/_layout': {
-      id: '/$game/_layout'
-      path: '/$game'
-      fullPath: '/$game'
-      preLoaderRoute: typeof GameLayoutRouteImport
-      parentRoute: typeof GameRoute
-    }
-    '/$game/_layout/$id': {
-      id: '/$game/_layout/$id'
-      path: '/$id'
-      fullPath: '/$game/$id'
-      preLoaderRoute: typeof GameLayoutIdRouteImport
-      parentRoute: typeof GameLayoutRoute
-    }
-    '/$game/_layout/': {
-      id: '/$game/_layout/'
+    '/$game/': {
+      id: '/$game/'
       path: '/'
       fullPath: '/$game/'
-      preLoaderRoute: typeof GameLayoutIndexRouteImport
-      parentRoute: typeof GameLayoutRoute
+      preLoaderRoute: typeof GameIndexRouteImport
+      parentRoute: typeof GameRouteRoute
     }
-    '/$game/_layout/$id/_layout': {
-      id: '/$game/_layout/$id/_layout'
+    '/$game/$id': {
+      id: '/$game/$id'
       path: '/$id'
       fullPath: '/$game/$id'
-      preLoaderRoute: typeof GameLayoutIdLayoutRouteImport
-      parentRoute: typeof GameLayoutIdRoute
+      preLoaderRoute: typeof GameIdRouteRouteImport
+      parentRoute: typeof GameRouteRoute
     }
-    '/$game/_layout/$id/_layout/': {
-      id: '/$game/_layout/$id/_layout/'
+    '/$game/$id/': {
+      id: '/$game/$id/'
       path: '/'
       fullPath: '/$game/$id/'
-      preLoaderRoute: typeof GameLayoutIdLayoutIndexRouteImport
-      parentRoute: typeof GameLayoutIdLayoutRoute
+      preLoaderRoute: typeof GameIdIndexRouteImport
+      parentRoute: typeof GameIdRouteRoute
     }
-    '/$game/_layout/$id/_layout/$token/': {
-      id: '/$game/_layout/$id/_layout/$token/'
+    '/$game/$id/$token/': {
+      id: '/$game/$id/$token/'
       path: '/$token'
-      fullPath: '/$game/$id/$token'
-      preLoaderRoute: typeof GameLayoutIdLayoutTokenIndexRouteImport
-      parentRoute: typeof GameLayoutIdLayoutRoute
+      fullPath: '/$game/$id/$token/'
+      preLoaderRoute: typeof GameIdTokenIndexRouteImport
+      parentRoute: typeof GameIdRouteRoute
     }
   }
 }
 
-interface GameLayoutIdLayoutRouteChildren {
-  GameLayoutIdLayoutIndexRoute: typeof GameLayoutIdLayoutIndexRoute
-  GameLayoutIdLayoutTokenIndexRoute: typeof GameLayoutIdLayoutTokenIndexRoute
+interface GameIdRouteRouteChildren {
+  GameIdIndexRoute: typeof GameIdIndexRoute
+  GameIdTokenIndexRoute: typeof GameIdTokenIndexRoute
 }
 
-const GameLayoutIdLayoutRouteChildren: GameLayoutIdLayoutRouteChildren = {
-  GameLayoutIdLayoutIndexRoute: GameLayoutIdLayoutIndexRoute,
-  GameLayoutIdLayoutTokenIndexRoute: GameLayoutIdLayoutTokenIndexRoute,
+const GameIdRouteRouteChildren: GameIdRouteRouteChildren = {
+  GameIdIndexRoute: GameIdIndexRoute,
+  GameIdTokenIndexRoute: GameIdTokenIndexRoute,
 }
 
-const GameLayoutIdLayoutRouteWithChildren =
-  GameLayoutIdLayoutRoute._addFileChildren(GameLayoutIdLayoutRouteChildren)
-
-interface GameLayoutIdRouteChildren {
-  GameLayoutIdLayoutRoute: typeof GameLayoutIdLayoutRouteWithChildren
-}
-
-const GameLayoutIdRouteChildren: GameLayoutIdRouteChildren = {
-  GameLayoutIdLayoutRoute: GameLayoutIdLayoutRouteWithChildren,
-}
-
-const GameLayoutIdRouteWithChildren = GameLayoutIdRoute._addFileChildren(
-  GameLayoutIdRouteChildren,
+const GameIdRouteRouteWithChildren = GameIdRouteRoute._addFileChildren(
+  GameIdRouteRouteChildren,
 )
 
-interface GameLayoutRouteChildren {
-  GameLayoutIndexRoute: typeof GameLayoutIndexRoute
-  GameLayoutIdRoute: typeof GameLayoutIdRouteWithChildren
+interface GameRouteRouteChildren {
+  GameIdRouteRoute: typeof GameIdRouteRouteWithChildren
+  GameIndexRoute: typeof GameIndexRoute
 }
 
-const GameLayoutRouteChildren: GameLayoutRouteChildren = {
-  GameLayoutIndexRoute: GameLayoutIndexRoute,
-  GameLayoutIdRoute: GameLayoutIdRouteWithChildren,
+const GameRouteRouteChildren: GameRouteRouteChildren = {
+  GameIdRouteRoute: GameIdRouteRouteWithChildren,
+  GameIndexRoute: GameIndexRoute,
 }
 
-const GameLayoutRouteWithChildren = GameLayoutRoute._addFileChildren(
-  GameLayoutRouteChildren,
+const GameRouteRouteWithChildren = GameRouteRoute._addFileChildren(
+  GameRouteRouteChildren,
 )
-
-interface GameRouteChildren {
-  GameLayoutRoute: typeof GameLayoutRouteWithChildren
-}
-
-const GameRouteChildren: GameRouteChildren = {
-  GameLayoutRoute: GameLayoutRouteWithChildren,
-}
-
-const GameRouteWithChildren = GameRoute._addFileChildren(GameRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  GameRoute: GameRouteWithChildren,
+  GameRouteRoute: GameRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,7 +1,5 @@
 import { useLoaderData, useParams } from '@tanstack/react-router'
 import { PickedMap, Team } from '@/utils/queries/veto-queries'
-import { pickSide } from '@/utils/mutations/veto-mutations'
-import { playErrorSound } from '@/assets/sfx/error/error'
 import { Image as ImageComp } from '@/components/image'
 import { Loader2, Shield, Swords } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
@@ -9,6 +7,7 @@ import { Portal } from '@radix-ui/react-portal'
 import { cn } from '@/utils/tailwind-utils'
 import { motion } from 'framer-motion'
 import { ComponentProps } from 'react'
+import { orpc } from '@/lib/orpc'
 import { toast } from 'sonner'
 
 type Teams = {
@@ -37,9 +36,9 @@ const SIDE_OPTIONS = [
 ]
 
 export function SidePickDialog(props: SidePickDialogProps) {
-  const { id, token: teamId } = useParams({ from: '/$game/_layout/$id/_layout/$token/' })
-  const { config } = useLoaderData({ from: '/$game/_layout' })
-  const { vetoData } = useLoaderData({ from: '/$game/_layout/$id/_layout/$token/' })
+  const { id, token: teamId } = useParams({ from: '/$game/$id/$token/' })
+  const { config } = useLoaderData({ from: '/$game' })
+  const { vetoData } = useLoaderData({ from: '/$game/$id/$token/' })
 
   const mapData = config.maps.find((m) => m.name === props.map?.name)
   const imageURL = `/optimized/${mapData?.sidePickImage}`
@@ -50,15 +49,13 @@ export function SidePickDialog(props: SidePickDialogProps) {
 
   const message = generateSidePickMessage(isMyTurn, isViewer, props.map, props.teams)
 
-  const pickSideMutation = useMutation({
-    mutationFn: async (isAttacker: boolean) => {
-      return pickSide(id, teamId, isAttacker)
-    },
-    onError() {
-      playErrorSound()
-      toast.error('Failed to pick side.')
-    }
-  })
+  const pickSideMutation = useMutation(
+    orpc.veto.pickSide.mutationOptions({
+      onError() {
+        toast.error('Failed to pick side.')
+      }
+    })
+  )
 
   return (
     <Portal>
@@ -86,7 +83,7 @@ export function SidePickDialog(props: SidePickDialogProps) {
 
           {SIDE_OPTIONS.map((option, idx) => (
             <button
-              onClick={() => pickSideMutation.mutate(option.isAttack)}
+              onClick={() => pickSideMutation.mutate({ id, teamId, attacker: option.isAttack })}
               key={idx}
               className={cn(
                 'flex h-32 w-48 flex-col items-center justify-center gap-2 rounded-md border border-foreground/20 bg-white/10 text-white shadow-md backdrop-blur-lg transition-all hover:scale-110 hover:shadow-glow active:scale-105',
@@ -139,7 +136,7 @@ function generateSidePickMessage(
   return `Waiting for opponent to pick a side.`
 }
 
-export function getPickedByTeam(pickedBy: Team | 0, myTeam: Team | 0, teams: Teams) {
+export function getPickedByTeam(pickedBy: 1 | 2 | 0, myTeam: 1 | 2 | 0, teams: Teams) {
   switch (pickedBy) {
     // 0 doesn't represent Viewer here, for map picked 0 represents Decider
     case 0:

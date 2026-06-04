@@ -1,5 +1,4 @@
-import { BanOrderPreset, Presets } from '@/types/ban-order.types'
-import { StageAction, Stage } from '@/types/ban-order.types'
+import { Presets, Stage } from '@/types/ban-order.types'
 import { Gavel, Swords } from 'lucide-react'
 
 function padBanOrder(stages: Stage[], poolSize: number): Stage[] {
@@ -24,9 +23,9 @@ export function getAlternateBanOrder(poolSize: number, bestOf: number): Stage[] 
   let picksUsed = 0
 
   /*
-    {POOLSIZE - 1} won't affect the result when POOLSIZE is odd but when 
+    {POOLSIZE - 1} won't affect the result when POOLSIZE is odd but when
     POOLSIZE is even, the last element will be skipped since {Math.floor((POOLSIZE - 1) / 2)}
-    will leave 2 maps out of the pool where the last map will be of NO_ACTION type and second 
+    will leave 2 maps out of the pool where the last map will be of NO_ACTION type and second
     last being the DECIDER.
    */
   for (let i = 0; i < Math.floor((poolSize - 1) / 2); i++) {
@@ -34,15 +33,15 @@ export function getAlternateBanOrder(poolSize: number, bestOf: number): Stage[] 
 
     const type = (() => {
       const picksLimitReached = picksUsed === bestOf - 1
-      if (isEven || picksLimitReached) return StageAction.Ban
-      return StageAction.Pick
+      if (isEven || picksLimitReached) return 'ban'
+      return 'pick'
     })()
 
     stages.push({ team: 1, type })
     stages.push({ team: 2, type })
-    if (type == StageAction.Pick) picksUsed += 2
+    if (type == 'pick') picksUsed += 2
   }
-  stages.push({ team: 0, type: StageAction.Decider })
+  stages.push({ team: 0, type: 'decider' })
 
   padBanOrder(stages, poolSize)
 
@@ -74,18 +73,18 @@ export function getLastPickBanOrder(poolSize: number, bestOf: number): Stage[] |
   }
 
   for (let i = 0; i < bansRequired; i++) {
-    stages.push({ team: ((i % 2) + 1) as 1 | 2, type: StageAction.Ban })
+    stages.push({ team: ((i % 2) + 1) as 1 | 2, type: 'ban' })
   }
 
   let picksRemaining = bestOf - 1
 
   while (picksRemaining > 0) {
-    stages.push({ team: 1, type: StageAction.Pick })
-    stages.push({ team: 2, type: StageAction.Pick })
+    stages.push({ team: 1, type: 'pick' })
+    stages.push({ team: 2, type: 'pick' })
     picksRemaining -= 2
   }
 
-  stages.push({ team: 0, type: StageAction.Decider })
+  stages.push({ team: 0, type: 'decider' })
 
   return padBanOrder(stages, poolSize)
 }
@@ -110,7 +109,7 @@ export function validateBanOrder(orders: Stage[], rounds: number): string | null
     }
 
     switch (itemType) {
-      case StageAction.Decider:
+      case 'decider':
         if (seenNull) {
           return `Decider can't be placed after a null action. Error at position ${i}.`
         }
@@ -121,7 +120,7 @@ export function validateBanOrder(orders: Stage[], rounds: number): string | null
         deciderCount++
         break
 
-      case StageAction.Pick:
+      case 'pick':
         if (seenDecider || seenNull) {
           return `Pick can't be placed after a Decider or null action. Error at position ${i}.`
         }
@@ -131,7 +130,7 @@ export function validateBanOrder(orders: Stage[], rounds: number): string | null
         else return `Invalid team for Pick at position ${i}.`
         break
 
-      case StageAction.Ban:
+      case 'ban':
         if (seenDecider || seenNull) {
           return `Ban can't be placed after a Decider or null action. Error at position ${i}.`
         }
@@ -174,7 +173,7 @@ export function getAvailableBanOrderPresets(poolSize: number, bestOf: number) {
   const lastPick = getLastPickBanOrder(poolSize, bestOf)
 
   const presets: Presets = {
-    [BanOrderPreset.Alternate]: {
+    alternate: {
       icons: (
         <>
           <Gavel />
@@ -186,7 +185,7 @@ export function getAvailableBanOrderPresets(poolSize: number, bestOf: number) {
       description: 'Ban, Pick, Ban until decider',
       stages: alternate
     },
-    [BanOrderPreset.LastPick]: {
+    lastPick: {
       icons: (
         <>
           <Gavel />

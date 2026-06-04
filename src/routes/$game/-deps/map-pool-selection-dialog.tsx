@@ -19,7 +19,7 @@ import { Info } from 'lucide-react'
 type MapPoolSelectionDialogProps = ComponentProps<typeof Dialog>
 
 export function MapPoolSelectionDialog({ ...props }: MapPoolSelectionDialogProps) {
-  const { config, store } = useLoaderData({ from: '/$game/_layout' })
+  const { config, store } = useLoaderData({ from: '/$game' })
   const { pool } = store.useStore('pool')
 
   const onOpenChange = (open: boolean) => {
@@ -35,7 +35,9 @@ export function MapPoolSelectionDialog({ ...props }: MapPoolSelectionDialogProps
       <DialogContent className='overflow-hidden'>
         <DialogHeader>
           <DialogTitle>Create Map Pool</DialogTitle>
-          <DialogDescription>Create a custom map pool by selecting the maps you want to include.</DialogDescription>
+          <DialogDescription>
+            Create a custom map pool by selecting the maps you want to include.
+          </DialogDescription>
         </DialogHeader>
         <CheckboxGroup
           value={pool.maps}
@@ -71,7 +73,11 @@ type MapsMinThresholdWarningProps = ComponentProps<typeof motion.div> & {
   threshold: number
   mapsCount: number
 }
-export function MapsMinThresholdWarning({ threshold = 5, mapsCount, ...props }: MapsMinThresholdWarningProps) {
+export function MapsMinThresholdWarning({
+  threshold = 5,
+  mapsCount,
+  ...props
+}: MapsMinThresholdWarningProps) {
   return (
     <AnimatePresence mode='popLayout' initial={false}>
       {mapsCount < threshold && (
@@ -86,7 +92,8 @@ export function MapsMinThresholdWarning({ threshold = 5, mapsCount, ...props }: 
             props.className
           )}
         >
-          <Info /> Minimum {threshold} maps required or competitive pool will be automatically selected.
+          <Info /> Minimum {threshold} maps required or competitive pool will be automatically
+          selected.
         </motion.div>
       )}
     </AnimatePresence>
@@ -105,7 +112,12 @@ function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
   const imageURL = `/optimized/${map.selectedImage}`
   return (
     <>
-      <Image asMotion src={imageURL} srcSet={{ 480: 480 }} className='absolute -z-10 h-full w-full object-cover' />
+      <Image
+        asMotion
+        src={imageURL}
+        srcSet={{ 480: 480 }}
+        className='absolute -z-10 h-full w-full object-cover'
+      />
       <motion.div
         style={{
           opacity: imageOpacity

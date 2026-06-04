@@ -1,6 +1,3 @@
-import { os, ORPCError } from '@orpc/server'
-import type { Env, VetoResponse, VetoPollPayload, VetoLog } from './types'
-import { generateId } from './utils'
 import {
   StartVetoInputSchema,
   StartVetoOutputSchema,
@@ -15,10 +12,14 @@ import {
   UpdateTeamInputSchema,
   GetLogsInputSchema,
   GetLogsOutputSchema,
-  EmptyOutputSchema,
+  EmptyOutputSchema
 } from './schemas'
+import type { VetoResponse, VetoPollPayload, VetoLog } from './types'
+import { os, ORPCError } from '@orpc/server'
+import { env } from 'cloudflare:workers'
+import { generateId } from './utils'
+type Env = typeof env
 
-// Base procedure builder with Cloudflare env context
 const base = os.$context<{ env: Env }>()
 
 // Helper: get DO stub by veto ID
@@ -32,8 +33,6 @@ async function doFetch(stub: DurableObjectStub, path: string, init?: RequestInit
   return { ok: res.ok, status: res.status, json: () => res.json() }
 }
 
-// ─── Procedures ──────────────────────────────────────────────────────────────
-
 export const startVeto = base
   .input(StartVetoInputSchema)
   .output(StartVetoOutputSchema)
@@ -43,7 +42,7 @@ export const startVeto = base
     const res = await doFetch(stub, '/api/veto/init', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...input, id: vetoId }),
+      body: JSON.stringify({ ...input, id: vetoId })
     })
     if (!res.ok) throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to start veto' })
     return res.json() as Promise<{ id: string; creatorToken: string }>
@@ -77,7 +76,10 @@ export const getTokens = base
   .output(GetTokensOutputSchema)
   .handler(async ({ input, context }) => {
     const stub = getStub(context.env, input.id)
-    const res = await doFetch(stub, `/api/veto/${input.id}/tokens?creatorToken=${input.creatorToken}`)
+    const res = await doFetch(
+      stub,
+      `/api/veto/${input.id}/tokens?creatorToken=${input.creatorToken}`
+    )
     if (res.status === 404) throw new ORPCError('NOT_FOUND')
     if (res.status === 401) throw new ORPCError('UNAUTHORIZED')
     if (!res.ok) throw new ORPCError('INTERNAL_SERVER_ERROR')
@@ -92,11 +94,11 @@ export const action = base
     const res = await doFetch(stub, `/api/veto/${input.id}/action`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ teamId: input.teamId, map: input.map }),
+      body: JSON.stringify({ teamId: input.teamId, map: input.map })
     })
     if (res.status === 404) throw new ORPCError('NOT_FOUND')
     if (res.status === 400) {
-      const data = await res.json() as { error: string }
+      const data = (await res.json()) as { error: string }
       throw new ORPCError('BAD_REQUEST', { message: data.error })
     }
     if (!res.ok) throw new ORPCError('INTERNAL_SERVER_ERROR')
@@ -111,11 +113,11 @@ export const pickSide = base
     const res = await doFetch(stub, `/api/veto/${input.id}/pick-side`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ teamId: input.teamId, attacker: input.attacker }),
+      body: JSON.stringify({ teamId: input.teamId, attacker: input.attacker })
     })
     if (res.status === 404) throw new ORPCError('NOT_FOUND')
     if (res.status === 400) {
-      const data = await res.json() as { error: string }
+      const data = (await res.json()) as { error: string }
       throw new ORPCError('BAD_REQUEST', { message: data.error })
     }
     if (!res.ok) throw new ORPCError('INTERNAL_SERVER_ERROR')
@@ -130,7 +132,7 @@ export const updateTeam = base
     const res = await doFetch(stub, `/api/veto/${input.id}/team/${input.teamId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: input.name }),
+      body: JSON.stringify({ name: input.name })
     })
     if (res.status === 404) throw new ORPCError('NOT_FOUND')
     if (!res.ok) throw new ORPCError('INTERNAL_SERVER_ERROR')
@@ -151,6 +153,7 @@ export const getLogs = base
 // ─── Router ──────────────────────────────────────────────────────────────────
 
 export const router = {
+  status: base.route({ method: 'GET' }).handler(() => 'OK'),
   veto: {
     start: startVeto,
     get: getVeto,
@@ -159,8 +162,8 @@ export const router = {
     action,
     pickSide,
     updateTeam,
-    logs: getLogs,
-  },
+    logs: getLogs
+  }
 }
 
 export type Router = typeof router

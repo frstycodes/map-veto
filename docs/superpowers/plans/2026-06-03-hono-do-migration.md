@@ -23,11 +23,7 @@
 
 **Create (frontend):**
 - `src/hooks/queries/use-veto-sse.ts` — SSE hook replacing `use-veto-poller.ts`
-
-**Modify (frontend):**
-- `src/routes/$game/_layout/$id/_layout/$token/index.tsx` — swap poller hook for SSE hook
-- `env.ts` — update `SERVER_URL` default to new Worker URL
-- `package.json` — remove Go scripts (`start`, `build:go`, `dev:go`), add `dev:server` and `deploy:server`
+/$id/
 
 **Delete:**
 - `src/hooks/queries/use-veto-poller.ts`
@@ -1084,11 +1080,7 @@ git commit -m "feat: add useVetoSSE hook replacing long poll"
 ---
 
 ## Task 10: Frontend — update VetoPoll page to use SSE hook
-
-**Files:**
-- Modify: `src/routes/$game/_layout/$id/_layout/$token/index.tsx`
-
-The change is a near-drop-in swap: `useVetoPoller` → `useVetoSSE`, `pollQuery.data` → `sseResult.data`.
+/$id/
 
 - [ ] **Step 1: Update imports in `index.tsx`**
 

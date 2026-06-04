@@ -187,10 +187,6 @@ export class VetoDurableObject {
     const remaining = this.getRemainingMaps()
     const randMap = remaining[Math.floor(Math.random() * remaining.length)]!
     this.pickMap(randMap, 0)
-    this.broadcast()
-
-    await new Promise((r) => setTimeout(r, 1000))
-    if (!this.state) return
     this.state.phase = 'choose-sides'
     this.broadcast()
   }
