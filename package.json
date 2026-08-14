@@ -17,8 +17,6 @@
     "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "@orpc/client": "^1.14.4",
-    "@orpc/tanstack-query": "^1.14.4",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
@@ -50,7 +48,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
-    "@orpc/server": "^1.14.4",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/howler": "^2.2.12",
     "@types/node": "^22.7.5",

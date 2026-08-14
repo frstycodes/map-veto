@@ -1,3 +1,4 @@
+import { typesafeValueInit } from '../utils/typesafe-value-init'
 import z from 'zod/v4'
 
 // ─── Shared sub-schemas ──────────────────────────────────────────────────────
@@ -119,7 +120,8 @@ export const VetoStateOutputSchema = z.object({
   banned: z.array(BannedMapSchema),
   currentStage: z.number(),
   phase: z.enum(['choose-maps', 'choose-sides']),
-  ended: z.boolean()
+  ended: z.boolean(),
+  logs: z.array(VetoLogSchema)
 })
 
 export const GetTokensOutputSchema = z.object({
@@ -136,11 +138,25 @@ export const EmptyOutputSchema = z.object({})
 
 // ─── Inferred types (single source of truth for API shapes) ──────────────────
 
+export const Stage = typesafeValueInit<Stage>()
 export type Stage = z.infer<typeof StageSchema>
+
+export const PickedMap = typesafeValueInit<PickedMap>()
 export type PickedMap = z.infer<typeof PickedMapSchema>
+
+export const BannedMap = typesafeValueInit<BannedMap>()
 export type BannedMap = z.infer<typeof BannedMapSchema>
+
+export const VetoLog = typesafeValueInit<VetoLog>()
 export type VetoLog = z.infer<typeof VetoLogSchema>
+
 export type VetoLogData = VetoLog['data']
+
+export const VetoPollPayload = typesafeValueInit<VetoPollPayload>()
 export type VetoPollPayload = z.infer<typeof VetoStateOutputSchema>
+
+export const VetoResponse = typesafeValueInit<VetoResponse>()
 export type VetoResponse = z.infer<typeof GetVetoOutputSchema>
+
+export const StartVetoBody = typesafeValueInit<StartVetoBody>()
 export type StartVetoBody = z.infer<typeof StartVetoInputSchema>

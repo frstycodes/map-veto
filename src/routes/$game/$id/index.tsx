@@ -4,7 +4,7 @@ import { PageLoader } from '@/components/page-loader'
 import { PageHeader } from '@/components/page-header'
 import { LinkIcon, NotebookText } from 'lucide-react'
 import { UrlInput } from './-deps/url-input'
-import { orpcClient } from '@/lib/orpc'
+import { getVetoSocket } from '@/lib/veto-socket'
 import { z } from 'zod'
 
 const validateSearch = z.object({
@@ -15,9 +15,8 @@ export const Route = createFileRoute('/$game/$id/')({
   loaderDeps: ({ search }) => ({ search }),
   loader: async ({ params, deps }) => {
     const { creatorToken = '' } = deps.search
-    const data = await orpcClient.veto.tokens({ creatorToken, id: params.id })
-    if (!data) throw new Error('Failed to fetch tokens')
-    return { tokens: data.tokens }
+    const { tokens } = await getVetoSocket(params.id).send('veto:tokens', { creatorToken })
+    return { tokens }
   },
   validateSearch,
   component: VetoPage,

@@ -12,6 +12,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      'socket-rpc': path.resolve(__dirname, './common/socket-rpc'),
       '@root': path.resolve(__dirname, './'),
       '@': path.resolve(__dirname, 'src')
     }

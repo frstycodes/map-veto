@@ -22,8 +22,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@root/*": ["./*"]
+      "@root/*": ["./*"],
+      "socket-rpc/*": ["./common/socket-rpc/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "common"]
 }

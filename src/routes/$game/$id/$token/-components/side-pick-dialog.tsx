@@ -7,7 +7,7 @@ import { Portal } from '@radix-ui/react-portal'
 import { cn } from '@/utils/tailwind-utils'
 import { motion } from 'framer-motion'
 import { ComponentProps } from 'react'
-import { orpc } from '@/lib/orpc'
+import { pickSide } from '@/utils/mutations/veto-mutations'
 import { toast } from 'sonner'
 
 type Teams = {
@@ -49,13 +49,12 @@ export function SidePickDialog(props: SidePickDialogProps) {
 
   const message = generateSidePickMessage(isMyTurn, isViewer, props.map, props.teams)
 
-  const pickSideMutation = useMutation(
-    orpc.veto.pickSide.mutationOptions({
-      onError() {
-        toast.error('Failed to pick side.')
-      }
-    })
-  )
+  const pickSideMutation = useMutation({
+    mutationFn: (attacker: boolean) => pickSide(id, teamId, attacker),
+    onError() {
+      toast.error('Failed to pick side.')
+    }
+  })
 
   return (
     <Portal>
@@ -83,7 +82,7 @@ export function SidePickDialog(props: SidePickDialogProps) {
 
           {SIDE_OPTIONS.map((option, idx) => (
             <button
-              onClick={() => pickSideMutation.mutate({ id, teamId, attacker: option.isAttack })}
+              onClick={() => pickSideMutation.mutate(option.isAttack)}
               key={idx}
               className={cn(
                 'flex h-32 w-48 flex-col items-center justify-center gap-2 rounded-md border border-foreground/20 bg-white/10 text-white shadow-md backdrop-blur-lg transition-all hover:scale-110 hover:shadow-glow active:scale-105',

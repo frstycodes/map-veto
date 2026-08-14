@@ -8,7 +8,11 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "socket-rpc/*": ["../common/socket-rpc/*"]
+    }
   },
   "include": ["src/**/*.ts", "worker-configuration.d.ts"]
 }

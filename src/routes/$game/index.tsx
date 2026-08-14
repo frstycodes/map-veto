@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/page-header'
 import { useMutation } from '@tanstack/react-query'
 import { Logo } from '@/components/logo'
 import { Info } from 'lucide-react'
-import { orpc } from '@/lib/orpc'
+import { createVeto } from '@/lib/veto-socket'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/$game/')({
@@ -21,7 +21,7 @@ function GamePage() {
   const navigate = Route.useNavigate()
 
   const startVetoMutation = useMutation({
-    ...orpc.veto.start.mutationOptions(),
+    mutationFn: createVeto,
     onSuccess(data) {
       navigate({
         to: '/$game/$id',

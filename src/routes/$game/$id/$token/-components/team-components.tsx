@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Hammer, Swords } from 'lucide-react'
 import { cn } from '@/utils/tailwind-utils'
 import { motion } from 'framer-motion'
-import { orpc } from '@/lib/orpc'
+import { updateTeam } from '@/utils/mutations/veto-mutations'
 import { toast } from 'sonner'
 
 type BanOrPick = 'ban' | 'pick'
@@ -53,17 +53,16 @@ export function TeamInitDialog({ open }: { open: boolean }) {
   const [teamName, setTeamName] = useState('')
   const { id, token } = useParams({ from: '/$game/$id/$token/' })
 
-  const updateTeamMutation = useMutation(
-    orpc.veto.updateTeam.mutationOptions({
-      onSuccess() {
-        toast.success('Successfully updated team name')
-        setTeamName('')
-      },
-      onError() {
-        toast.error('Failed to update team name')
-      }
-    })
-  )
+  const updateTeamMutation = useMutation({
+    mutationFn: (name: string) => updateTeam(id, token, name),
+    onSuccess() {
+      toast.success('Successfully updated team name')
+      setTeamName('')
+    },
+    onError() {
+      toast.error('Failed to update team name')
+    }
+  })
 
   return (
     <Dialog open={open}>
@@ -75,11 +74,7 @@ export function TeamInitDialog({ open }: { open: boolean }) {
           className='w-full space-y-4'
           onSubmit={(e) => {
             e.preventDefault()
-            updateTeamMutation.mutate({
-              id,
-              teamId: token,
-              name: teamName.trim()
-            })
+            updateTeamMutation.mutate(teamName.trim())
           }}
         >
           <div className='flex items-center gap-2'>

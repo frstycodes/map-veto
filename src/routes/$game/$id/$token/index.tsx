@@ -3,8 +3,8 @@ import { createFileRoute, redirect, useLoaderData } from '@tanstack/react-router
 import { playMapsHoverSound } from '@/assets/sfx/maps-hover/maps-hover.sfx'
 import { CenteredPageLayout } from '@/components/centered-page-layout'
 import { sendAction } from '@/utils/mutations/veto-mutations'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useVetoSSE } from '@/hooks/queries/use-veto-sse'
+import { useMutation } from '@tanstack/react-query'
+import { useVetoState } from '@/hooks/queries/use-veto-state'
 import { playErrorSound } from '@/assets/sfx/error/error'
 import { VetoPhase } from '@/utils/queries/veto-queries'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -12,7 +12,7 @@ import { useRerender } from '@/hooks/use-rerender'
 import { Portal } from '@radix-ui/react-portal'
 import { cn } from '@/utils/tailwind-utils'
 import { Time } from '@/utils/time'
-import { orpc } from '@/lib/orpc'
+import { getVetoSocket } from '@/lib/veto-socket'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
@@ -30,15 +30,12 @@ import {
 } from './-components'
 
 export const Route = createFileRoute('/$game/$id/$token/')({
-  loader: async ({ params, context }) => {
-    const statePromise = context.queryClient.ensureQueryData(
-      orpc.veto.state.queryOptions({ input: { id: params.id } })
-    )
-    const dataPromise = context.queryClient.ensureQueryData(
-      orpc.veto.get.queryOptions({ input: { id: params.id, token: params.token } })
-    )
-
-    const [vetoState, vetoData] = await Promise.all([statePromise, dataPromise])
+  loader: async ({ params }) => {
+    const socket = getVetoSocket(params.id)
+    const [vetoState, vetoData] = await Promise.all([
+      socket.send('veto:state', undefined),
+      socket.send('veto:get', { token: params.token })
+    ])
     return { vetoState, vetoData }
   },
   component: VetoPage,
@@ -63,7 +60,7 @@ function VetoPage() {
 
   const { isSidePickAnimating, animateSidePick } = useSidePickAnimation()
 
-  const sseResult = useVetoSSE(id, token, {
+  const liveState = useVetoState(id, {
     initialData: loader_vetoState,
     async onData(data) {
       // Preload the last rounds images
@@ -94,11 +91,11 @@ function VetoPage() {
     }
   })
 
-  const stage = vetoData.stages[sseResult.data?.currentStage ?? 0]
+  const stage = vetoData.stages[liveState.data?.currentStage ?? 0]
   const vetoState = {
-    ...sseResult.data,
-    team1: sseResult.data?.team1 || 'Team 1',
-    team2: sseResult.data?.team2 || 'Team 2',
+    ...liveState.data,
+    team1: liveState.data?.team1 || 'Team 1',
+    team2: liveState.data?.team2 || 'Team 2',
     type: stage.type,
     team: stage.team
   }
@@ -132,7 +129,7 @@ function VetoPage() {
   })
 
   const isViewer = vetoData.myTeam === 0
-  const isDialogOpen_teamInit = !isViewer && (!sseResult.data?.team1 || !sseResult.data?.team2)
+  const isDialogOpen_teamInit = !isViewer && (!liveState.data?.team1 || !liveState.data?.team2)
   const isChoosingSides = vetoState.phase === VetoPhase.ChooseSides
 
   useEffect(() => {
@@ -152,8 +149,6 @@ function VetoPage() {
     (deciderAnimationState === AnimationState.Ended &&
       vetoState.selected?.find((map) => !map.attacker)) ||
     null
-
-  const logsQuery = useQuery(orpc.veto.logs.queryOptions({ input: { id } }))
 
   return (
     <CenteredPageLayout className='relative w-[clamp(300px,80%,600px)]'>
@@ -264,10 +259,10 @@ function VetoPage() {
           </motion.div>
         </AnimatePresence>
       </motion.div>
-      {logsQuery.data && (
+      {!!vetoState.logs.length && (
         <div className='flex flex-col gap-1 py-2'>
           <LogsDialog
-            logs={logsQuery.data}
+            logs={vetoState.logs}
             teams={{
               team1: vetoState.team1,
               team2: vetoState.team2
