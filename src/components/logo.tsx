@@ -20,7 +20,7 @@ export function Logo(props: LogoProps) {
         playHoverSound(1)
         props.onMouseEnter?.(e)
       }}
-      transition={{ visualDuration: 5, type: 'spring', bounce: 0.2, ...props.transition }}
+      transition={{ visualDuration: 0.4, type: 'spring', bounce: 0.2, ...props.transition }}
       className={cn('text-3xl font-bold', props.className)}
     >
       <Map className='inline h-8 w-8' /> Map Veto
