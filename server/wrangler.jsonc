@@ -3,6 +3,12 @@
   "name": "map-veto-server",
   "main": "src/index.ts",
   "compatibility_date": "2025-06-03",
+  "vars": {
+    // CORS allow-origin for the deployed frontend. Override per-env or via
+    // `wrangler deploy --var CLIENT_URL:https://...` if the SPA lives elsewhere.
+    "CLIENT_URL": "https://map-veto.workers.dev",
+    "VETO_TIMEOUT_MINS": "5"
+  },
   "durable_objects": {
     "bindings": [
       {
