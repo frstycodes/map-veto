@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as GameRouteRouteImport } from './routes/$game/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GameIndexRouteImport } from './routes/$game/index'
@@ -17,6 +18,11 @@ import { Route as GameIdRouteRouteImport } from './routes/$game/$id/route'
 import { Route as GameIdIndexRouteImport } from './routes/$game/$id/index'
 import { Route as GameIdTokenIndexRouteImport } from './routes/$game/$id/$token/index'
 
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GameRouteRoute = GameRouteRouteImport.update({
   id: '/$game',
   path: '/$game',
@@ -56,6 +62,7 @@ const GameIdTokenIndexRoute = GameIdTokenIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$game': typeof GameRouteRouteWithChildren
+  '/admin': typeof AdminRoute
   '/$game/$id': typeof GameIdRouteRouteWithChildren
   '/$game/playground': typeof GamePlaygroundRoute
   '/$game/': typeof GameIndexRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/$game/playground': typeof GamePlaygroundRoute
   '/$game': typeof GameIndexRoute
   '/$game/$id': typeof GameIdIndexRoute
@@ -73,6 +81,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$game': typeof GameRouteRouteWithChildren
+  '/admin': typeof AdminRoute
   '/$game/$id': typeof GameIdRouteRouteWithChildren
   '/$game/playground': typeof GamePlaygroundRoute
   '/$game/': typeof GameIndexRoute
@@ -84,17 +93,25 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$game'
+    | '/admin'
     | '/$game/$id'
     | '/$game/playground'
     | '/$game/'
     | '/$game/$id/'
     | '/$game/$id/$token/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$game/playground' | '/$game' | '/$game/$id' | '/$game/$id/$token'
+  to:
+    | '/'
+    | '/admin'
+    | '/$game/playground'
+    | '/$game'
+    | '/$game/$id'
+    | '/$game/$id/$token'
   id:
     | '__root__'
     | '/'
     | '/$game'
+    | '/admin'
     | '/$game/$id'
     | '/$game/playground'
     | '/$game/'
@@ -105,10 +122,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GameRouteRoute: typeof GameRouteRouteWithChildren
+  AdminRoute: typeof AdminRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$game': {
       id: '/$game'
       path: '/$game'
@@ -194,6 +219,7 @@ const GameRouteRouteWithChildren = GameRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GameRouteRoute: GameRouteRouteWithChildren,
+  AdminRoute: AdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
