@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as GameRouteRouteImport } from './routes/$game/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GameIndexRouteImport } from './routes/$game/index'
+import { Route as GamePlaygroundRouteImport } from './routes/$game/playground'
 import { Route as GameIdRouteRouteImport } from './routes/$game/$id/route'
 import { Route as GameIdIndexRouteImport } from './routes/$game/$id/index'
 import { Route as GameIdTokenIndexRouteImport } from './routes/$game/$id/$token/index'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const GameIndexRoute = GameIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => GameRouteRoute,
+} as any)
+const GamePlaygroundRoute = GamePlaygroundRouteImport.update({
+  id: '/playground',
+  path: '/playground',
   getParentRoute: () => GameRouteRoute,
 } as any)
 const GameIdRouteRoute = GameIdRouteRouteImport.update({
@@ -51,12 +57,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$game': typeof GameRouteRouteWithChildren
   '/$game/$id': typeof GameIdRouteRouteWithChildren
+  '/$game/playground': typeof GamePlaygroundRoute
   '/$game/': typeof GameIndexRoute
   '/$game/$id/': typeof GameIdIndexRoute
   '/$game/$id/$token/': typeof GameIdTokenIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$game/playground': typeof GamePlaygroundRoute
   '/$game': typeof GameIndexRoute
   '/$game/$id': typeof GameIdIndexRoute
   '/$game/$id/$token': typeof GameIdTokenIndexRoute
@@ -66,6 +74,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$game': typeof GameRouteRouteWithChildren
   '/$game/$id': typeof GameIdRouteRouteWithChildren
+  '/$game/playground': typeof GamePlaygroundRoute
   '/$game/': typeof GameIndexRoute
   '/$game/$id/': typeof GameIdIndexRoute
   '/$game/$id/$token/': typeof GameIdTokenIndexRoute
@@ -76,16 +85,18 @@ export interface FileRouteTypes {
     | '/'
     | '/$game'
     | '/$game/$id'
+    | '/$game/playground'
     | '/$game/'
     | '/$game/$id/'
     | '/$game/$id/$token/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$game' | '/$game/$id' | '/$game/$id/$token'
+  to: '/' | '/$game/playground' | '/$game' | '/$game/$id' | '/$game/$id/$token'
   id:
     | '__root__'
     | '/'
     | '/$game'
     | '/$game/$id'
+    | '/$game/playground'
     | '/$game/'
     | '/$game/$id/'
     | '/$game/$id/$token/'
@@ -117,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/$game/'
       preLoaderRoute: typeof GameIndexRouteImport
+      parentRoute: typeof GameRouteRoute
+    }
+    '/$game/playground': {
+      id: '/$game/playground'
+      path: '/playground'
+      fullPath: '/$game/playground'
+      preLoaderRoute: typeof GamePlaygroundRouteImport
       parentRoute: typeof GameRouteRoute
     }
     '/$game/$id': {
@@ -159,11 +177,13 @@ const GameIdRouteRouteWithChildren = GameIdRouteRoute._addFileChildren(
 
 interface GameRouteRouteChildren {
   GameIdRouteRoute: typeof GameIdRouteRouteWithChildren
+  GamePlaygroundRoute: typeof GamePlaygroundRoute
   GameIndexRoute: typeof GameIndexRoute
 }
 
 const GameRouteRouteChildren: GameRouteRouteChildren = {
   GameIdRouteRoute: GameIdRouteRouteWithChildren,
+  GamePlaygroundRoute: GamePlaygroundRoute,
   GameIndexRoute: GameIndexRoute,
 }
 

@@ -1,36 +1,26 @@
-import { DialogContent, DialogTrigger } from '@/components/ui/dialog'
-import { useLoaderData } from '@tanstack/react-router'
+import { DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Log, Logs } from '@/utils/log-events/logs'
 import { Dialog } from '@radix-ui/react-dialog'
 import { Button } from '@/components/ui/button'
-import { NotebookText } from 'lucide-react'
-
-type Teams = {
-  team1: string
-  team2: string
-}
+import { NoteText } from 'reicon-react'
 
 type LogsDialogProps = {
   logs: Log[]
-  teams: Teams
+  game: string
+  teams: { team1: string; team2: string }
 }
 
-export function LogsDialog(props: LogsDialogProps) {
-  const { vetoData } = useLoaderData({ from: '/$game/$id/$token/' })
-
+export function LogsDialog({ logs, game, teams }: LogsDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant='outline' className='gap-2 rounded-lg'>
-          <NotebookText className='size-5' /> Logs are available: View
+        <Button variant='outline' className='gap-2'>
+          <NoteText aria-hidden className='size-5' /> Veto log
         </Button>
       </DialogTrigger>
-      <DialogContent className='p-0'>
-        <Logs
-          logs={props.logs}
-          game={vetoData.game}
-          teams={{ team1: props.teams.team1, team2: props.teams.team2 }}
-        />
+      <DialogContent className='max-w-xl gap-0 overflow-hidden p-0'>
+        <DialogTitle className='sr-only'>Veto log</DialogTitle>
+        <Logs logs={logs} game={game} teams={teams} />
       </DialogContent>
     </Dialog>
   )
