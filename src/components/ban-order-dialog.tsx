@@ -12,7 +12,7 @@ import { playErrorSound } from '@/assets/sfx/error/error'
 import { RadioGroup, RadioItem } from './ui/custom-radio'
 import { useLoaderData } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
-import { Gavel, Medal, Swords } from 'lucide-react'
+import { Crosshairs, Judge, Medal } from 'reicon-react'
 import { DialogHeader } from './ui/dialog'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
@@ -69,14 +69,14 @@ export function BanOrderDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant='outline' className='w-fit gap-2 rounded-lg border-2 font-semibold'>
-          <Gavel /> Customize Ban Order
+        <Button variant='outline' className='w-fit gap-2 font-semibold'>
+          <Judge /> Customize Ban Order
         </Button>
       </DialogTrigger>
       <DialogContent className='pb-2'>
         <DialogHeader>
           <DialogTitle className='inline-flex items-center gap-2'>
-            <Gavel className='h-8 w-8' /> Ban Order Settings
+            <Judge className='h-8 w-8' /> Ban Order Settings
           </DialogTitle>
           <DialogDescription>
             Customize the order in which maps are picked for the ban rounds.
@@ -208,7 +208,7 @@ const STAGE_ACTION_TO_BADGE_PROPS = {
   ban: {
     children: (
       <p className='flex items-center gap-1'>
-        <Gavel className='h-3.5 w-3.5' /> Ban
+        <Judge className='h-3.5 w-3.5' /> Ban
       </p>
     ),
     className: `border-red-500 bg-red-500/20 ${stageActionBadgeBaseStyles}`
@@ -216,7 +216,7 @@ const STAGE_ACTION_TO_BADGE_PROPS = {
   pick: {
     children: (
       <p className='flex items-center gap-1'>
-        <Swords className='h-3.5 w-3.5' /> Pick
+        <Crosshairs className='h-3.5 w-3.5' /> Pick
       </p>
     ),
     className: `border-emerald-500 bg-emerald-500/20 ${stageActionBadgeBaseStyles}`

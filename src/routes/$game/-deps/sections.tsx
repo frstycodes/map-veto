@@ -4,7 +4,7 @@ import { RainbowButton } from '@/components/ui/rainbow-button'
 import customPoolIcon from '@/config/games/custom_pool.json'
 import { ComponentProps, useEffect, useState } from 'react'
 import { useLoaderData } from '@tanstack/react-router'
-import { Loader2, Map, Swords } from 'lucide-react'
+import { Crosshairs, Loader, Map } from 'reicon-react'
 import { Button } from '@/components/ui/button'
 import { AppStore } from '@/state/app-store'
 import { cn } from '@/utils/tailwind-utils'
@@ -96,7 +96,7 @@ export function ChooseBestOf() {
             >
               <div className='flex flex-wrap items-center justify-center gap-1.5'>
                 {Array.from({ length: mapped_bestOf }, (_, i) => (
-                  <Swords key={i} className='h-5 w-5' />
+                  <Crosshairs key={i} className='h-5 w-5' />
                 ))}
               </div>
               <p className='absolute bottom-1 left-3 grid place-items-center text-sm font-semibold text-foreground'>
@@ -129,7 +129,7 @@ export function StartMapVetoButton(props: StartMapVetoProps) {
         props.className
       )}
     >
-      {props.loading && <Loader2 className='animate-spin' />}
+      {props.loading && <Loader className='animate-spin' />}
       {!props.loading && <Map />} Start
     </Comp>
   )

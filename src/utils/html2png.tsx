@@ -5,7 +5,7 @@ type PngOptions = {
   scale: number
 }
 export default async function convertToPng(
-  ref: React.RefObject<HTMLElement>,
+  ref: React.RefObject<HTMLElement | null>,
   options: Partial<PngOptions> = {
     name: 'image',
     scale: 2
@@ -16,7 +16,6 @@ export default async function convertToPng(
   const element = ref.current
 
   const fontEmbedCSS = await getFontEmbedCSS(element)
-  console.log({ fontEmbedCSS })
 
   toPng(element, {
     pixelRatio: options.scale,

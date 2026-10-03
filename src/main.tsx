@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { MutationCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, redirect, RouterProvider } from '@tanstack/react-router'
-import { ThemeProvider } from './providers/theme-provider'
 import { playErrorSound } from './assets/sfx/error/error'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { Toaster } from './components/ui/sonner'
@@ -30,18 +29,16 @@ function Root() {
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme='dark'>
-          <TooltipProvider delayDuration={100}>
-            <Toaster />
-            <RouterProvider
-              defaultErrorComponent={() => {
-                throw redirect({ to: '/' })
-              }}
-              defaultPendingMinMs={0}
-              router={router}
-            />
-          </TooltipProvider>
-        </ThemeProvider>
+        <TooltipProvider delayDuration={100}>
+          <Toaster />
+          <RouterProvider
+            defaultErrorComponent={() => {
+              throw redirect({ to: '/' })
+            }}
+            defaultPendingMinMs={0}
+            router={router}
+          />
+        </TooltipProvider>
       </QueryClientProvider>
     </StrictMode>
   )

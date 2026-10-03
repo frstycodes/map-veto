@@ -23,8 +23,13 @@ export function Image<T extends boolean>({ src, srcSet, asMotion, ...props }: Im
     })
     .join(', ')
 
+  // Only sized variants exist in /optimized, so src must name one: srcset-unaware consumers
+  // (html-to-image's PNG export) fetch src directly and fail on the bare name
+  const largest = Math.max(...Object.keys(srcSet).map(Number))
+  const fallbackSrc = `/optimized/${name}-${largest}w.${ext}`
+
   const Comp = asMotion ? motion.img : 'img'
 
   // @ts-expect-error - Don't complain now, I already used generics for you!!
-  return <Comp src={src} srcSet={_srcSet} {...props} />
+  return <Comp src={fallbackSrc} srcSet={_srcSet} {...props} />
 }

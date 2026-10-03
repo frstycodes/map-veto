@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { cn } from '@/utils/tailwind-utils'
 import { motion } from 'framer-motion'
 import { ComponentProps } from 'react'
-import { Map } from 'lucide-react'
+import { Map } from 'reicon-react'
 
 const MotionLink = motion.create(Link)
 type LogoProps = ComponentProps<typeof MotionLink>

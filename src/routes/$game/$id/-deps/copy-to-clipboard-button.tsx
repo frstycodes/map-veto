@@ -1,9 +1,9 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { AlertCircle, CheckCheckIcon, ClipboardList } from 'lucide-react'
+import { AlertCircle, CheckRead, ClipboardList } from 'reicon-react'
 import { playErrorSound } from '@/assets/sfx/error/error'
+import { IconSwap } from '@/components/icon-swap'
 import { ComponentProps, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/utils/tailwind-utils'
 import { toast } from 'sonner'
 
 type CopyToClipBoardButtonProps = ComponentProps<typeof Button> & {
@@ -20,31 +20,31 @@ export function CopyToClipBoardButton({ textToCopy, ...props }: CopyToClipBoardB
       setTimeout(() => setCopied(false), 2000)
     } catch {
       setError(true)
+      setTimeout(() => setError(false), 2000)
       toast.error('Failed to copy!')
       playErrorSound()
     }
   }
 
-  //IIFE
-  const buttonContent = (() => {
-    if (error) return <AlertCircle className='h-5 w-5 text-destructive animate-in zoom-in-50' />
-    if (copied) return <CheckCheckIcon className='h-5 w-5 text-emerald-500 animate-in zoom-in-50' />
-    return <ClipboardList className='h-5 w-5 animate-in zoom-in-50' />
-  })()
+  const state = error ? 'error' : copied ? 'copied' : 'idle'
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button
-          onClick={handleCopy}
-          variant='outline'
-          {...props}
-          className={cn('aspect-square h-10 rounded-lg px-0', props.className)}
-        >
-          {buttonContent}
+        <Button onClick={handleCopy} variant='outline' size='icon' {...props}>
+          <IconSwap swapKey={state}>
+            <CopyStateIcon state={state} />
+          </IconSwap>
         </Button>
       </TooltipTrigger>
       <TooltipContent>Copy to clipboard</TooltipContent>
     </Tooltip>
   )
+}
+
+function CopyStateIcon({ state }: { state: 'error' | 'copied' | 'idle' }) {
+  if (state === 'error') return <AlertCircle className='size-5 text-destructive' />
+  if (state === 'copied')
+    return <CheckRead className='size-5 text-emerald-400' />
+  return <ClipboardList className='size-5' />
 }

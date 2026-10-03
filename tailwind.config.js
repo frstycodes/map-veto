@@ -3,7 +3,6 @@ import animate from 'tailwindcss-animate'
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ['class'],
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -17,6 +16,7 @@ export default {
       boxShadow: {
         glow: '0 0 10px 5px hsl(var(--background)/ 0.2)',
         'active-indicator': '0 0 2px var(--color-primary)',
+        lift: '0 1px 2px hsl(var(--lift-shadow)), 0 12px 32px -12px hsl(var(--lift-shadow))',
         rim: 'inset 0 1px 0 #ffffff12, inset 0 -1px 0 #00000020, inset 0 0 0.5px 0.1px #ffffff12, inset 0 0 0.5px 0.4px #00000020'
       },
       borderRadius: {

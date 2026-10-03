@@ -14,7 +14,7 @@ import { useLoaderData } from '@tanstack/react-router'
 import { cn } from '@/utils/tailwind-utils'
 import { Image } from '@/components/image'
 import { ComponentProps } from 'react'
-import { Info } from 'lucide-react'
+import { InfoCircle } from 'reicon-react'
 
 type MapPoolSelectionDialogProps = ComponentProps<typeof Dialog>
 
@@ -88,11 +88,11 @@ export function MapsMinThresholdWarning({
           exit={{ y: 40 }}
           {...props}
           className={cn(
-            'flex w-full items-center gap-2 rounded-xl border-2 border-yellow-500/20 bg-yellow-500/10 px-4 py-3 text-xs text-yellow-800 dark:text-yellow-200',
+            'flex w-full items-center gap-2 rounded-xl border-2 border-yellow-500/20 bg-yellow-500/10 px-4 py-3 text-xs text-yellow-200',
             props.className
           )}
         >
-          <Info /> Minimum {threshold} maps required or competitive pool will be automatically
+          <InfoCircle /> Minimum {threshold} maps required or competitive pool will be automatically
           selected.
         </motion.div>
       )}

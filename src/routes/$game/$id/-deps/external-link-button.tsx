@@ -1,9 +1,9 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { playHoverSound } from '@/assets/sfx/hover/hover'
-import { ExternalLinkIcon } from 'lucide-react'
+import { ArrowUpRight } from 'reicon-react'
 import { Link } from '@tanstack/react-router'
-import { cn } from '@/utils/tailwind-utils'
+import { cn, SQUIRCLE_CONTROL } from '@/utils/tailwind-utils'
 import { ComponentProps } from 'react'
 
 type ExternalLinkButtonProps = ComponentProps<typeof Button> & {
@@ -14,14 +14,14 @@ export function ExternalLinkButton(props: ExternalLinkButtonProps) {
     <Tooltip>
       <TooltipTrigger asChild>
         <Link
-          className={cn(buttonVariants({ variant: 'outline' }), 'aspect-square px-0')}
+          className={cn(SQUIRCLE_CONTROL, buttonVariants({ variant: 'outline', size: 'icon' }))}
           to={props.url}
           target='_blank'
           onMouseEnter={() => {
             playHoverSound(1)
           }}
         >
-          <ExternalLinkIcon className='h-5 w-5' />
+          <ArrowUpRight className='h-5 w-5' />
         </Link>
       </TooltipTrigger>
       <TooltipContent>Open in new tab</TooltipContent>

@@ -1,6 +1,6 @@
-import { Rocket, Stars } from 'lucide-react'
+import { Rocket, Stars } from 'reicon-react'
 
-import { AnimatePresence, motion } from 'framer-motion'
+import { IconSwap } from '@/components/icon-swap'
 import { Button } from '@/components/ui/button'
 import { AppStore } from '@/state/app-store'
 
@@ -11,38 +11,15 @@ export function PerformanceModeToggle() {
     AppStore.set({ performanceMode: !performanceMode })
   }
   return (
-    <Button layout variant='ghost' className='gap-2 rounded-lg' onClick={handleThemeChange}>
-      <AnimatePresence initial={false} mode='popLayout'>
-        {performanceMode ? <PerformanceIcon /> : <QualityIcon />}
-        <span className='sr-only'>Toggle theme</span>
-        <p className='capitalize'>{performanceMode ? 'performance' : 'quality'}</p>
-      </AnimatePresence>
+    <Button variant='ghost' className='gap-2' onClick={handleThemeChange}>
+      <IconSwap swapKey={performanceMode ? 'performance' : 'quality'}>
+        {performanceMode ? (
+          <Rocket className='size-[1.2rem]' />
+        ) : (
+          <Stars className='size-[1.2rem]' />
+        )}
+      </IconSwap>
+      <p className='capitalize'>{performanceMode ? 'performance' : 'quality'}</p>
     </Button>
-  )
-}
-
-function QualityIcon() {
-  return (
-    <motion.div
-      key='icon'
-      initial={{ rotate: 0, scale: 0 }}
-      animate={{ rotate: 0, scale: 1 }}
-      exit={{ rotate: 90, scale: 0 }}
-    >
-      <Stars className='h-[1.2rem] w-[1.2rem]' />
-    </motion.div>
-  )
-}
-
-function PerformanceIcon() {
-  return (
-    <motion.div
-      key='icon'
-      initial={{ x: -50, y: 50, scale: 0 }}
-      animate={{ x: 0, y: 0, scale: 1 }}
-      exit={{ x: 50, y: -50, scale: 0 }}
-    >
-      <Rocket className='h-[1.2rem] w-[1.2rem]' />
-    </motion.div>
   )
 }

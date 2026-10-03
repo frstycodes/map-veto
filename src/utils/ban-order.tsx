@@ -1,5 +1,5 @@
 import { Presets, Stage } from '@/types/ban-order.types'
-import { Gavel, Swords } from 'lucide-react'
+import { Crosshairs, Judge } from 'reicon-react'
 
 function padBanOrder(stages: Stage[], poolSize: number): Stage[] {
   for (let i = 0; i < poolSize - stages.length; i++) {
@@ -176,9 +176,9 @@ export function getAvailableBanOrderPresets(poolSize: number, bestOf: number) {
     alternate: {
       icons: (
         <>
-          <Gavel />
-          <Swords />
-          <Gavel />
+          <Judge />
+          <Crosshairs />
+          <Judge />
         </>
       ),
       label: 'Alternate',
@@ -188,9 +188,9 @@ export function getAvailableBanOrderPresets(poolSize: number, bestOf: number) {
     lastPick: {
       icons: (
         <>
-          <Gavel />
-          <Gavel />
-          <Swords />
+          <Judge />
+          <Judge />
+          <Crosshairs />
         </>
       ),
       label: 'Last Pick',

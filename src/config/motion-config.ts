@@ -1,5 +1,6 @@
+// Near-critically damped: settles fast without wobble so hover feels crisp
 export const SPRING_OPTS = {
-  stiffness: 100,
-  damping: 5,
-  mass: 0.1
+  stiffness: 420,
+  damping: 30,
+  mass: 0.5
 }

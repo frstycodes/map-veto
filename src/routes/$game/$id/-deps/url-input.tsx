@@ -18,7 +18,6 @@ export function UrlInput(props: UrlInputProps) {
       <div className='flex items-center gap-2'>
         <Input
           readOnly
-          className='rounded-lg'
           value={url}
           type='password'
           onMouseEnter={(e) => (e.currentTarget.type = 'text')}

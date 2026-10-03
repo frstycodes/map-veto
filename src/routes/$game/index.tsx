@@ -6,7 +6,7 @@ import { PageLoader } from '@/components/page-loader'
 import { PageHeader } from '@/components/page-header'
 import { useMutation } from '@tanstack/react-query'
 import { Logo } from '@/components/logo'
-import { Info } from 'lucide-react'
+import { InfoCircle } from 'reicon-react'
 import { createVeto } from '@/lib/veto-socket'
 import { toast } from 'sonner'
 
@@ -54,7 +54,7 @@ function GamePage() {
           <span className='font-bold uppercase text-primary'> {config.name}</span>
         </p>
         <p className='flex items-center gap-1 text-sm text-muted-foreground'>
-          <Info className='size-4' /> Veto session will expire after 3 minutes of inactivity.
+          <InfoCircle className='size-4' /> Veto session will expire after 3 minutes of inactivity.
         </p>
       </header>
       <div className='space-y-8 duration-500 animate-in fade-in-0'>

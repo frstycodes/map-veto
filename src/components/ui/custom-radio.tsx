@@ -1,10 +1,16 @@
-import { motion, motionValue, useMotionTemplate as mt, useSpring, useTransform } from 'framer-motion'
+import {
+  motion,
+  motionValue,
+  useMotionTemplate as mt,
+  useSpring,
+  useTransform
+} from 'framer-motion'
 import { ComponentProps, createContext, useContext } from 'react'
 import * as Radix_RadioGroup from '@radix-ui/react-radio-group'
 import { useMousePosition } from '@/hooks/use-mouse-position'
 import { playHoverSound } from '@/assets/sfx/hover/hover'
+import { cn, SQUIRCLE } from '@/utils/tailwind-utils'
 import { useDistance } from '@/hooks/use-distance'
-import { cn } from '@/utils/tailwind-utils'
 import { Vec2 } from '@/utils/math'
 
 const groupContext = createContext({
@@ -20,7 +26,9 @@ export function RadioGroup({ animateRange = 150, ...props }: RadioGroupProps) {
   const [position, ref] = useMousePosition<HTMLDivElement>()
   return (
     <Radix_RadioGroup.Root ref={ref} {...props}>
-      <groupContext.Provider value={{ position, animateRange }}>{props.children}</groupContext.Provider>
+      <groupContext.Provider value={{ position, animateRange }}>
+        {props.children}
+      </groupContext.Provider>
     </Radix_RadioGroup.Root>
   )
 }
@@ -51,13 +59,11 @@ export function RadioItem({ children, ...props }: RadioItemProps) {
         playHoverSound(1)
         props.onMouseEnter?.(e)
       }}
-      style={{
-        borderColor: mt`hsl(var(--foreground) / ${borderOpacity})`,
-        backgroundColor: mt`hsl(var(--foreground) / ${backgroundOpacity})`
-      }}
+      style={{ backgroundColor: mt`hsl(var(--foreground) / ${backgroundOpacity})` }}
       className={cn(
-        'h-full w-full cursor-pointer rounded-xl border-2 border-foreground data-[state=checked]:!border-primary data-[state=checked]:!bg-primary/20 data-[state=checked]:text-foreground',
+        'glass-edge relative h-full w-full cursor-pointer data-[state=checked]:!bg-primary/20 data-[state=checked]:text-foreground',
         'disabled:cursor-not-allowed disabled:opacity-50',
+        SQUIRCLE,
         props.className
       )}
     >

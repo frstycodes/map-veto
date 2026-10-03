@@ -1,4 +1,4 @@
-import { Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { Check, ChevronDown, ChevronUp } from 'reicon-react'
 import * as SelectPrimitive from '@radix-ui/react-select'
 import * as React from 'react'
 

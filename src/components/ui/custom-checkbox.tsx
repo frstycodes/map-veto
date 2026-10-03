@@ -10,12 +10,15 @@ import {
 import React, { ComponentProps, createContext, useContext, useState } from 'react'
 import { useMousePosition } from '@/hooks/use-mouse-position'
 import { playHoverSound } from '@/assets/sfx/hover/hover'
+import { cn, SQUIRCLE_SM } from '@/utils/tailwind-utils'
 import * as Checkbox from '@radix-ui/react-checkbox'
 import { useDistance } from '@/hooks/use-distance'
-import { cn } from '@/utils/tailwind-utils'
 import { Vec2 } from '@/utils/math'
 
-const groupContext = createContext({ mousePosition: motionValue([Infinity, Infinity] as Vec2), animateRange: 0 })
+const groupContext = createContext({
+  mousePosition: motionValue([Infinity, Infinity] as Vec2),
+  animateRange: 0
+})
 
 type CheckboxGroupProps = {
   children: React.ReactNode
@@ -25,12 +28,20 @@ type CheckboxGroupProps = {
   animateRange?: number
 }
 
-export function CheckboxGroup({ children, className, value, onValueChange, animateRange = 150 }: CheckboxGroupProps) {
+export function CheckboxGroup({
+  children,
+  className,
+  value,
+  onValueChange,
+  animateRange = 150
+}: CheckboxGroupProps) {
   const [mousePosition, ref] = useMousePosition<HTMLDivElement>()
   const [checkedItems, setCheckedItems] = useState<string[]>(value ?? [])
 
   const handleCheckedChange = (itemValue: string, checked: boolean) => {
-    const newCheckedItems = checked ? [...checkedItems, itemValue] : checkedItems.filter((item) => item !== itemValue)
+    const newCheckedItems = checked
+      ? [...checkedItems, itemValue]
+      : checkedItems.filter((item) => item !== itemValue)
 
     setCheckedItems(newCheckedItems)
     onValueChange?.(newCheckedItems)
@@ -70,7 +81,6 @@ export function CheckboxItem({ children, render: Render, ...props }: CheckboxIte
   const backgroundOpacity = useTransform(borderOpacity, [0, 1], [0, 0.1])
 
   const backgroundColor = mt`hsl(var(--foreground) / ${backgroundOpacity})`
-  const borderColor = mt`hsl(var(--foreground) / ${borderOpacity})`
 
   return (
     <Checkbox.Root
@@ -83,9 +93,10 @@ export function CheckboxItem({ children, render: Render, ...props }: CheckboxIte
     >
       <motion.div
         ref={ref}
-        style={{ borderColor, backgroundColor }}
+        style={{ backgroundColor }}
         className={cn(
-          'cursor-pointer rounded-md border-2 border-foreground group-data-[state=checked]:!border-primary group-data-[state=checked]:!bg-primary/20 group-data-[state=checked]:text-foreground',
+          'glass-edge relative cursor-pointer group-data-[state=checked]:!bg-primary/20 group-data-[state=checked]:text-foreground',
+          SQUIRCLE_SM,
           props.className
         )}
       >

@@ -1,9 +1,7 @@
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { PerformanceModeToggle } from '@/components/performance-toggle'
 import { WelcomeDialog } from '@/components/welcome-dialog'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { OnekoToggle } from '@/components/oneko-toggle'
-import { useTheme } from '@/providers/theme-provider'
 import { QueryClient } from '@tanstack/react-query'
 import Particles from '@/components/ui/particles'
 import { OnekoCat } from '@/components/oneko'
@@ -27,14 +25,12 @@ function Root() {
         <WelcomeDialog />
         <OnekoToggle />
         <PerformanceModeToggle />
-        <ThemeToggle />
       </div>
     </>
   )
 }
 
 function Background() {
-  const { computedTheme } = useTheme()
   const { performanceMode } = AppStore.useStore('performanceMode')
 
   if (performanceMode) return <div className='fixed inset-0 -z-50 bg-bg bg-center' />
@@ -42,7 +38,7 @@ function Background() {
   return (
     <>
       <Particles
-        color={computedTheme === 'light' ? '#000' : '#fff'}
+        color='#fff'
         refresh
         quantity={300}
         staticity={10}
