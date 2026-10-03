@@ -36,7 +36,8 @@ export function CheckboxGroup({
   animateRange = 150
 }: CheckboxGroupProps) {
   const [mousePosition, ref] = useMousePosition<HTMLDivElement>()
-  const [checkedItems, setCheckedItems] = useState<string[]>(value ?? [])
+  const [uncontrolledItems, setCheckedItems] = useState<string[]>(value ?? [])
+  const checkedItems = value ?? uncontrolledItems
 
   const handleCheckedChange = (itemValue: string, checked: boolean) => {
     const newCheckedItems = checked
