@@ -12,8 +12,6 @@
     "clean": "rm -rf dist node_modules",
     "lint": "eslint .",
     "preview": "vite preview",
-    "download-images": "bun scripts/download-images.ts",
-    "process-images": "bun scripts/image-optimizer.ts --input ./public/maps --output ./public/optimized --sizes 360,480,640,1024,1920 --quality 85",
     "deploy": "wrangler deploy"
   },
   "dependencies": {
