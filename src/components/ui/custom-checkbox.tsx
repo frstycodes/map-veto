@@ -68,10 +68,10 @@ export function CheckboxGroup({
 
 type CheckboxItemProps = ComponentProps<typeof Checkbox.Root> &
   MotionProps & {
-    render?: React.FC<{ distance: MotionValue<number> }>
+    render?: (props: { distance: MotionValue<number> }) => React.ReactNode
   }
 
-export function CheckboxItem({ children, render: Render, ...props }: CheckboxItemProps) {
+export function CheckboxItem({ children, render, ...props }: CheckboxItemProps) {
   const { mousePosition, animateRange } = useContext(groupContext)
 
   const [distance, ref] = useDistance<HTMLDivElement>(mousePosition)
@@ -101,7 +101,7 @@ export function CheckboxItem({ children, render: Render, ...props }: CheckboxIte
           props.className
         )}
       >
-        {Render ? <Render distance={distanceFrac} /> : children}
+        {render ? render({ distance: distanceFrac }) : children}
       </motion.div>
     </Checkbox.Root>
   )
