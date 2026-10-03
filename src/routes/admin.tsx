@@ -1,5 +1,5 @@
-import { CheckboxCustomRender } from '@/routes/$game/-deps/map-pool-selection-dialog'
-import { CheckboxGroup, CheckboxItem } from '@/components/ui/custom-checkbox'
+import { MapCheckboxItem } from '@/routes/$game/-deps/map-pool-selection-dialog'
+import { CheckboxGroup } from '@/components/ui/custom-checkbox'
 import { CenteredPageLayout } from '@/components/centered-page-layout'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { getGameConfig } from '@/utils/game-config.utils'
@@ -46,11 +46,11 @@ function AdminPage() {
         className='grid select-none grid-cols-12 gap-2'
       >
         {config.maps.map((map) => (
-          <CheckboxItem
+          <MapCheckboxItem
             value={map.name}
             key={map.id}
-            className='group relative col-span-6 flex h-20 w-full items-end overflow-hidden rounded-xl group-data-[state=checked]:!bg-primary/10 sm:col-span-4'
-            render={(props) => <CheckboxCustomRender {...props} map={map} />}
+            map={map}
+            className='col-span-6 sm:col-span-4'
           />
         ))}
       </CheckboxGroup>

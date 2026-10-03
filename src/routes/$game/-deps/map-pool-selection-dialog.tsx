@@ -12,7 +12,7 @@ import { MapData } from '@/config/games/game-config.types'
 import customPool from '@/config/games/custom_pool.json'
 import { useLoaderData } from '@tanstack/react-router'
 import { cn } from '@/utils/tailwind-utils'
-import { mapImageSrc } from '@/utils/image'
+import { landscapeImageProps } from '@/utils/image'
 import { Image } from '@/components/image'
 import { ComponentProps } from 'react'
 import { InfoCircle } from 'reicon-react'
@@ -54,12 +54,7 @@ export function MapPoolSelectionDialog({ ...props }: MapPoolSelectionDialogProps
         >
           {config.maps.map((map) => {
             return (
-              <CheckboxItem
-                value={map.name}
-                key={map.id}
-                className='group relative col-span-6 flex aspect-square h-20 w-full items-end overflow-hidden rounded-xl group-data-[state=checked]:!bg-primary/10 md:col-span-6'
-                render={(props) => <CheckboxCustomRender {...props} map={map} />}
-              />
+              <MapCheckboxItem value={map.name} key={map.id} map={map} className='col-span-6' />
             )
           })}
         </CheckboxGroup>
@@ -101,22 +96,37 @@ export function MapsMinThresholdWarning({
   )
 }
 
+type MapCheckboxItemProps = ComponentProps<typeof CheckboxItem> & { map: MapData }
+
+// className lands on both the checkbox root and its card, so the skew goes through style (root only)
+export function MapCheckboxItem({ map, className, ...props }: MapCheckboxItemProps) {
+  return (
+    <CheckboxItem
+      {...props}
+      style={{ transform: 'skewX(-8deg)' }}
+      className={cn(
+        'group relative flex h-20 w-full items-end overflow-hidden rounded-xl group-data-[state=checked]:!bg-primary/10',
+        className
+      )}
+      render={(renderProps) => <CheckboxCustomRender {...renderProps} map={map} />}
+    />
+  )
+}
+
 type CheckboxCustomRenderProps = {
   distance: MotionValue<number>
   map: MapData
 }
-export function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
+function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
   const overlayOpacitySync = useTransform(distance, [0, 1], [0.1, 0])
   const imageOpacity = useSpring(overlayOpacitySync, {
     mass: 0.1
   })
-  const imageURL = mapImageSrc(map.selectedImage)
   return (
     <>
       <Image
         asMotion
-        src={imageURL}
-        srcSet={{ 480: 480 }}
+        {...landscapeImageProps(map)}
         className='absolute -z-10 h-full w-full object-cover'
       />
       <motion.div
@@ -125,7 +135,12 @@ export function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProp
         }}
         className='absolute inset-0 z-0 bg-background'
       />
-      <p className='-z-10 -ml-2 w-[calc(100%+12px)] -skew-x-[8deg] bg-gradient-to-t from-black/80 to-transparent px-4 pt-2 text-left text-sm font-bold text-white drop-shadow-lg group-data-[state=checked]:w-auto group-data-[state=checked]:bg-primary group-data-[state=checked]:from-transparent group-data-[state=checked]:pt-0'>
+      <div className='absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent' />
+      <p className='relative isolate mb-2 ml-3 py-0.5 text-sm font-bold text-white transition-[margin,padding] duration-200 ease-out [text-shadow:0_1px_2px_rgb(0_0_0/0.9)] group-data-[state=checked]:ml-2 group-data-[state=checked]:px-2 group-data-[state=checked]:text-primary-foreground group-data-[state=checked]:[text-shadow:none] motion-reduce:transition-none'>
+        <span
+          aria-hidden
+          className='glass-edge absolute inset-0 -z-10 origin-left -translate-x-4 scale-75 bg-primary opacity-0 shadow-lift blur-sm transition-[transform,filter,opacity] duration-200 ease-out group-data-[state=checked]:translate-x-0 group-data-[state=checked]:scale-100 group-data-[state=checked]:opacity-100 group-data-[state=checked]:blur-0 motion-reduce:transition-none'
+        />
         {map.name}
       </p>
     </>
