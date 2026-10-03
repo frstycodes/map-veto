@@ -374,7 +374,10 @@ function SeriesRow({ veto, isSideStep }: { veto: Veto; isSideStep: boolean }) {
             return (
               <div
                 key={map.data.name}
-                className={cn('relative flex', isSideStep ? 'w-full' : 'flex-1')}
+                className={cn(
+                  'relative flex',
+                  isSideStep ? 'w-full flex-wrap gap-y-2 lg:flex-nowrap' : 'flex-1'
+                )}
               >
                 <SeriesCard
                   map={map}
@@ -486,9 +489,6 @@ const SIDES = {
   }
 } as const
 
-// How far a tab tucks under the card, so it reads as pulled out from behind it
-const TAB_TUCK = 14
-
 type SideTagsProps = {
   attacker: TeamIndex | undefined
   chooser: TeamIndex | undefined
@@ -499,6 +499,8 @@ type SideTagsProps = {
 
 // Rows mirror the scoreboard: Team Alpha owns the left edge, Team Bravo the right.
 // The chooser's picker and, afterwards, each team's side slide out from under the edge that belongs to them.
+// Below lg there's no room beside the card, so the tags sit under it on the same sides.
+// The 14px tuck hides a tab's inner edge under the card, so it reads as pulled out from behind it.
 function SideTags({ attacker, chooser, canChoose, onChoose }: SideTagsProps) {
   return (
     <>
@@ -509,10 +511,11 @@ function SideTags({ attacker, chooser, canChoose, onChoose }: SideTagsProps) {
         return (
           <div
             key={team}
-            style={{ [isLeft ? 'marginRight' : 'marginLeft']: -TAB_TUCK }}
             className={cn(
-              'absolute inset-y-0 z-0 flex items-center',
-              isLeft ? 'right-full' : 'left-full'
+              'z-0 flex basis-1/2 items-center lg:absolute lg:inset-y-0',
+              isLeft
+                ? 'justify-start lg:right-full lg:-mr-[14px]'
+                : 'justify-end lg:left-full lg:-ml-[14px]'
             )}
           >
             <AnimatePresence mode='popLayout'>
@@ -523,10 +526,9 @@ function SideTags({ attacker, chooser, canChoose, onChoose }: SideTagsProps) {
                   animate={{ x: 0, opacity: 1, skewX: -8 }}
                   exit={{ x: isLeft ? 48 : -48, opacity: 0, skewX: -8 }}
                   transition={{ ...SPRING, delay: side ? i * 0.08 : 0 }}
-                  style={{ [isLeft ? 'paddingRight' : 'paddingLeft']: TAB_TUCK }}
                   className={cn(
-                    'glass-edge-image relative flex h-[72px] items-center overflow-hidden bg-neutral-900/90 text-white shadow-lift backdrop-blur-md',
-                    isLeft ? 'rounded-l-xl' : 'rounded-r-xl'
+                    'glass-edge-image relative flex h-11 items-center overflow-hidden rounded-xl bg-neutral-900/90 text-white shadow-lift backdrop-blur-md lg:h-[72px]',
+                    isLeft ? 'lg:rounded-r-none lg:pr-[14px]' : 'lg:rounded-l-none lg:pl-[14px]'
                   )}
                 >
                   {side ? (
@@ -576,7 +578,7 @@ function ChoosingTag() {
 
 function SidePicker({ onChoose }: { onChoose: (attack: boolean) => void }) {
   return (
-    <div className='flex h-full flex-col divide-y divide-white/10'>
+    <div className='flex h-full divide-x divide-white/10 lg:flex-col lg:divide-x-0 lg:divide-y'>
       {(['attack', 'defend'] as const).map((side) => {
         const { Icon, label, tone, hover } = SIDES[side]
         return (
