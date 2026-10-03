@@ -445,7 +445,13 @@ function SeriesCard({ map, isSideStep, chooser }: SeriesCardProps) {
         isChoosing && 'shadow-2xl shadow-black/50'
       )}
     >
-      <ArrivingImage map={map.data} crossfade={crossfade} delay={landingDelay * 0.4} />
+      <ArrivingImage
+        map={map.data}
+        crossfade={crossfade}
+        delay={landingDelay * 0.4}
+        // Side-pick rows span the max-w-2xl series column
+        sizes='(max-width: 672px) 100vw, 672px'
+      />
       <div className='absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/60' />
       <LandingFlash delay={landingDelay} className='bg-white' />
       {!isDecider && <PickEdge team={action.team as TeamIndex} delay={landingDelay} />}
@@ -751,9 +757,11 @@ type ArrivingImageProps = {
   delay?: number
   /** Drains the art to greyscale, for a banned slab once struck */
   isMuted?: boolean
+  /** Rendered width of the landscape art, for srcset selection */
+  sizes?: string
 }
 
-function ArrivingImage({ map, crossfade, delay = 0, isMuted = false }: ArrivingImageProps) {
+function ArrivingImage({ map, crossfade, delay = 0, isMuted = false, sizes }: ArrivingImageProps) {
   const { landingDelay } = useCardTransition()
   const art = useFlightSizedArt(landingDelay)
   const imageClass = 'absolute inset-0 size-full object-cover object-center'
@@ -771,7 +779,7 @@ function ArrivingImage({ map, crossfade, delay = 0, isMuted = false }: ArrivingI
         <Image
           asMotion
           role='presentation'
-          {...landscapeImageProps(map)}
+          {...landscapeImageProps(map, sizes)}
           initial={{ opacity: 0, scale: 1.08, filter: 'blur(6px)' }}
           animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           transition={swap}
