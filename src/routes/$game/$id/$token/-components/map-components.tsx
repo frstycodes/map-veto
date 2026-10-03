@@ -1,7 +1,6 @@
 import { motion, MotionValue, useMotionTemplate, useSpring, useTransform } from 'framer-motion'
 import { MapData } from '@/config/games/game-config.types'
 import { Image as ImageComp } from '@/components/image'
-import { useLoaderData } from '@tanstack/react-router'
 import { SPRING_OPTS } from '@/config/motion-config'
 import { portraitImageProps } from '@/utils/image'
 
@@ -18,19 +17,15 @@ export function AnimatingMapCardContents({
   const scrimOpacitySync = useTransform(distance, [0, 1], [0.3, 0.6])
   // distance jumps when the cursor enters the row; the spring keeps the scrim from snapping
   const scrimOpacity = useSpring(scrimOpacitySync, { stiffness: 160, damping: 26 })
-  const { config } = useLoaderData({ from: '/$game' })
 
   return (
     <div className='relative flex h-full w-full items-center justify-center bg-cover bg-center transition-all'>
       <ImageComp
         role='presentation'
-        {...portraitImageProps(map, config.slug)}
+        {...portraitImageProps(map)}
         data-ripple='image'
         className='absolute z-10 h-full w-full object-cover object-center transition-all'
       />
-      {config.slug === 'cs2' && (
-        <div data-ripple='fill' className='absolute inset-0 z-10 bg-black/40' />
-      )}
       <motion.div
         data-ripple='fill'
         style={{ opacity: scrimOpacity }}

@@ -9,7 +9,10 @@ const HENRIK_QUEUE_STATUS = 'https://api.henrikdev.xyz/valorant/v1/queue-status/
 
 const pool = new Hono<{ Bindings: Env }>()
 
-pool.get('/', async (c) => c.json(await c.env.POOLS.get<StoredPool>(KEY, 'json')))
+// Seeds itself on first read, so a fresh deploy serves maps before anyone opens /admin
+pool.get('/', async (c) =>
+  c.json((await c.env.POOLS.get<StoredPool>(KEY, 'json')) ?? (await refreshPool(c.env)))
+)
 
 pool.use('/admin/*', async (c, next) => {
   // Only server/.dev.vars sets this; production never defines it.
@@ -56,7 +59,6 @@ export async function refreshPool(env: Env): Promise<StoredPool> {
 type ApiMap = {
   displayName: string
   tacticalDescription: string | null
-  premierBackgroundImage: string | null
   listViewIconTall: string | null
   splash: string
 }
@@ -70,7 +72,6 @@ async function fetchStandardMaps(): Promise<RemoteMap[]> {
     .filter((m) => m.tacticalDescription)
     .map((m) => ({
       name: m.displayName,
-      poolImage: m.premierBackgroundImage ?? m.splash,
       selectedImage: m.listViewIconTall ?? m.splash,
       sidePickImage: m.splash
     }))

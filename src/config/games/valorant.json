@@ -1,143 +1,24 @@
 {
   "slug": "valorant",
   "name": "Valorant",
-
   "pools": {
     "all": {
       "id": "all",
       "name": "All Maps",
-      "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-boxes\"><path d=\"M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z\"/><path d=\"m7 16.5-4.74-2.85\"/><path d=\"m7 16.5 5-3\"/><path d=\"M7 16.5v5.17\"/><path d=\"M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z\"/><path d=\"m17 16.5-5-3\"/><path d=\"m17 16.5 4.74-2.85\"/><path d=\"M17 16.5v5.17\"/><path d=\"M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z\"/><path d=\"M12 8 7.26 5.15\"/><path d=\"m12 8 4.74-2.85\"/><path d=\"M12 13.5V8\"/></svg>",
-      "maps": [
-        "Abyss",
-        "Ascent",
-        "Bind",
-        "Breeze",
-        "Corrode",
-        "Fracture",
-        "Haven",
-        "Icebox",
-        "Lotus",
-        "Pearl",
-        "Split",
-        "Summit",
-        "Sunset"
-      ]
+      "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-boxes\"><path d=\"M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z\"/><path d=\"m7 16.5-4.74-2.85\"/><path d=\"m7 16.5 5-3\"/><path d=\"M7 16.5v5.17\"/><path d=\"M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z\"/><path d=\"m17 16.5-5-3\"/><path d=\"m17 16.5 4.74-2.85\"/><path d=\"M17 16.5v5.17\"/><path d=\"M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z\"/><path d=\"M12 8 7.26 5.15\"/><path d=\"m12 8 4.74-2.85\"/><path d=\"M12 13.5V8\"/></svg>"
     },
     "comp": {
       "id": "comp",
       "name": "Competitive Pool",
-      "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-medal\"><path d=\"M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15\"/><path d=\"M11 12 5.12 2.2\"/><path d=\"m13 12 5.88-9.8\"/><path d=\"M8 7h8\"/><circle cx=\"12\" cy=\"17\" r=\"5\"/><path d=\"M12 18v-2h-.5\"/></svg>",
-      "maps": ["Ascent", "Breeze", "Haven", "Lotus", "Split", "Summit", "Sunset"]
+      "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-medal\"><path d=\"M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15\"/><path d=\"M11 12 5.12 2.2\"/><path d=\"m13 12 5.88-9.8\"/><path d=\"M8 7h8\"/><circle cx=\"12\" cy=\"17\" r=\"5\"/><path d=\"M12 18v-2h-.5\"/></svg>"
     }
   },
   "defaultPool": "comp",
-  "bestOfOptions": [1, 3, 5],
+  "bestOfOptions": [
+    1,
+    3,
+    5
+  ],
   "defaultBestOf": 3,
-  "color": "355 100% 60%",
-  "maps": [
-    {
-      "id": 1,
-      "name": "Ascent",
-      "poolImage": "Ascent-premier.webp",
-      "cardImage": "Ascent-premier.webp",
-      "selectedImage": "Ascent-tall.webp",
-      "sidePickImage": "Ascent-splash.webp"
-    },
-    {
-      "id": 2,
-      "name": "Split",
-      "poolImage": "Split-premier.webp",
-      "cardImage": "Split-premier.webp",
-      "selectedImage": "Split-tall.webp",
-      "sidePickImage": "Split-splash.webp"
-    },
-    {
-      "id": 3,
-      "name": "Fracture",
-      "poolImage": "Fracture-premier.webp",
-      "cardImage": "Fracture-premier.webp",
-      "selectedImage": "Fracture-tall.webp",
-      "sidePickImage": "Fracture-splash.webp"
-    },
-    {
-      "id": 4,
-      "name": "Bind",
-      "poolImage": "Bind-premier.webp",
-      "cardImage": "Bind-premier.webp",
-      "selectedImage": "Bind-tall.webp",
-      "sidePickImage": "Bind-splash.webp"
-    },
-    {
-      "id": 5,
-      "name": "Breeze",
-      "poolImage": "Breeze-premier.webp",
-      "cardImage": "Breeze-premier.webp",
-      "selectedImage": "Breeze-tall.webp",
-      "sidePickImage": "Breeze-splash.webp"
-    },
-    {
-      "id": 6,
-      "name": "Abyss",
-      "poolImage": "Abyss-premier.webp",
-      "cardImage": "Abyss-premier.webp",
-      "selectedImage": "Abyss-tall.webp",
-      "sidePickImage": "Abyss-splash.webp"
-    },
-    {
-      "id": 7,
-      "name": "Lotus",
-      "poolImage": "Lotus-premier.webp",
-      "cardImage": "Lotus-premier.webp",
-      "selectedImage": "Lotus-tall.webp",
-      "sidePickImage": "Lotus-splash.webp"
-    },
-    {
-      "id": 8,
-      "name": "Sunset",
-      "poolImage": "Sunset-premier.webp",
-      "cardImage": "Sunset-premier.webp",
-      "selectedImage": "Sunset-tall.webp",
-      "sidePickImage": "Sunset-splash.webp"
-    },
-    {
-      "id": 9,
-      "name": "Pearl",
-      "poolImage": "Pearl-premier.webp",
-      "cardImage": "Pearl-premier.webp",
-      "selectedImage": "Pearl-tall.webp",
-      "sidePickImage": "Pearl-splash.webp"
-    },
-    {
-      "id": 10,
-      "name": "Icebox",
-      "poolImage": "Icebox-premier.webp",
-      "cardImage": "Icebox-premier.webp",
-      "selectedImage": "Icebox-tall.webp",
-      "sidePickImage": "Icebox-splash.webp"
-    },
-    {
-      "id": 11,
-      "name": "Haven",
-      "poolImage": "Haven-premier.webp",
-      "cardImage": "Haven-premier.webp",
-      "selectedImage": "Haven-tall.webp",
-      "sidePickImage": "Haven-splash.webp"
-    },
-    {
-      "id": 12,
-      "name": "Corrode",
-      "poolImage": "Corrode-premier.webp",
-      "cardImage": "Corrode-premier.webp",
-      "selectedImage": "Corrode-tall.webp",
-      "sidePickImage": "Corrode-splash.webp"
-    },
-    {
-      "id": 13,
-      "name": "Summit",
-      "poolImage": "Summit-premier.webp",
-      "cardImage": "Summit-premier.webp",
-      "selectedImage": "Summit-tall.webp",
-      "sidePickImage": "Summit-splash.webp"
-    }
-  ]
+  "color": "355 100% 60%"
 }

@@ -54,7 +54,7 @@ export function MapPoolSelectionDialog({ ...props }: MapPoolSelectionDialogProps
         >
           {config.maps.map((map) => {
             return (
-              <MapCheckboxItem value={map.name} key={map.id} map={map} className='col-span-6' />
+              <MapCheckboxItem value={map.name} key={map.name} map={map} className='col-span-6' />
             )
           })}
         </CheckboxGroup>

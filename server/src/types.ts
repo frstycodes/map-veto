@@ -68,7 +68,6 @@ export type VetoState = {
 
 export type RemoteMap = {
   name: string
-  poolImage: string
   selectedImage: string
   sidePickImage: string
 }

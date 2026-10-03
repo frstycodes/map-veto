@@ -598,7 +598,6 @@ function SidePicker({ onChoose }: { onChoose: (attack: boolean) => void }) {
 }
 
 function DeciderStage({ map }: { map: VetoMap }) {
-  const { config } = useLoaderData({ from: '/$game' })
   const art = useFlightSizedArt(SPRING.duration)
   const name = map.data.name
 
@@ -620,7 +619,7 @@ function DeciderStage({ map }: { map: VetoMap }) {
             <div ref={art} className='absolute left-0 top-0 size-full'>
               <Image
                 role='presentation'
-                {...portraitImageProps(map.data, config.slug)}
+                {...portraitImageProps(map.data)}
                 className='absolute inset-0 size-full object-cover object-center'
               />
             </div>
@@ -755,7 +754,6 @@ type ArrivingImageProps = {
 }
 
 function ArrivingImage({ map, crossfade, delay = 0, isMuted = false }: ArrivingImageProps) {
-  const { config } = useLoaderData({ from: '/$game' })
   const { landingDelay } = useCardTransition()
   const art = useFlightSizedArt(landingDelay)
   const imageClass = 'absolute inset-0 size-full object-cover object-center'
@@ -782,7 +780,7 @@ function ArrivingImage({ map, crossfade, delay = 0, isMuted = false }: ArrivingI
         <Image
           asMotion
           role='presentation'
-          {...portraitImageProps(map, config.slug)}
+          {...portraitImageProps(map)}
           initial={{ opacity: 1, filter: 'blur(0px)' }}
           animate={{ opacity: 0, filter: 'blur(6px)' }}
           transition={swap}

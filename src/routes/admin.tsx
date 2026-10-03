@@ -14,11 +14,7 @@ import { env } from '@root/env'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/admin')({
-  loader: async () => {
-    const [err, config] = await getGameConfig('valorant')
-    if (err) throw err
-    return config
-  },
+  loader: getGameConfig,
   pendingComponent: PageLoader,
   component: AdminPage
 })
@@ -48,7 +44,7 @@ function AdminPage() {
         {config.maps.map((map) => (
           <MapCheckboxItem
             value={map.name}
-            key={map.id}
+            key={map.name}
             map={map}
             className='col-span-6 sm:col-span-4'
           />
