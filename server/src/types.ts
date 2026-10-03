@@ -65,3 +65,11 @@ export type VetoState = {
   logs: VetoLog[]
   ended: boolean
 }
+
+export type RemoteMap = {
+  name: string
+  poolImage: string
+  selectedImage: string
+  sidePickImage: string
+}
+export type StoredPool = { maps: RemoteMap[]; comp: string[] }

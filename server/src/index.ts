@@ -2,6 +2,7 @@ import { StartVetoInputSchema } from './schemas'
 import { VetoDurableObject } from './veto-do'
 import { cors } from 'hono/cors'
 import { nanoid } from 'nanoid'
+import { pool, refreshPool } from './pool'
 import { Hono } from 'hono'
 
 const app = new Hono<{ Bindings: Env }>()
@@ -9,12 +10,14 @@ const app = new Hono<{ Bindings: Env }>()
 app.use('*', (c, next) =>
   cors({
     origin: c.env.CLIENT_URL,
-    allowMethods: ['GET', 'POST', 'OPTIONS'],
-    allowHeaders: ['Content-Type']
+    allowMethods: ['GET', 'POST', 'PUT', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization']
   })(c, next)
 )
 
 app.get('/api/status', (c) => c.json({ status: 'ok' }))
+
+app.route('/api/pool', pool)
 
 // Creating a veto is the one call with no session to attach a socket to yet.
 app.post('/api/veto', async (c) => {
@@ -35,5 +38,8 @@ app.get('/api/ws/:vetoId', (c) => {
   return stub.fetch(c.req.raw)
 })
 
-export default app
+export default {
+  fetch: app.fetch,
+  scheduled: async (_event, env, ctx) => ctx.waitUntil(refreshPool(env))
+} satisfies ExportedHandler<Env>
 export { VetoDurableObject }

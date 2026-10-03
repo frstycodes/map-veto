@@ -9,6 +9,9 @@
     "CLIENT_URL": "https://veto.frsty.dev",
     "VETO_TIMEOUT_MINS": "5"
   },
+  // Secrets: ADMIN_PASSWORD, HENRIK_API_KEY (`wrangler secret put <name>`, or .dev.vars locally).
+  "kv_namespaces": [{ "binding": "POOLS" }],
+  "triggers": { "crons": ["0 */6 * * *"] },
   "durable_objects": {
     "bindings": [
       {
