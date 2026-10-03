@@ -566,13 +566,11 @@ function SideTag({ side }: { side: keyof typeof SIDES }) {
 
 function ChoosingTag() {
   return (
-    <motion.span
-      animate={{ opacity: [0.5, 1, 0.5] }}
-      transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-      className='flex h-full items-center px-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground'
-    >
-      Choosing…
-    </motion.span>
+    <span className='flex h-full items-center px-4 text-xs font-semibold uppercase tracking-wide'>
+      <span className='t-shimmer' data-text='Choosing…'>
+        Choosing…
+      </span>
+    </span>
   )
 }
 
