@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "pnpm build:vite",
+    "build": "bun run build:vite",
     "dev": "vite --open --host",
-    "dev:server": "cd server && npm run dev",
-    "deploy:server": "cd server && npm run deploy",
+    "dev:server": "cd server && bun run dev",
+    "deploy:server": "cd server && bun run deploy",
     "build:vite": "vite build",
     "clean": "rm -rf dist node_modules",
     "lint": "eslint .",
