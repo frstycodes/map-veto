@@ -52,6 +52,7 @@ console.log(`Added ${newMaps.map((m) => m.displayName).join(', ')} → ${CONFIG_
 async function download(url: string, filename: string) {
   const imgRes = await fetch(url, { signal: AbortSignal.timeout(30_000) })
   if (!imgRes.ok) throw new Error(`${filename}: ${imgRes.status}`)
-  await Bun.write(join(OUT_DIR, filename), imgRes)
+  // Streaming the Response straight into Bun.write hung at 100% CPU on Bun 1.3.14
+  await Bun.write(join(OUT_DIR, filename), await imgRes.arrayBuffer())
   console.log(`✓ ${filename}`)
 }
