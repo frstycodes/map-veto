@@ -1,66 +1,57 @@
 import valConfig from '../src/config/games/valorant.json'
 import { mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
 import { join } from 'path'
 
 const API_URL = 'https://valorant-api.com/v1/maps'
 const OUT_DIR = './public/maps'
+const CONFIG_PATH = './src/config/games/valorant.json'
 
-interface MapData {
+interface ApiMap {
   displayName: string
+  tacticalDescription: string | null
   splash: string
   listViewIconTall: string
   premierBackgroundImage: string
 }
 
-const maps = valConfig.maps.map((m) => m.name.toLowerCase())
-
 const res = await fetch(API_URL)
-const { data }: { data: MapData[] } = await res.json()
+const { data }: { data: ApiMap[] } = await res.json()
+
+// Same filter as the server's /api/pool refresh: only plant/defuse maps have a tacticalDescription
+const known = new Set(valConfig.maps.map((m) => m.name))
+const newMaps = data.filter((m) => m.tacticalDescription && !known.has(m.displayName))
+
+if (newMaps.length === 0) {
+  console.log('No new maps.')
+  process.exit(0)
+}
 
 await mkdir(OUT_DIR, { recursive: true })
 
-const downloads = data
-  .filter((map) => maps.includes(map.displayName.toLowerCase()))
-  .flatMap((map) =>
-    [
-      { url: map.premierBackgroundImage, type: 'premier' },
-      { url: map.splash, type: 'splash' },
-      { url: map.listViewIconTall, type: 'tall' }
-    ].map(({ url, type }) => ({ url, filename: `${map.displayName}-${type}.png` }))
-  )
-
-const batches = arrayToBatch(downloads, 5)
-
-for (const batch of batches) {
-  await Promise.all(batch.map(({ url, filename }) => downloadAndSaveImage(url, filename)))
-  await new Promise((resolve) => setTimeout(resolve, 2000))
-}
-
-console.log(`\nDone. ${downloads.length} files → ${OUT_DIR}`)
-
-function arrayToBatch<T>(arr: T[], batchSize: number): T[][] {
-  const batches: T[][] = []
-  for (let i = 0; i < arr.length; i += batchSize) {
-    batches.push(arr.slice(i, i + batchSize))
-  }
-  return batches
-}
-
-async function downloadAndSaveImage(url: string, filename: string) {
-  if (existsSync(join(OUT_DIR, filename))) {
-    console.log(`✓ ${filename} (cached)`)
-    return
-  }
-  console.log(`Downloading ${filename}...`)
-  if (!url) return
-  const imgRes = await fetch(url, {
-    signal: AbortSignal.timeout(5000)
+for (const map of newMaps) {
+  const stem = map.displayName.replace(/\s+/g, '-')
+  await Promise.all([
+    download(map.premierBackgroundImage, `${stem}-premier.png`),
+    download(map.splash, `${stem}-splash.png`),
+    download(map.listViewIconTall, `${stem}-tall.png`)
+  ])
+  valConfig.maps.push({
+    id: Math.max(...valConfig.maps.map((m) => m.id)) + 1,
+    name: map.displayName,
+    poolImage: `${stem}-premier.webp`,
+    cardImage: `${stem}-premier.webp`,
+    selectedImage: `${stem}-tall.webp`,
+    sidePickImage: `${stem}-splash.webp`
   })
-  if (!imgRes.ok) {
-    console.error(`FAILED ${filename}: ${imgRes.status}`)
-    return
-  }
-  await Bun.file(join(OUT_DIR, filename)).write(imgRes)
+  valConfig.pools.all.maps.push(map.displayName)
+}
+
+await Bun.write(CONFIG_PATH, JSON.stringify(valConfig, null, 2) + '\n')
+console.log(`Added ${newMaps.map((m) => m.displayName).join(', ')} → ${CONFIG_PATH}`)
+
+async function download(url: string, filename: string) {
+  const imgRes = await fetch(url, { signal: AbortSignal.timeout(30_000) })
+  if (!imgRes.ok) throw new Error(`${filename}: ${imgRes.status}`)
+  await Bun.write(join(OUT_DIR, filename), imgRes)
   console.log(`✓ ${filename}`)
 }

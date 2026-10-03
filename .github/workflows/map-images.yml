@@ -1,0 +1,27 @@
+name: Sync Valorant map images
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun run download-images
+      - name: Optimize new images
+        run: '[ -d public/maps ] && bun run process-images || echo "Nothing to optimize"'
+      - name: Commit
+        run: |
+          git add public/optimized src/config/games/valorant.json
+          git diff --cached --quiet && exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m "chore(maps): add optimized images for new Valorant maps"
+          git push
