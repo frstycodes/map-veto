@@ -1,4 +1,5 @@
 import { createFileRoute, redirect, useLoaderData } from '@tanstack/react-router'
+import { CenteredPageLayout } from '@/components/centered-page-layout'
 import { LogsDialog, TeamInitDialog } from './-components'
 import { landscapeImageProps } from '@/utils/image'
 import { VetoBoard } from '../../-veto/veto-board'
@@ -27,7 +28,7 @@ function VetoPage() {
   const hasActions = veto.logs.length > 1
 
   return (
-    <div className='mx-auto flex min-h-full w-full max-w-5xl flex-col gap-6 px-4 py-6'>
+    <CenteredPageLayout className='flex w-full max-w-5xl flex-col gap-6 px-4 py-6'>
       <TeamInitDialog open={isNamingTeams} />
       <VetoBoard veto={veto} />
       {hasActions && (
@@ -38,7 +39,7 @@ function VetoPage() {
         />
       )}
       <MapArtPreload />
-    </div>
+    </CenteredPageLayout>
   )
 }
 

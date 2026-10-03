@@ -124,9 +124,12 @@ function useDeciderReveal(map: string | undefined) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map])
 
-  const isPending = step === 'settling' || step === 'revealing'
+  // A freshly drawn decider renders once before the effect starts its reveal; it already counts as
+  // settling, or it would land in the series first and then fly to centre stage
+  const phase = step === 'idle' ? 'settling' : step
+  const isPending = phase === 'settling' || phase === 'revealing'
   return {
-    decider: map && isPending ? { map, phase: step } : null,
+    decider: map && isPending ? { map, phase } : null,
     isSidesOpen: step === 'open'
   }
 }
