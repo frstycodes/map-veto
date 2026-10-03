@@ -6,7 +6,7 @@
   "vars": {
     // CORS allow-origin for the deployed frontend. Override per-env or via
     // `wrangler deploy --var CLIENT_URL:https://...` if the SPA lives elsewhere.
-    "CLIENT_URL": "https://map-veto.workers.dev",
+    "CLIENT_URL": "https://veto.frsty.dev",
     "VETO_TIMEOUT_MINS": "5"
   },
   "durable_objects": {
