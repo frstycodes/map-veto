@@ -12,6 +12,7 @@ import { MapData } from '@/config/games/game-config.types'
 import customPool from '@/config/games/custom_pool.json'
 import { useLoaderData } from '@tanstack/react-router'
 import { cn } from '@/utils/tailwind-utils'
+import { mapImageSrc } from '@/utils/image'
 import { Image } from '@/components/image'
 import { ComponentProps } from 'react'
 import { InfoCircle } from 'reicon-react'
@@ -104,12 +105,12 @@ type CheckboxCustomRenderProps = {
   distance: MotionValue<number>
   map: MapData
 }
-function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
+export function CheckboxCustomRender({ distance, map }: CheckboxCustomRenderProps) {
   const overlayOpacitySync = useTransform(distance, [0, 1], [0.1, 0])
   const imageOpacity = useSpring(overlayOpacitySync, {
     mass: 0.1
   })
-  const imageURL = `/optimized/${map.selectedImage}`
+  const imageURL = mapImageSrc(map.selectedImage)
   return (
     <>
       <Image
