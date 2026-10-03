@@ -21,7 +21,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/trpc': 'http://localhost:3001/',
-      '/api': 'http://localhost:8000/'
+      '/api': { target: 'http://localhost:8787', ws: true }
     }
   }
 })
