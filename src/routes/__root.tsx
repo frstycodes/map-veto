@@ -2,6 +2,7 @@ import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { PerformanceModeToggle } from '@/components/performance-toggle'
 import { WelcomeDialog } from '@/components/welcome-dialog'
 import { OnekoToggle } from '@/components/oneko-toggle'
+import { SoundToggle } from '@/components/sound-toggle'
 import { QueryClient } from '@tanstack/react-query'
 import Particles from '@/components/ui/particles'
 import { OnekoCat } from '@/components/oneko'
@@ -24,6 +25,7 @@ function Root() {
       <div className='fixed bottom-4 right-4 flex items-center gap-2'>
         <WelcomeDialog />
         <OnekoToggle />
+        <SoundToggle />
         <PerformanceModeToggle />
       </div>
     </>

@@ -5,13 +5,15 @@ import { create } from 'zustand'
 export type AppStore = {
   performanceMode: boolean
   onekoEnabled: boolean
+  soundEnabled: boolean
 }
 
 const appStore = create(
   persist<AppStore>(
     () => ({
       performanceMode: false,
-      onekoEnabled: false
+      onekoEnabled: false,
+      soundEnabled: true
     }),
     {
       name: 'config',
@@ -22,5 +24,7 @@ const appStore = create(
 
 export const AppStore = {
   useStore: createSelector(appStore),
-  set: appStore.setState
+  set: appStore.setState,
+  get: appStore.getState,
+  subscribe: appStore.subscribe
 }
