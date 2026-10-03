@@ -12,6 +12,8 @@ const pool = new Hono<{ Bindings: Env }>()
 pool.get('/', async (c) => c.json(await c.env.POOLS.get<StoredPool>(KEY, 'json')))
 
 pool.use('/admin/*', async (c, next) => {
+  // Only server/.dev.vars sets this; production never defines it.
+  if (c.env.ADMIN_AUTH_BYPASS === 'true') return next()
   const password = c.req.header('Authorization')?.replace(/^Bearer /, '') ?? ''
   if (!c.env.ADMIN_PASSWORD || !(await safeEqual(password, c.env.ADMIN_PASSWORD)))
     return c.json({ error: 'Unauthorized' }, 401)

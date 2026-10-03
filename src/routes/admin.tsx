@@ -28,6 +28,8 @@ function AdminPage() {
   const [password, setPassword] = useState('')
   const [comp, setComp] = useState(config.pools.comp.maps)
   const { refreshMutation, saveMutation } = usePoolAdmin(password, setComp)
+  // The local worker skips auth via ADMIN_AUTH_BYPASS, so dev builds don't need a password
+  const isLocked = !import.meta.env.DEV && !password
 
   return (
     <CenteredPageLayout className='flex w-[min(40rem,calc(100vw-2rem))] flex-col gap-4 py-8'>
@@ -55,14 +57,14 @@ function AdminPage() {
       <div className='flex flex-wrap justify-end gap-2'>
         <Button
           variant='outline'
-          disabled={!password}
+          disabled={isLocked}
           loading={refreshMutation.isPending}
           onClick={() => refreshMutation.mutate()}
         >
           Refresh maps & rotation
         </Button>
         <Button
-          disabled={!password || comp.length < 3}
+          disabled={isLocked || comp.length < 3}
           loading={saveMutation.isPending}
           onClick={() => saveMutation.mutate(comp)}
         >
